@@ -13,11 +13,11 @@ export async function PromoBanner() {
           <div className="grid overflow-hidden rounded-[1.5rem] bg-[color:var(--rg-paper-deep)] shadow-sm ring-1 ring-[color:var(--rg-line)] md:grid-cols-2">
             <div className="relative min-h-[260px] md:min-h-[360px]">
               <Image
-                src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=1400&q=80"
+                src="/products/filigree-earrings.jpg"
                 alt=""
                 fill
                 sizes="(max-width:768px) 100vw, 50vw"
-                className="object-cover"
+                className="object-cover object-[center_20%]"
               />
             </div>
             <div className="flex flex-col justify-center bg-[color:var(--rg-blush)] px-6 py-10 md:px-12 md:py-14">

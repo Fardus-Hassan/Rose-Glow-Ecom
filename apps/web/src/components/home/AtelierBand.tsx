@@ -3,8 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/motion/Reveal";
 
-const ATELIER_IMAGE =
-  "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=2000&q=85";
+const ATELIER_IMAGE = "/home/atelier-gold-spread.jpg";
 
 export async function AtelierBand() {
   const t = await getTranslations("Home");

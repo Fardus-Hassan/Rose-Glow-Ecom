@@ -9,8 +9,7 @@ import {
   Noto_Serif_Bengali,
 } from "next/font/google";
 import { routing } from "@/i18n/routing";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { BagProvider } from "@/store/bag";
 import "../globals.css";
@@ -96,9 +95,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <BagProvider>
             <SmoothScroll>
-              <Header />
-              <main className="flex-1 bg-[color:var(--rg-paper)]">{children}</main>
-              <Footer />
+              <SiteChrome>{children}</SiteChrome>
             </SmoothScroll>
           </BagProvider>
         </NextIntlClientProvider>

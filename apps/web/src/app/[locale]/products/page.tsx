@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { products } from "@/data/products";
 import { ProductsView } from "@/components/products/ProductsView";
@@ -29,8 +30,21 @@ export default async function ProductsPage({
 
   return (
     <div className="bg-[#f0ebe4] pb-20 md:pb-28">
-      <section className="border-b border-white/10 bg-[#0e0d0c] text-[#f4efe8]">
-        <div className="container-rg pb-12 pt-28 md:pb-16 md:pt-32">
+      <section className="relative isolate overflow-hidden border-b border-white/10 bg-[#0e0d0c] text-[#f4efe8]">
+        <div className="absolute inset-0 -z-20">
+          <Image
+            src="/home/atelier-gold-spread.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[center_40%]"
+          />
+        </div>
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#0e0d0c]/90 via-[#0e0d0c]/72 to-[#0e0d0c]/45" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#0e0d0c]/80 via-transparent to-[#0e0d0c]/35" />
+
+        <div className="container-rg relative pb-12 pt-28 md:pb-16 md:pt-32">
           <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
             {t("eyebrow")}
           </p>
@@ -38,7 +52,7 @@ export default async function ProductsPage({
             {t("title")}
           </h1>
           <div className="mt-5 h-px w-14 bg-gradient-to-r from-[#c9a08a] to-transparent" />
-          <p className="mt-5 max-w-xl text-[15px] leading-7 text-[#f4efe8]/58 md:text-base">
+          <p className="mt-5 max-w-xl text-[15px] leading-7 text-[#f4efe8]/70 md:text-base">
             {t("subtitle")}
           </p>
         </div>

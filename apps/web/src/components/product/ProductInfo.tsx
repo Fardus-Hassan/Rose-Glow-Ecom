@@ -7,6 +7,7 @@ import { formatBdt, cn } from "@/lib/format";
 import { IconHeart, IconShield, IconStar, IconTruck } from "@/components/icons";
 import { useRouter } from "@/i18n/navigation";
 import { useBag } from "@/store/bag";
+import { SocialLinks } from "@/components/ui/SocialLinks";
 
 export function ProductInfo({ product }: { product: Product }) {
   const t = useTranslations("Product");
@@ -183,25 +184,40 @@ export function ProductInfo({ product }: { product: Product }) {
         </button>
       </div>
 
-      <div className="mt-4 hidden gap-6 text-[11px] uppercase tracking-[0.18em] text-[#1c1a19]/45 sm:flex">
-        <button
-          type="button"
-          onClick={() => toggleWishlist(product.slug)}
-          className={cn(
-            "inline-flex items-center gap-2 transition hover:text-[#1c1a19]",
-            wishlisted && "text-[#a67c68]",
-          )}
-        >
-          <IconHeart className="h-4 w-4" />
-          {t("wishlist")}
-        </button>
-        <button
-          type="button"
-          onClick={handleShare}
-          className="transition hover:text-[#1c1a19]"
-        >
-          {t("share")}
-        </button>
+      <div className="mt-4 hidden flex-col gap-4 sm:flex">
+        <div className="flex gap-6 text-[11px] uppercase tracking-[0.18em] text-[#1c1a19]/45">
+          <button
+            type="button"
+            onClick={() => toggleWishlist(product.slug)}
+            className={cn(
+              "inline-flex items-center gap-2 transition hover:text-[#1c1a19]",
+              wishlisted && "text-[#a67c68]",
+            )}
+          >
+            <IconHeart className="h-4 w-4" />
+            {t("wishlist")}
+          </button>
+          <button
+            type="button"
+            onClick={handleShare}
+            className="transition hover:text-[#1c1a19]"
+          >
+            {t("share")}
+          </button>
+        </div>
+        <div>
+          <p className="mb-2.5 text-[10px] uppercase tracking-[0.2em] text-[#1c1a19]/4">
+            {t("follow")}
+          </p>
+          <SocialLinks tone="dark" />
+        </div>
+      </div>
+
+      <div className="mt-6 border-t border-[#1c1a19]/10 pt-5 sm:hidden">
+        <p className="mb-2.5 text-[10px] uppercase tracking-[0.2em] text-[#1c1a19]/4">
+          {t("follow")}
+        </p>
+        <SocialLinks tone="dark" />
       </div>
 
       {/* Mobile sticky bar */}

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
@@ -23,6 +24,19 @@ export default async function AboutPage({
         <p className="mt-8 text-base leading-8 text-[#1c1a19]/65 md:text-lg md:leading-9">
           {t("lead")}
         </p>
+      </div>
+
+      <div className="container-rg mt-12 md:mt-16">
+        <div className="relative aspect-[16/9] overflow-hidden md:aspect-[21/9]">
+          <Image
+            src="/home/atelier-gold-spread.jpg"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover object-center"
+            priority
+          />
+        </div>
       </div>
 
       <div className="container-rg mt-14 grid gap-10 md:mt-20 md:grid-cols-3 md:gap-8">

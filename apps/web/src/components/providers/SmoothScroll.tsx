@@ -21,6 +21,10 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       touchMultiplier: 1.1,
     });
 
+    (
+      window as Window & { __rgLenis?: typeof lenis }
+    ).__rgLenis = lenis;
+
     lenis.on("scroll", ScrollTrigger.update);
 
     const ticker = (time: number) => {
@@ -33,6 +37,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     return () => {
       gsap.ticker.remove(ticker);
       lenis.destroy();
+      delete (window as Window & { __rgLenis?: typeof lenis }).__rgLenis;
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, []);

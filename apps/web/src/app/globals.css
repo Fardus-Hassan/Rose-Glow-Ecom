@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .rg-ease {
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .rg-fade-in {
+    animation: rg-fade-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .rg-scale-in {
+    animation: rg-scale-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes rg-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rg-scale-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 :root {
   /* Paper tones — never pure white */
   --rg-pearl: #f0ebe4;
@@ -128,6 +162,52 @@
   .icon-btn {
     @apply relative inline-flex h-10 w-10 items-center justify-center rounded-full text-white/90 transition hover:bg-white/10 hover:text-white;
   }
+}
+
+/* Dual price-range thumbs */
+.price-range-input {
+  height: 1.5rem;
+  margin: 0;
+  outline: none;
+}
+
+.price-range-input::-webkit-slider-runnable-track {
+  height: 1px;
+  background: transparent;
+}
+
+.price-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -6.5px;
+  border: 1px solid #1c1a19;
+  border-radius: 999px;
+  background: #f0ebe4;
+  cursor: pointer;
+  box-shadow: 0 0 0 3px #f0ebe4;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.price-range-input::-webkit-slider-thumb:hover {
+  background: #c9a08a;
+  border-color: #c9a08a;
+}
+
+.price-range-input::-moz-range-track {
+  height: 1px;
+  background: transparent;
+  border: none;
+}
+
+.price-range-input::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 1px solid #1c1a19;
+  border-radius: 999px;
+  background: #f0ebe4;
+  cursor: pointer;
 }
 
 html.lenis,

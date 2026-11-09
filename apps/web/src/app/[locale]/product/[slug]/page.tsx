@@ -9,6 +9,7 @@ import {
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductInfo } from "@/components/product/ProductInfo";
 import { ProductDetails } from "@/components/product/ProductDetails";
+import { ProductReviews } from "@/components/product/ProductReviews";
 import { ProductCard } from "@/components/products/ProductCard";
 import { StaggerGrid } from "@/components/motion/StaggerGrid";
 import { Link } from "@/i18n/navigation";
@@ -92,6 +93,10 @@ export default async function ProductPage({
 
       <div className="mt-12 md:mt-16">
         <ProductDetails product={product} />
+      </div>
+
+      <div className="mt-14 md:mt-20">
+        <ProductReviews product={product} />
       </div>
 
       {related.length > 0 ? (

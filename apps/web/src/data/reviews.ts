@@ -6,6 +6,8 @@ export type Review = {
   place: LocalizedString;
   quote: LocalizedString;
   rating: number;
+  /** Customer photo(s) attached to the review */
+  images?: string[];
 };
 
 export const reviews: Review[] = [
@@ -18,6 +20,10 @@ export const reviews: Review[] = [
       bn: "ইয়াররিংস খুব হালকা আর লাইভে দেখতে প্রিমিয়াম। প্যাকেজিংও সুন্দর ছিল।",
     },
     rating: 5,
+    images: [
+      "/products/pearl-gold-earrings.jpg",
+      "/products/filigree-detail.jpg",
+    ],
   },
   {
     id: "r2",
@@ -28,6 +34,7 @@ export const reviews: Review[] = [
       bn: "COD-তে নিশ্চিন্তে অর্ডার করেছি। নেকলেস ছবির মতোই, নিরাপদে পৌঁছেছে।",
     },
     rating: 5,
+    images: ["/products/filigree-necklace.jpg"],
   },
   {
     id: "r3",
@@ -38,6 +45,7 @@ export const reviews: Review[] = [
       bn: "নরম চকচকে, প্রতিদিন পরার জন্য যা চেয়েছিলাম। আবারও অর্ডার করব।",
     },
     rating: 5,
+    images: ["/products/gold-hoops.jpg", "/products/filigree-earrings.jpg"],
   },
   {
     id: "r4",
@@ -48,6 +56,10 @@ export const reviews: Review[] = [
       bn: "ব্রাইডাল সেট ফটোতে সুন্দর, পরলে আরও বেশি কমনীয় লাগে।",
     },
     rating: 5,
+    images: [
+      "/products/filigree-bridal-set.jpg",
+      "/products/filigree-earrings.jpg",
+    ],
   },
   {
     id: "r5",
@@ -58,5 +70,6 @@ export const reviews: Review[] = [
       bn: "ডেলিভারি দ্রুত, ফিনিশ খুব পরিপাটি। Rose Glow সত্যিই প্রিমিয়াম লাগে।",
     },
     rating: 5,
+    images: ["/products/filigree-ring.jpg", "/products/gold-bangles.jpg"],
   },
 ];
