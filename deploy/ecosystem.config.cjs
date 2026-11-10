@@ -1,8 +1,8 @@
-/** PM2 process for Rose Glow Ecom — port 3001 (laam uses 3000/3333). */
+/** PM2 process for Rose Glow Ecom — port 3001 (legacy rose-glow uses 4000; laam uses 3000/3333). */
 module.exports = {
   apps: [
     {
-      name: "rose-glow",
+      name: "rose-glow-ecom",
       cwd: "/opt/rose-glow-ecom",
       script: "pnpm",
       args: ["--filter", "web", "start"],

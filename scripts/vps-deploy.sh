@@ -3,19 +3,21 @@
 set -euo pipefail
 
 APP_DIR="/opt/rose-glow-ecom"
-APP_NAME="rose-glow"
+APP_NAME="rose-glow-ecom"
 BRANCH="main"
 HEALTH_URL="http://127.0.0.1:3001"
+LEGACY_ROSE="http://127.0.0.1:4000"
 LAAM_WEB="http://127.0.0.1:3000"
 LAAM_API="http://127.0.0.1:3333"
 
 log() { printf '[rose-glow-deploy] %s\n' "$*"; }
 fail() { printf '[rose-glow-deploy] ERROR: %s\n' "$*" >&2; exit 1; }
 
-assert_laam_ok() {
-  local web_code api_code
+assert_neighbors_ok() {
+  local web_code api_code legacy_code
   web_code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$LAAM_WEB" || true)"
   api_code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$LAAM_API" || true)"
+  legacy_code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$LEGACY_ROSE" || true)"
   # 2xx/3xx/404 all mean the process is answering (api may 404 on /)
   if [[ ! "$web_code" =~ ^(2|3)[0-9][0-9]$ ]]; then
     fail "laam-web health check failed (HTTP $web_code) — aborting deploy"
@@ -23,12 +25,15 @@ assert_laam_ok() {
   if [[ -z "$api_code" || "$api_code" == "000" ]]; then
     fail "laam-api not responding — aborting deploy"
   fi
-  log "laam-crm OK (web=$web_code api=$api_code)"
+  if [[ ! "$legacy_code" =~ ^(2|3)[0-9][0-9]$ ]]; then
+    fail "legacy rose-glow (:4000) health check failed (HTTP $legacy_code) — aborting deploy"
+  fi
+  log "neighbors OK (laam-web=$web_code laam-api=$api_code legacy-rose=$legacy_code)"
 }
 
 [[ "$(id -u)" -eq 0 ]] || fail "run as root"
 [[ -d "$APP_DIR/.git" ]] || fail "missing $APP_DIR"
-assert_laam_ok
+assert_neighbors_ok
 
 export CI=true
 export NODE_ENV=production
@@ -84,5 +89,5 @@ for i in $(seq 1 30); do
 done
 [[ "$ok" -eq 1 ]] || fail "app health check failed on $HEALTH_URL"
 
-assert_laam_ok
+assert_neighbors_ok
 log "deploy complete"
