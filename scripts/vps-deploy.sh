@@ -57,7 +57,8 @@ hash -r || true
 log "installing dependencies"
 pnpm install --frozen-lockfile
 
-log "prisma migrate deploy"
+log "prisma generate + migrate"
+pnpm --filter web exec prisma generate
 pnpm --filter web exec prisma migrate deploy
 
 log "building"
