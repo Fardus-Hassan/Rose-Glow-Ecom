@@ -48,7 +48,7 @@ export function ProductsView({
 
   const [minPrice, setMinPrice] = useState(priceBounds.min);
   const [maxPrice, setMaxPrice] = useState(priceBounds.max);
-  const [bounds, setBounds] = useState(priceBounds);
+  const bounds = priceBounds;
 
   const selectCategory = (next: ProductCategory | "all") => {
     setCategory(next);
