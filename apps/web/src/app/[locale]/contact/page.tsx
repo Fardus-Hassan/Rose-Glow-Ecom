@@ -1,7 +1,31 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { SocialLinks } from "@/components/ui/SocialLinks";
-import { siteContact } from "@/data/contact";
+import { fetchCmsPage, fetchContactContent } from "@/lib/catalog";
+import { buildPageMetadata } from "@/lib/seo";
+import { localize } from "@/data/products";
+
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Contact" });
+  const page = await fetchCmsPage("contact");
+  return buildPageMetadata({
+    path: "/contact",
+    locale,
+    fallbackTitle: page
+      ? localize(page.seoTitle, locale) || localize(page.title, locale)
+      : `${t("title")} · Rose Glow`,
+    fallbackDescription: page
+      ? localize(page.seoDescription, locale) || localize(page.body, locale)
+      : t("sub"),
+  });
+}
 
 export default async function ContactPage({
   params,
@@ -11,6 +35,7 @@ export default async function ContactPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Contact");
+  const siteContact = await fetchContactContent();
   const address =
     locale === "bn" ? siteContact.addressBn : siteContact.addressEn;
   const hours = locale === "bn" ? siteContact.hoursBn : siteContact.hoursEn;

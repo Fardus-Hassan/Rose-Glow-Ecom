@@ -1,14 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { getCoverMedia, localize, products } from "@/data/products";
+import { getCoverMedia, localize, type Product } from "@/data/products";
 import { formatBdt } from "@/lib/format";
 import { Reveal } from "@/components/motion/Reveal";
 import { Slider } from "@/components/ui/Slider";
+import { SmartImage } from "@/components/media/SmartImage";
 
-export function FeaturedSection() {
+export function FeaturedSection({ products }: { products: Product[] }) {
   const t = useTranslations("Home");
   const tc = useTranslations("Categories");
   const locale = useLocale();
@@ -41,8 +41,10 @@ export function FeaturedSection() {
           labelNext={t("sliderNext")}
           slideClassName="basis-[70%] sm:basis-[45%] md:basis-[32%] lg:basis-[24%]"
         >
-          {showcase.map((product) => {
+          {showcase.map((product, index) => {
             const cover = getCoverMedia(product);
+            const coverSrc =
+              cover?.type === "video" ? cover.poster || cover.src : cover?.src;
             return (
               <article key={product.slug}>
                 <Link href={`/product/${product.slug}`} className="group block">
@@ -50,12 +52,16 @@ export function FeaturedSection() {
                     className="relative aspect-[4/5] overflow-hidden bg-[#ebe4dc]"
                     style={{ position: "relative" }}
                   >
-                    {cover ? (
-                      <Image
-                        src={cover.src}
+                    {coverSrc ? (
+                      <SmartImage
+                        src={coverSrc}
                         alt={localize(product.name, locale)}
                         fill
-                        sizes="(max-width:768px) 70vw, 25vw"
+                        variant="card"
+                        variants={cover?.variants}
+                        blurDataURL={cover?.blurDataUrl}
+                        sizesPreset="card"
+                        priority={index < 2}
                         className="object-cover transition duration-700 group-hover:scale-[1.04]"
                       />
                     ) : null}

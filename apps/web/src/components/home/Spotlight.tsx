@@ -1,14 +1,15 @@
 import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { getCoverMedia, localize, products } from "@/data/products";
+import { getCoverMedia, localize, type Product } from "@/data/products";
 import { formatBdt } from "@/lib/format";
 import { Reveal } from "@/components/motion/Reveal";
 
-export async function Spotlight() {
+export async function Spotlight({ products }: { products: Product[] }) {
   const t = await getTranslations("Home");
   const locale = await getLocale();
   const product = products.find((p) => p.featured) ?? products[0];
+  if (!product) return null;
   const cover = getCoverMedia(product);
 
   return (

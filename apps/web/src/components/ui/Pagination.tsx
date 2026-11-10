@@ -129,4 +129,3 @@ export function Pagination({
   );
 }
 
-export const SHOP_PAGE_SIZE = 4;

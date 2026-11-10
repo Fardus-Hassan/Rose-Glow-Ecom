@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
+import { mediaUrl } from "@/lib/media";
 
 export function LandingNav() {
   const t = useTranslations("LandingPearl");
@@ -27,7 +28,7 @@ export function LandingNav() {
         >
           <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full ring-1 ring-[#c9a08a]/35 md:h-9 md:w-9">
             <Image
-              src="/brand/logo.png"
+              src={mediaUrl("/brand/logo.png")}
               alt="Rose Glow"
               fill
               sizes="36px"

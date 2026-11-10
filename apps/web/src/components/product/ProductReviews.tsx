@@ -4,13 +4,19 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { localize, type Product } from "@/data/products";
-import { reviews } from "@/data/reviews";
+import type { Review } from "@/data/reviews";
 import { IconStar } from "@/components/icons";
 import { Pagination } from "@/components/ui/Pagination";
 
-const REVIEW_PAGE_SIZE = 2;
+const REVIEW_PAGE_SIZE = 5;
 
-export function ProductReviews({ product }: { product: Product }) {
+export function ProductReviews({
+  product,
+  reviews,
+}: {
+  product: Product;
+  reviews: Review[];
+}) {
   const t = useTranslations("Product");
   const locale = useLocale();
   const filled = Math.round(product.rating);
@@ -40,7 +46,7 @@ export function ProductReviews({ product }: { product: Product }) {
   const notes = useMemo(() => {
     const start = (page - 1) * REVIEW_PAGE_SIZE;
     return reviews.slice(start, start + REVIEW_PAGE_SIZE);
-  }, [page]);
+  }, [page, reviews]);
 
   const goToPage = (next: number) => {
     setPage(next);

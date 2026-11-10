@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/motion/Reveal";
+import { mediaUrl } from "@/lib/media";
 
 export async function PromoBanner() {
   const t = await getTranslations("Home");
@@ -13,7 +14,7 @@ export async function PromoBanner() {
           <div className="grid overflow-hidden rounded-[1.5rem] bg-[color:var(--rg-paper-deep)] shadow-sm ring-1 ring-[color:var(--rg-line)] md:grid-cols-2">
             <div className="relative min-h-[260px] md:min-h-[360px]">
               <Image
-                src="/products/filigree-earrings.jpg"
+                src={mediaUrl("/products/filigree-earrings.jpg")}
                 alt=""
                 fill
                 sizes="(max-width:768px) 100vw, 50vw"

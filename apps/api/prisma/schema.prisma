@@ -1,0 +1,230 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  COD
+  BKASH
+  NAGAD
+  CARD
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(ADMIN)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id                 String    @id @default(cuid())
+  slug               String    @unique
+  nameEn             String
+  nameBn             String
+  descriptionEn      String    @default("")
+  descriptionBn      String    @default("")
+  seoTitleEn         String    @default("")
+  seoTitleBn         String    @default("")
+  seoDescriptionEn   String    @default("")
+  seoDescriptionBn   String    @default("")
+  sortOrder          Int       @default(0)
+  isActive           Boolean   @default(true)
+  products           Product[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Product {
+  id               String         @id @default(cuid())
+  slug             String         @unique
+  sku              String         @unique
+  nameEn           String
+  nameBn           String
+  descriptionEn    String
+  descriptionBn    String
+  price            Int
+  compareAtPrice   Int?
+  categoryId       String
+  category         Category       @relation(fields: [categoryId], references: [id])
+  materialEn       String         @default("")
+  materialBn       String         @default("")
+  colors           Json           @default("[]")
+  rating           Float          @default(0)
+  reviewCount      Int            @default(0)
+  soldCount        Int            @default(0)
+  stock            Int            @default(0)
+  featured         Boolean        @default(false)
+  newest           Boolean        @default(false)
+  inStock          Boolean        @default(true)
+  published        Boolean        @default(true)
+  seoTitleEn       String         @default("")
+  seoTitleBn       String         @default("")
+  seoDescriptionEn String         @default("")
+  seoDescriptionBn String         @default("")
+  seoKeywords      String         @default("")
+  canonicalPath    String         @default("")
+  ogImage          String         @default("")
+  media            ProductMedia[]
+  orderItems       OrderItem[]
+  reviews          Review[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([categoryId])
+  @@index([published, featured])
+}
+
+model ProductMedia {
+  id        String    @id @default(cuid())
+  productId String
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  type      MediaType @default(IMAGE)
+  src       String
+  poster    String?
+  altEn     String    @default("")
+  altBn     String    @default("")
+  sortOrder Int       @default(0)
+
+  @@index([productId])
+}
+
+model Order {
+  id             String        @id @default(cuid())
+  orderNumber    String        @unique
+  customerName   String
+  customerPhone  String
+  customerEmail  String?
+  addressLine    String
+  city           String
+  district       String
+  note           String?
+  status         OrderStatus   @default(PENDING)
+  paymentMethod  PaymentMethod @default(COD)
+  paymentStatus  PaymentStatus @default(UNPAID)
+  subtotal       Int
+  shippingFee    Int           @default(0)
+  discount       Int           @default(0)
+  total          Int
+  items          OrderItem[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([status, createdAt])
+  @@index([customerPhone])
+}
+
+model OrderItem {
+  id          String  @id @default(cuid())
+  orderId     String
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName String
+  productSku  String
+  unitPrice   Int
+  quantity    Int
+  lineTotal   Int
+
+  @@index([orderId])
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  authorName  String
+  locationEn  String   @default("")
+  locationBn  String   @default("")
+  bodyEn      String
+  bodyBn      String
+  rating      Int      @default(5)
+  imageUrls   Json     @default("[]")
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Page {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  titleEn            String
+  titleBn            String
+  bodyEn             String   @default("")
+  bodyBn             String   @default("")
+  seoTitleEn         String   @default("")
+  seoTitleBn         String   @default("")
+  seoDescriptionEn   String   @default("")
+  seoDescriptionBn   String   @default("")
+  ogImage            String   @default("")
+  isPublished        Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+/// Flexible CMS store for hero, contact, social, homepage copy, etc.
+model ContentBlock {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  label     String
+  group     String   @default("general")
+  value     Json
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
+model SeoEntry {
+  id               String   @id @default(cuid())
+  path             String   @unique
+  titleEn          String   @default("")
+  titleBn          String   @default("")
+  descriptionEn    String   @default("")
+  descriptionBn    String   @default("")
+  keywords         String   @default("")
+  ogImage          String   @default("")
+  noIndex          Boolean  @default(false)
+  canonicalUrl     String   @default("")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}

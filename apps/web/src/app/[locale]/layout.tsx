@@ -2,47 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
-import {
-  Cormorant_Garamond,
-  Hind_Siliguri,
-  Manrope,
-  Noto_Serif_Bengali,
-} from "next/font/google";
 import { routing } from "@/i18n/routing";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { BagProvider } from "@/store/bag";
-import "../globals.css";
-
-const display = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-const sans = Manrope({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans",
-  display: "swap",
-});
-
-/** Elegant Bengali display — pairs with Cormorant for headings */
-const displayBn = Noto_Serif_Bengali({
-  subsets: ["bengali"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-display-bn",
-  display: "swap",
-});
-
-/** Clean premium Bengali UI/body */
-const sansBn = Hind_Siliguri({
-  subsets: ["bengali", "latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans-bn",
-  display: "swap",
-});
+import { CatalogProvider } from "@/store/catalog";
+import { buildPageMetadata } from "@/lib/seo";
+import { mediaUrl } from "@/lib/media";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -55,14 +21,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Meta" });
+  const seo = await buildPageMetadata({
+    path: "/",
+    locale,
+    fallbackTitle: t("title"),
+    fallbackDescription: t("description"),
+  });
 
   return {
-    title: t("title"),
-    description: t("description"),
+    ...seo,
     icons: {
-      icon: [{ url: "/brand/logo.png", type: "image/png" }],
-      apple: [{ url: "/brand/logo.png", type: "image/png" }],
-      shortcut: "/brand/logo.png",
+      icon: [{ url: mediaUrl("/brand/logo.png"), type: "image/png" }],
+      apple: [{ url: mediaUrl("/brand/logo.png"), type: "image/png" }],
+      shortcut: mediaUrl("/brand/logo.png"),
     },
   };
 }
@@ -84,22 +55,16 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html
-      lang={locale}
-      className={`${display.variable} ${sans.variable} ${displayBn.variable} ${sansBn.variable} h-full`}
-    >
-      <body
-        className={`locale-${locale} flex min-h-full flex-col antialiased`}
-        suppressHydrationWarning
-      >
-        <NextIntlClientProvider messages={messages}>
+    <div className={`locale-${locale} flex min-h-full flex-col`}>
+      <NextIntlClientProvider messages={messages}>
+        <CatalogProvider>
           <BagProvider>
             <SmoothScroll>
               <SiteChrome>{children}</SiteChrome>
             </SmoothScroll>
           </BagProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+        </CatalogProvider>
+      </NextIntlClientProvider>
+    </div>
   );
 }

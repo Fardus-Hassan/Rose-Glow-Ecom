@@ -4,8 +4,9 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
-  useSyncExternalStore,
+  useState,
   type ReactNode,
 } from "react";
 
@@ -50,90 +51,88 @@ function readStorage(): BagState {
   }
 }
 
-let memoryState: BagState = EMPTY;
-const listeners = new Set<() => void>();
-
-if (typeof window !== "undefined") {
-  memoryState = readStorage();
-}
-
 function writeStorage(next: BagState) {
-  memoryState = next;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   } catch {
     /* ignore quota */
   }
-  listeners.forEach((listener) => listener());
-}
-
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
-
-function getSnapshot() {
-  return memoryState;
-}
-
-function getServerSnapshot() {
-  return EMPTY;
-}
-
-function update(mutator: (prev: BagState) => BagState) {
-  writeStorage(mutator(memoryState));
 }
 
 export function BagProvider({ children }: { children: ReactNode }) {
-  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [state, setState] = useState<BagState>(EMPTY);
 
-  const addToCart = useCallback((slug: string, qty = 1) => {
-    const amount = Math.max(1, qty);
-    update((prev) => {
-      const existing = prev.cart.find((line) => line.slug === slug);
-      if (existing) {
-        return {
-          ...prev,
-          cart: prev.cart.map((line) =>
-            line.slug === slug ? { ...line, qty: line.qty + amount } : line,
-          ),
-        };
-      }
-      return { ...prev, cart: [...prev.cart, { slug, qty: amount }] };
+  useEffect(() => {
+    setState(readStorage());
+  }, []);
+
+  const commit = useCallback((mutator: (prev: BagState) => BagState) => {
+    setState((prev) => {
+      const next = mutator(prev);
+      writeStorage(next);
+      return next;
     });
   }, []);
 
-  const setCartQty = useCallback((slug: string, qty: number) => {
-    update((prev) => ({
-      ...prev,
-      cart:
-        qty <= 0
-          ? prev.cart.filter((line) => line.slug !== slug)
-          : prev.cart.map((line) =>
-              line.slug === slug ? { ...line, qty } : line,
+  const addToCart = useCallback(
+    (slug: string, qty = 1) => {
+      const amount = Math.max(1, qty);
+      commit((prev) => {
+        const existing = prev.cart.find((line) => line.slug === slug);
+        if (existing) {
+          return {
+            ...prev,
+            cart: prev.cart.map((line) =>
+              line.slug === slug ? { ...line, qty: line.qty + amount } : line,
             ),
-    }));
-  }, []);
+          };
+        }
+        return { ...prev, cart: [...prev.cart, { slug, qty: amount }] };
+      });
+    },
+    [commit],
+  );
 
-  const removeFromCart = useCallback((slug: string) => {
-    update((prev) => ({
-      ...prev,
-      cart: prev.cart.filter((line) => line.slug !== slug),
-    }));
-  }, []);
+  const setCartQty = useCallback(
+    (slug: string, qty: number) => {
+      commit((prev) => ({
+        ...prev,
+        cart:
+          qty <= 0
+            ? prev.cart.filter((line) => line.slug !== slug)
+            : prev.cart.map((line) =>
+                line.slug === slug ? { ...line, qty } : line,
+              ),
+      }));
+    },
+    [commit],
+  );
+
+  const removeFromCart = useCallback(
+    (slug: string) => {
+      commit((prev) => ({
+        ...prev,
+        cart: prev.cart.filter((line) => line.slug !== slug),
+      }));
+    },
+    [commit],
+  );
 
   const clearCart = useCallback(() => {
-    update((prev) => ({ ...prev, cart: [] }));
-  }, []);
+    commit((prev) => ({ ...prev, cart: [] }));
+  }, [commit]);
 
-  const toggleWishlist = useCallback((slug: string) => {
-    update((prev) => ({
-      ...prev,
-      wishlist: prev.wishlist.includes(slug)
-        ? prev.wishlist.filter((item) => item !== slug)
-        : [...prev.wishlist, slug],
-    }));
-  }, []);
+  const toggleWishlist = useCallback(
+    (slug: string) => {
+      commit((prev) => ({
+        ...prev,
+        wishlist: prev.wishlist.includes(slug)
+          ? prev.wishlist.filter((item) => item !== slug)
+          : [...prev.wishlist, slug],
+      }));
+    },
+    [commit],
+  );
 
   const isWishlisted = useCallback(
     (slug: string) => state.wishlist.includes(slug),

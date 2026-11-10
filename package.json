@@ -3,11 +3,14 @@
   "private": true,
   "packageManager": "pnpm@11.9.0",
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "lint": "turbo lint",
-    "dev:web": "pnpm --filter web exec next dev --port 3000",
-    "build:web": "pnpm --filter web build"
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "lint": "pnpm --filter web lint",
+    "start": "pnpm --filter web start",
+    "db:up": "docker compose up -d",
+    "db:migrate": "pnpm --filter web prisma:migrate",
+    "db:seed": "pnpm --filter web seed",
+    "db:generate": "pnpm --filter web prisma:generate"
   },
   "devDependencies": {
     "turbo": "^2.11.10"

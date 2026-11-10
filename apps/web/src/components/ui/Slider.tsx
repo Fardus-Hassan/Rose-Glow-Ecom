@@ -11,7 +11,7 @@ type SliderProps = {
   dark?: boolean;
   labelPrev?: string;
   labelNext?: string;
-  /** Auto-advance interval in ms. Set 0 to disable. Default 5000. */
+  /** Auto-advance interval in ms. Set 0 to disable. Default 3000 (loops). */
   autoPlayMs?: number;
 };
 
@@ -22,12 +22,15 @@ export function Slider({
   dark = false,
   labelPrev = "Previous",
   labelNext = "Next",
-  autoPlayMs = 5000,
+  autoPlayMs = 3000,
 }: SliderProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
   const [paused, setPaused] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [tabVisible, setTabVisible] = useState(true);
 
   const update = useCallback(() => {
     const el = scrollerRef.current;
@@ -49,13 +52,34 @@ export function Slider({
     };
   }, [update, children]);
 
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.25, rootMargin: "0px" },
+    );
+    io.observe(root);
+    return () => io.disconnect();
+  }, []);
+
   const scrollByDir = useCallback((dir: -1 | 1) => {
     const el = scrollerRef.current;
     if (!el) return;
     const max = el.scrollWidth - el.clientWidth;
     if (max <= 8) return;
 
-    const amount = Math.max(el.clientWidth * 0.85, 260);
+    const slides = Array.from(el.children) as HTMLElement[];
+    if (!slides.length) return;
+
+    const gapRaw = getComputedStyle(el).columnGap || getComputedStyle(el).gap || "0";
+    const gap = Number.parseFloat(gapRaw) || 0;
+    const step = (slides[0]?.offsetWidth || 0) + gap;
+    if (step <= 0) return;
+
+    // Snap to nearest slide index, then move exactly one slide
+    const currentIndex = Math.round(el.scrollLeft / step);
+    const lastIndex = Math.max(0, slides.length - 1);
 
     if (dir === 1 && el.scrollLeft >= max - 8) {
       el.scrollTo({ left: 0, behavior: "smooth" });
@@ -67,12 +91,23 @@ export function Slider({
       return;
     }
 
-    el.scrollBy({ left: dir * amount, behavior: "smooth" });
+    const nextIndex = Math.min(lastIndex, Math.max(0, currentIndex + dir));
+    el.scrollTo({
+      left: Math.min(max, nextIndex * step),
+      behavior: "smooth",
+    });
+  }, []);
+
+  useEffect(() => {
+    const onVisibility = () => setTabVisible(!document.hidden);
+    onVisibility();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
   }, []);
 
   useEffect(() => {
     if (!autoPlayMs || autoPlayMs <= 0) return;
-    if (paused) return;
+    if (paused || !inView || !tabVisible) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const id = window.setInterval(() => {
@@ -80,12 +115,13 @@ export function Slider({
     }, autoPlayMs);
 
     return () => window.clearInterval(id);
-  }, [autoPlayMs, paused, scrollByDir, children]);
+  }, [autoPlayMs, paused, inView, tabVisible, scrollByDir, children]);
 
   const items = Array.isArray(children) ? children : [children];
 
   return (
     <div
+      ref={rootRef}
       className={cn("relative", className)}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}

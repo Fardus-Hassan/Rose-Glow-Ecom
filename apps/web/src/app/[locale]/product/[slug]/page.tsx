@@ -1,11 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import {
-  getProductBySlug,
-  getRelatedProducts,
-  localize,
-  products,
-} from "@/data/products";
+import { localize } from "@/data/products";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductInfo } from "@/components/product/ProductInfo";
 import { ProductDetails } from "@/components/product/ProductDetails";
@@ -13,13 +8,14 @@ import { ProductReviews } from "@/components/product/ProductReviews";
 import { ProductCard } from "@/components/products/ProductCard";
 import { StaggerGrid } from "@/components/motion/StaggerGrid";
 import { Link } from "@/i18n/navigation";
+import {
+  fetchProductBySlug,
+  fetchRelatedProducts,
+  fetchReviews,
+} from "@/lib/catalog";
+import { buildPageMetadata } from "@/lib/seo";
 
-export function generateStaticParams() {
-  const locales = ["bn", "en"];
-  return locales.flatMap((locale) =>
-    products.map((product) => ({ locale, slug: product.slug })),
-  );
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -27,13 +23,15 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await fetchProductBySlug(slug);
   if (!product) return {};
 
-  return {
-    title: `${localize(product.name, locale)} · Rose Glow`,
-    description: localize(product.description, locale),
-  };
+  return buildPageMetadata({
+    path: `/product/${slug}`,
+    locale,
+    fallbackTitle: `${localize(product.name, locale)} · Rose Glow`,
+    fallbackDescription: localize(product.description, locale),
+  });
 }
 
 export default async function ProductPage({
@@ -44,10 +42,13 @@ export default async function ProductPage({
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const product = getProductBySlug(slug);
+  const product = await fetchProductBySlug(slug);
   if (!product) notFound();
 
-  const related = getRelatedProducts(slug, 4);
+  const [related, reviews] = await Promise.all([
+    fetchRelatedProducts(slug, 4),
+    fetchReviews({ productSlug: slug, pageSize: 50 }),
+  ]);
   const t = await getTranslations("Product");
   const tc = await getTranslations("Categories");
 
@@ -96,7 +97,7 @@ export default async function ProductPage({
       </div>
 
       <div className="mt-14 md:mt-20">
-        <ProductReviews product={product} />
+        <ProductReviews product={product} reviews={reviews} />
       </div>
 
       {related.length > 0 ? (

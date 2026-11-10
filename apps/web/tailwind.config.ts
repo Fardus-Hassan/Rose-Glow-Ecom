@@ -16,11 +16,20 @@ const config: Config = {
         blush: "var(--rg-blush)",
         pink: "var(--rg-pink)",
         "pink-deep": "var(--rg-pink-deep)",
-        rose: "var(--rg-rose)",
+        rose: "#c9a08a",
         charcoal: "var(--rg-charcoal)",
-        ink: "var(--rg-ink)",
-        muted: "var(--rg-muted)",
+        ink: "#1c1a19",
+        muted: "#7d7470",
         line: "var(--rg-line)",
+        paper: "#f0ebe4",
+        "paper-deep": "#e7e0d6",
+        night: "#121110",
+        "night-deep": "#0e0d0c",
+        cream: "#f4efe8",
+      },
+      boxShadow: {
+        atelier:
+          "0 24px 64px rgba(14, 13, 12, 0.12), 0 2px 8px rgba(14, 13, 12, 0.06)",
       },
       fontFamily: {
         display: [

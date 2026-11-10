@@ -2,8 +2,9 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/motion/Reveal";
+import { mediaUrl } from "@/lib/media";
 
-const ATELIER_IMAGE = "/home/atelier-gold-spread.jpg";
+const ATELIER_IMAGE = mediaUrl("/home/atelier-gold-spread.jpg");
 
 export async function AtelierBand() {
   const t = await getTranslations("Home");

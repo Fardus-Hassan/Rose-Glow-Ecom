@@ -1,0 +1,12 @@
+import { handleRouteError, json } from "@/lib/server/http";
+import { requireUser } from "@/lib/server/auth";
+import { dashboardStats } from "@/lib/server/cms";
+
+export async function GET(request: Request) {
+  try {
+    await requireUser(request);
+    return json(await dashboardStats());
+  } catch (err) {
+    return handleRouteError(err);
+  }
+}

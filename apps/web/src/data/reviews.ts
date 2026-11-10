@@ -1,4 +1,5 @@
 import type { LocalizedString } from "./products";
+import { mediaUrl } from "@/lib/media";
 
 export type Review = {
   id: string;
@@ -21,8 +22,8 @@ export const reviews: Review[] = [
     },
     rating: 5,
     images: [
-      "/products/pearl-gold-earrings.jpg",
-      "/products/filigree-detail.jpg",
+      mediaUrl("/products/pearl-gold-earrings.jpg"),
+      mediaUrl("/products/filigree-detail.jpg"),
     ],
   },
   {
@@ -34,7 +35,7 @@ export const reviews: Review[] = [
       bn: "COD-তে নিশ্চিন্তে অর্ডার করেছি। নেকলেস ছবির মতোই, নিরাপদে পৌঁছেছে।",
     },
     rating: 5,
-    images: ["/products/filigree-necklace.jpg"],
+    images: [mediaUrl("/products/filigree-necklace.jpg")],
   },
   {
     id: "r3",
@@ -45,7 +46,7 @@ export const reviews: Review[] = [
       bn: "নরম চকচকে, প্রতিদিন পরার জন্য যা চেয়েছিলাম। আবারও অর্ডার করব।",
     },
     rating: 5,
-    images: ["/products/gold-hoops.jpg", "/products/filigree-earrings.jpg"],
+    images: [mediaUrl("/products/gold-hoops.jpg"), mediaUrl("/products/filigree-earrings.jpg")],
   },
   {
     id: "r4",
@@ -57,8 +58,8 @@ export const reviews: Review[] = [
     },
     rating: 5,
     images: [
-      "/products/filigree-bridal-set.jpg",
-      "/products/filigree-earrings.jpg",
+      mediaUrl("/products/filigree-bridal-set.jpg"),
+      mediaUrl("/products/filigree-earrings.jpg"),
     ],
   },
   {
@@ -70,6 +71,6 @@ export const reviews: Review[] = [
       bn: "ডেলিভারি দ্রুত, ফিনিশ খুব পরিপাটি। Rose Glow সত্যিই প্রিমিয়াম লাগে।",
     },
     rating: 5,
-    images: ["/products/filigree-ring.jpg", "/products/gold-bangles.jpg"],
+    images: [mediaUrl("/products/filigree-ring.jpg"), mediaUrl("/products/gold-bangles.jpg")],
   },
 ];

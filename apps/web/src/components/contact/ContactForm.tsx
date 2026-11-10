@@ -41,10 +41,27 @@ export function ContactForm() {
     return Object.keys(next).length === 0;
   };
 
-  const onSubmit = (event: FormEvent) => {
+  const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!validate()) return;
-    setSent(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as {
+          message?: string;
+        } | null;
+        throw new Error(data?.message || "Failed to send");
+      }
+      setSent(true);
+    } catch (err) {
+      setErrors({
+        message: err instanceof Error ? err.message : "Failed to send",
+      });
+    }
   };
 
   if (sent) {

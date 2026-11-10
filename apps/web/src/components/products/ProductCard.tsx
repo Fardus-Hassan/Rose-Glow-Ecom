@@ -1,13 +1,19 @@
 "use client";
 
-import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { getCoverMedia, localize, type Product } from "@/data/products";
 import { formatBdt } from "@/lib/format";
 import { IconStar } from "@/components/icons";
+import { SmartImage } from "@/components/media/SmartImage";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({
+  product,
+  priority = false,
+}: {
+  product: Product;
+  priority?: boolean;
+}) {
   const locale = useLocale();
   const t = useTranslations("Products");
   const tc = useTranslations("Categories");
@@ -20,21 +26,27 @@ export function ProductCard({ product }: { product: Product }) {
         )
       : 0;
   const filledStars = Math.round(product.rating);
+  const coverSrc =
+    cover?.type === "video" ? cover.poster || cover.src : cover?.src;
 
   return (
     <article data-stagger-item className="group flex flex-col">
       <Link href={`/product/${product.slug}`} className="block">
         <div className="relative aspect-[4/5] overflow-hidden bg-[#e2dacf]">
-          {cover ? (
-            <Image
-              src={cover.src}
+          {coverSrc ? (
+            <SmartImage
+              src={coverSrc}
               alt={
-                cover.alt
+                cover?.alt
                   ? localize(cover.alt, locale)
                   : localize(product.name, locale)
               }
               fill
-              sizes="(max-width: 768px) 50vw, 25vw"
+              variant="card"
+              variants={cover?.variants}
+              blurDataURL={cover?.blurDataUrl}
+              sizesPreset="card"
+              priority={priority}
               className="object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
             />
           ) : null}

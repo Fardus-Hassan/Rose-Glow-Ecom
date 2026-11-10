@@ -1,11 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import gsap from "gsap";
 import { localize, type ProductMedia } from "@/data/products";
 import { cn } from "@/lib/format";
+import { SmartImage } from "@/components/media/SmartImage";
+import { SmartVideo } from "@/components/media/SmartVideo";
 
 export function ProductGallery({
   media,
@@ -22,7 +23,6 @@ export function ProductGallery({
   const [ratio, setRatio] = useState(4 / 5);
   const stageRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const shouldPlayVideo = useRef(false);
   const current = media[active];
 
@@ -47,31 +47,6 @@ export function ProductGallery({
   }, [active]);
 
   useEffect(() => {
-    if (current?.type !== "video") return;
-    if (!shouldPlayVideo.current) return;
-
-    const video = videoRef.current;
-    if (!video) return;
-
-    shouldPlayVideo.current = false;
-    video.currentTime = 0;
-    const play = () => {
-      void video.play().catch(() => {
-        video.muted = true;
-        void video.play().catch(() => undefined);
-      });
-    };
-
-    if (video.readyState >= 2) play();
-    else video.addEventListener("loadeddata", play, { once: true });
-
-    return () => {
-      video.removeEventListener("loadeddata", play);
-      video.pause();
-    };
-  }, [active, current?.type]);
-
-  useEffect(() => {
     if (media.length < 2) return;
     if (paused || zooming) return;
     if (current?.type === "video") return;
@@ -79,27 +54,13 @@ export function ProductGallery({
 
     const id = window.setInterval(() => {
       setActive((prev) => (prev + 1) % media.length);
-    }, 5000);
+    }, 3000);
 
     return () => window.clearInterval(id);
   }, [media.length, paused, zooming, current?.type]);
 
-  const playActiveVideo = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.currentTime = 0;
-    void video.play().catch(() => {
-      video.muted = true;
-      void video.play().catch(() => undefined);
-    });
-  };
-
   const selectMedia = (index: number) => {
     const next = media[index];
-    if (index === active && next?.type === "video") {
-      playActiveVideo();
-      return;
-    }
     shouldPlayVideo.current = next?.type === "video";
     setActive(index);
   };
@@ -158,11 +119,15 @@ export function ProductGallery({
               aria-label={item.type === "video" ? t("video") : t("image")}
               aria-current={active === index ? "true" : undefined}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <SmartImage
                 src={thumb}
                 alt=""
-                className="h-full w-full object-contain"
+                fill
+                variant="thumb"
+                variants={item.variants}
+                blurDataURL={item.blurDataUrl}
+                sizesPreset="thumb"
+                className="object-contain"
               />
               {item.type === "video" ? (
                 <span className="absolute inset-0 flex items-center justify-center bg-[#0e0d0c]/40">
@@ -199,12 +164,15 @@ export function ProductGallery({
             ref={imageRef}
             className="absolute inset-0 transition-transform duration-200 ease-out will-change-transform"
           >
-            <Image
+            <SmartImage
               src={current.src}
               alt={current.alt ? localize(current.alt, locale) : t("image")}
               fill
-              priority
-              sizes="(max-width: 768px) 100vw, 52vw"
+              variant="detail"
+              variants={current.variants}
+              blurDataURL={current.blurDataUrl}
+              sizesPreset="gallery"
+              priority={active === 0}
               className="object-contain"
               onLoadingComplete={(img) => {
                 applyNaturalRatio(img.naturalWidth, img.naturalHeight);
@@ -212,22 +180,19 @@ export function ProductGallery({
             />
           </div>
         ) : (
-          <video
+          <SmartVideo
             key={current.src}
-            ref={videoRef}
+            src={current.src}
+            poster={current.poster}
             className="h-full w-full object-contain"
             controls
-            playsInline
-            autoPlay
-            poster={current.poster}
-            preload="auto"
+            autoPlay={shouldPlayVideo.current || active === 0}
+            lazy={active !== 0}
             onLoadedMetadata={(event) => {
               const video = event.currentTarget;
               applyNaturalRatio(video.videoWidth, video.videoHeight);
             }}
-          >
-            <source src={current.src} type="video/mp4" />
-          </video>
+          />
         )}
 
         {discount > 0 && current.type === "image" ? (

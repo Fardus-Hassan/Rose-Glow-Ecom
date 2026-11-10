@@ -7,6 +7,32 @@
     transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
+  .admin-card {
+    @apply rounded-sm border border-[#1c1a19]/10 bg-[#f4efe8]/60 shadow-[0_24px_64px_rgba(14,13,12,0.12),0_2px_8px_rgba(14,13,12,0.06)] backdrop-blur-sm;
+  }
+
+  .admin-input {
+    @apply w-full border border-[#1c1a19]/15 bg-[#f0ebe4]/80 px-3 py-2.5 text-sm text-[#1c1a19] outline-none transition rg-ease placeholder:text-[#7d7470] focus:border-[#c9a08a]/70 focus:ring-1 focus:ring-[#c9a08a]/30;
+  }
+
+  .admin-label {
+    @apply mb-1.5 block text-[10px] font-medium uppercase tracking-[0.2em] text-[#7d7470];
+  }
+
+  /* Scroll works; bar is visually hidden */
+  .admin-sidebar-scroll,
+  .admin-main-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .admin-sidebar-scroll::-webkit-scrollbar,
+  .admin-main-scroll::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
   .rg-fade-in {
     animation: rg-fade-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
@@ -58,6 +84,14 @@
 @layer base {
   * {
     @apply box-border;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   html {

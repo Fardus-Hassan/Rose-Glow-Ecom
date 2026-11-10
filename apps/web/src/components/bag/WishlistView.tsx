@@ -3,18 +3,31 @@
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { getCoverMedia, getProductBySlug, localize } from "@/data/products";
+import { getCoverMedia, localize, type Product } from "@/data/products";
 import { formatBdt } from "@/lib/format";
+import { ProductGridSkeleton } from "@/components/skeletons/StorefrontSkeletons";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useBag } from "@/store/bag";
+import { useCatalog } from "@/store/catalog";
 
 export function WishlistView() {
   const t = useTranslations("Wishlist");
   const locale = useLocale();
   const { wishlist, toggleWishlist, addToCart } = useBag();
+  const { ready, getBySlug } = useCatalog();
+
+  if (!ready) {
+    return (
+      <div>
+        <Skeleton className="mb-8 h-9 w-40" />
+        <ProductGridSkeleton count={4} />
+      </div>
+    );
+  }
 
   const items = wishlist
-    .map((slug) => getProductBySlug(slug))
-    .filter(Boolean) as NonNullable<ReturnType<typeof getProductBySlug>>[];
+    .map((slug) => getBySlug(slug))
+    .filter(Boolean) as Product[];
 
   if (items.length === 0) {
     return (

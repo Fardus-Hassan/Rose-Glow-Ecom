@@ -3,13 +3,13 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { reviews } from "@/data/reviews";
 import { localize } from "@/data/products";
+import type { Review } from "@/data/reviews";
 import { IconStar } from "@/components/icons";
 import { Reveal } from "@/components/motion/Reveal";
 import { Slider } from "@/components/ui/Slider";
 
-export function ReviewsSection() {
+export function ReviewsSection({ reviews }: { reviews: Review[] }) {
   const t = useTranslations("Home");
   const locale = useLocale();
   const [lightbox, setLightbox] = useState<string | null>(null);

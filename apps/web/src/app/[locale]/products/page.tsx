@@ -1,7 +1,12 @@
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { products } from "@/data/products";
 import { ProductsView } from "@/components/products/ProductsView";
+import { fetchProductsPage } from "@/lib/catalog";
+import { SHOP_PAGE_SIZE } from "@/lib/shop";
+import { buildPageMetadata } from "@/lib/seo";
+import { mediaUrl } from "@/lib/media";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -10,10 +15,12 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Products" });
-  return {
-    title: `${t("title")} · Rose Glow`,
-    description: t("subtitle"),
-  };
+  return buildPageMetadata({
+    path: "/products",
+    locale,
+    fallbackTitle: `${t("title")} · Rose Glow`,
+    fallbackDescription: t("subtitle"),
+  });
 }
 
 export default async function ProductsPage({
@@ -27,13 +34,18 @@ export default async function ProductsPage({
   const { category } = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("Products");
+  const initial = await fetchProductsPage({
+    page: 1,
+    pageSize: SHOP_PAGE_SIZE,
+    category: category || undefined,
+  });
 
   return (
     <div className="bg-[#f0ebe4] pb-20 md:pb-28">
       <section className="relative isolate overflow-hidden border-b border-white/10 bg-[#0e0d0c] text-[#f4efe8]">
         <div className="absolute inset-0 -z-20">
           <Image
-            src="/home/atelier-gold-spread.jpg"
+            src={mediaUrl("/home/atelier-gold-spread.jpg")}
             alt=""
             fill
             priority
@@ -59,7 +71,7 @@ export default async function ProductsPage({
       </section>
 
       <div className="container-rg pt-10 md:pt-14">
-        <ProductsView products={products} initialCategory={category} />
+        <ProductsView initial={initial} initialCategory={category} />
       </div>
     </div>
   );

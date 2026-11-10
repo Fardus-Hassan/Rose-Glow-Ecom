@@ -1,3 +1,5 @@
+import { mediaUrl, type MediaVariants } from "@/lib/media";
+
 export type LocalizedString = {
   en: string;
   bn: string;
@@ -8,6 +10,8 @@ export type ProductMedia = {
   src: string;
   poster?: string;
   alt?: LocalizedString;
+  blurDataUrl?: string;
+  variants?: MediaVariants;
 };
 
 export type ProductCategory =
@@ -18,6 +22,7 @@ export type ProductCategory =
   | "sets";
 
 export type Product = {
+  id?: string;
   slug: string;
   sku: string;
   name: LocalizedString;
@@ -56,17 +61,17 @@ export const products: Product[] = [
     media: [
       {
         type: "image",
-        src: "/products/filigree-bridal-set.jpg",
+        src: mediaUrl("/products/filigree-bridal-set.jpg"),
         alt: { en: "Glow bridal set", bn: "গ্লো ব্রাইডাল সেট" },
       },
       {
         type: "image",
-        src: "/products/filigree-earrings.jpg",
+        src: mediaUrl("/products/filigree-earrings.jpg"),
         alt: { en: "Bridal earrings", bn: "ব্রাইডাল ইয়াররিংস" },
       },
       {
         type: "image",
-        src: "/products/filigree-detail.jpg",
+        src: mediaUrl("/products/filigree-detail.jpg"),
         alt: { en: "Filigree detail", bn: "ফিলিগ্রি ডিটেইল" },
       },
     ],
@@ -99,18 +104,18 @@ export const products: Product[] = [
     media: [
       {
         type: "image",
-        src: "/products/pearl-gold-earrings.jpg",
+        src: mediaUrl("/products/pearl-gold-earrings.jpg"),
         alt: { en: "Pearl bloom earrings", bn: "পার্ল ব্লুম ইয়াররিংস" },
       },
       {
         type: "image",
-        src: "/products/filigree-detail.jpg",
+        src: mediaUrl("/products/filigree-detail.jpg"),
         alt: { en: "Earrings detail", bn: "ইয়াররিংস ডিটেইল" },
       },
       {
         type: "video",
         src: "https://videos.pexels.com/video-files/7626566/7626566-hd_1080_1920_25fps.mp4",
-        poster: "/products/pearl-gold-earrings.jpg",
+        poster: mediaUrl("/products/pearl-gold-earrings.jpg"),
         alt: { en: "Pearl bloom video", bn: "পার্ল ব্লুম ভিডিও" },
       },
     ],
@@ -139,12 +144,12 @@ export const products: Product[] = [
     media: [
       {
         type: "image",
-        src: "/products/filigree-necklace.jpg",
+        src: mediaUrl("/products/filigree-necklace.jpg"),
         alt: { en: "Filigree veil necklace", bn: "ফিলিগ্রি ভেইল নেকলেস" },
       },
       {
         type: "image",
-        src: "/products/filigree-detail.jpg",
+        src: mediaUrl("/products/filigree-detail.jpg"),
         alt: { en: "Necklace close-up", bn: "নেকলেস ক্লোজ-আপ" },
       },
     ],
@@ -173,12 +178,12 @@ export const products: Product[] = [
     media: [
       {
         type: "image",
-        src: "/products/gold-bangles.jpg",
+        src: mediaUrl("/products/gold-bangles.jpg"),
         alt: { en: "Dusk bangle set", bn: "ডাস্ক ব্যাঙ্গল সেট" },
       },
       {
         type: "image",
-        src: "/products/filigree-detail.jpg",
+        src: mediaUrl("/products/filigree-detail.jpg"),
         alt: { en: "Bangle detail", bn: "ব্যাঙ্গল ডিটেইল" },
       },
     ],
@@ -209,12 +214,12 @@ export const products: Product[] = [
     media: [
       {
         type: "image",
-        src: "/products/filigree-ring.jpg",
+        src: mediaUrl("/products/filigree-ring.jpg"),
         alt: { en: "Lattice petal ring", bn: "ল্যাটিস পেটাল রিং" },
       },
       {
         type: "image",
-        src: "/products/filigree-detail.jpg",
+        src: mediaUrl("/products/filigree-detail.jpg"),
         alt: { en: "Ring detail", bn: "রিং ডিটেইল" },
       },
     ],
@@ -242,12 +247,12 @@ export const products: Product[] = [
     media: [
       {
         type: "image",
-        src: "/products/gold-hoops.jpg",
+        src: mediaUrl("/products/gold-hoops.jpg"),
         alt: { en: "Soft hoop earrings", bn: "সফট হুপ ইয়াররিংস" },
       },
       {
         type: "image",
-        src: "/products/filigree-detail.jpg",
+        src: mediaUrl("/products/filigree-detail.jpg"),
         alt: { en: "Hoop detail", bn: "হুপ ডিটেইল" },
       },
     ],

@@ -1,31 +1,35 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { type Product, type ProductCategory } from "@/data/products";
 import {
-  categories,
-  type Product,
-  type ProductCategory,
-} from "@/data/products";
+  fetchProductsPage,
+  type ProductsPage,
+} from "@/lib/catalog";
 import { ProductCard } from "./ProductCard";
 import { StaggerGrid } from "@/components/motion/StaggerGrid";
-import { Pagination, SHOP_PAGE_SIZE } from "@/components/ui/Pagination";
+import { ProductGridSkeleton } from "@/components/skeletons/StorefrontSkeletons";
+import { Pagination } from "@/components/ui/Pagination";
+import { SHOP_PAGE_SIZE } from "@/lib/shop";
 import { formatBdt, cn } from "@/lib/format";
+import { useCatalog } from "@/store/catalog";
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "newest";
 
 export function ProductsView({
-  products,
+  initial,
   initialCategory,
 }: {
-  products: Product[];
+  initial: ProductsPage;
   initialCategory?: string;
 }) {
   const t = useTranslations("Products");
   const tc = useTranslations("Categories");
   const locale = useLocale();
   const router = useRouter();
+  const { ready, categories } = useCatalog();
   const [, startTransition] = useTransition();
   const [category, setCategory] = useState<ProductCategory | "all">(
     categories.includes(initialCategory as ProductCategory)
@@ -33,17 +37,18 @@ export function ProductsView({
       : "all",
   );
   const [sort, setSort] = useState<SortKey>("featured");
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(initial.page || 1);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<ProductsPage>(initial);
 
-  const priceBounds = useMemo(() => {
-    const prices = products.map((p) => p.price);
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-    return { min, max };
-  }, [products]);
+  const priceBounds = {
+    min: initial.facets?.minPrice ?? result.facets?.minPrice ?? 0,
+    max: initial.facets?.maxPrice ?? result.facets?.maxPrice ?? 0,
+  };
 
   const [minPrice, setMinPrice] = useState(priceBounds.min);
   const [maxPrice, setMaxPrice] = useState(priceBounds.max);
+  const [bounds, setBounds] = useState(priceBounds);
 
   const selectCategory = (next: ProductCategory | "all") => {
     setCategory(next);
@@ -56,97 +61,100 @@ export function ProductsView({
     });
   };
 
-  const filtered = useMemo(() => {
-    let list =
-      category === "all"
-        ? [...products]
-        : products.filter((product) => product.category === category);
-
-    list = list.filter(
-      (product) => product.price >= minPrice && product.price <= maxPrice,
-    );
-
-    switch (sort) {
-      case "price-asc":
-        list.sort((a, b) => a.price - b.price);
-        break;
-      case "price-desc":
-        list.sort((a, b) => b.price - a.price);
-        break;
-      case "newest":
-        list.sort((a, b) => Number(b.newest) - Number(a.newest));
-        break;
-      default:
-        list.sort((a, b) => Number(b.featured) - Number(a.featured));
-    }
-
-    return list;
-  }, [category, maxPrice, minPrice, products, sort]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / SHOP_PAGE_SIZE));
-  const priceDirty =
-    minPrice !== priceBounds.min || maxPrice !== priceBounds.max;
-
-  useEffect(() => {
+  const changeSort = (next: SortKey) => {
+    setSort(next);
     setPage(1);
-  }, [sort, minPrice, maxPrice]);
+  };
 
   useEffect(() => {
-    if (page > totalPages) setPage(totalPages);
-  }, [page, totalPages]);
-
-  const paged = useMemo(() => {
-    const start = (page - 1) * SHOP_PAGE_SIZE;
-    return filtered.slice(start, start + SHOP_PAGE_SIZE);
-  }, [filtered, page]);
+    let cancelled = false;
+    const run = async () => {
+      setLoading(true);
+      try {
+        const next = await fetchProductsPage({
+          page,
+          pageSize: SHOP_PAGE_SIZE,
+          category: category === "all" ? undefined : category,
+          sort,
+          minPrice,
+          maxPrice,
+        });
+        if (cancelled) return;
+        setResult(next);
+        if (next.page !== page) setPage(next.page);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [category, sort, minPrice, maxPrice, page]);
 
   const goToPage = (next: number) => {
     setPage(next);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const priceDirty = minPrice !== bounds.min || maxPrice !== bounds.max;
+
   const resetPrice = () => {
-    setMinPrice(priceBounds.min);
-    setMaxPrice(priceBounds.max);
+    setMinPrice(bounds.min);
+    setMaxPrice(bounds.max);
   };
 
   const onMinChange = (value: number) => {
     setMinPrice(Math.min(value, maxPrice));
+    setPage(1);
   };
 
   const onMaxChange = (value: number) => {
     setMaxPrice(Math.max(value, minPrice));
+    setPage(1);
   };
 
-  const span = Math.max(priceBounds.max - priceBounds.min, 1);
-  const leftPct = ((minPrice - priceBounds.min) / span) * 100;
-  const rightPct = ((priceBounds.max - maxPrice) / span) * 100;
+  const span = Math.max(bounds.max - bounds.min, 1);
+  const leftPct = ((minPrice - bounds.min) / span) * 100;
+  const rightPct = ((bounds.max - maxPrice) / span) * 100;
+  const products = result.items;
 
   return (
     <div>
       <div className="mb-8 flex flex-col gap-5 border-b border-[#1c1a19]/10 pb-6 md:mb-10 md:pb-7">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-          <div className="-mx-5 flex gap-1 overflow-x-auto px-5 sm:-mx-8 sm:px-8 md:mx-0 md:px-0 lg:gap-2">
-            <FilterChip
-              active={category === "all"}
-              onClick={() => selectCategory("all")}
-              label={t("allCategories")}
-            />
-            {categories.map((item) => (
-              <FilterChip
-                key={item}
-                active={category === item}
-                onClick={() => selectCategory(item)}
-                label={tc(item)}
-              />
-            ))}
+          <div className="-mx-5 flex gap-1 overflow-x-auto px-5 [-ms-overflow-style:none] [scrollbar-width:none] sm:-mx-8 sm:px-8 md:mx-0 md:px-0 lg:gap-2 [&::-webkit-scrollbar]:hidden">
+            {!ready ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <span
+                  key={i}
+                  className="inline-block h-9 w-20 shrink-0 animate-pulse rounded-sm bg-[#1c1a19]/10"
+                />
+              ))
+            ) : (
+              <>
+                <FilterChip
+                  active={category === "all"}
+                  onClick={() => selectCategory("all")}
+                  label={t("allCategories")}
+                />
+                {categories.map((item) => (
+                  <FilterChip
+                    key={item}
+                    active={category === item}
+                    onClick={() => selectCategory(item)}
+                    label={tc(item)}
+                  />
+                ))}
+              </>
+            )}
           </div>
 
           <label className="flex shrink-0 items-center gap-3 text-[10px] uppercase tracking-[0.22em] text-[#1c1a19]/45">
             {t("sort")}
             <select
               value={sort}
-              onChange={(event) => setSort(event.target.value as SortKey)}
+              onChange={(event) => changeSort(event.target.value as SortKey)}
               className="min-h-10 border border-[#1c1a19]/15 bg-transparent px-3 text-[11px] tracking-[0.08em] text-[#1c1a19] outline-none focus:border-[#c9a08a]"
             >
               <option value="featured">{t("sortFeatured")}</option>
@@ -157,7 +165,6 @@ export function ProductsView({
           </label>
         </div>
 
-        {/* Price range */}
         <div className="flex flex-col gap-3 border-t border-[#1c1a19]/08 pt-5 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
           <div className="min-w-0 flex-1 sm:max-w-md">
             <div className="mb-3 flex items-center justify-between gap-3">
@@ -183,8 +190,8 @@ export function ProductsView({
               />
               <input
                 type="range"
-                min={priceBounds.min}
-                max={priceBounds.max}
+                min={bounds.min}
+                max={bounds.max}
                 step={10}
                 value={minPrice}
                 onChange={(e) => onMinChange(Number(e.target.value))}
@@ -193,8 +200,8 @@ export function ProductsView({
               />
               <input
                 type="range"
-                min={priceBounds.min}
-                max={priceBounds.max}
+                min={bounds.min}
+                max={bounds.max}
                 step={10}
                 value={maxPrice}
                 onChange={(e) => onMaxChange(Number(e.target.value))}
@@ -214,14 +221,14 @@ export function ProductsView({
             {(
               [
                 [
-                  priceBounds.min,
+                  bounds.min,
                   1000,
                   t("under", { amount: formatBdt(1000, locale) }),
                 ],
                 [1000, 2000, t("midRange")],
                 [
                   2000,
-                  priceBounds.max,
+                  bounds.max,
                   t("above", { amount: formatBdt(2000, locale) }),
                 ],
               ] as const
@@ -234,6 +241,7 @@ export function ProductsView({
                   onClick={() => {
                     setMinPrice(lo);
                     setMaxPrice(hi);
+                    setPage(1);
                   }}
                   className={cn(
                     "border px-3 py-2 text-[10px] uppercase tracking-[0.14em] transition",
@@ -251,10 +259,16 @@ export function ProductsView({
       </div>
 
       <p className="mb-6 text-[10px] uppercase tracking-[0.22em] text-[#1c1a19]/40">
-        {t("results", { count: filtered.length })}
+        {loading && products.length === 0 ? (
+          <span className="inline-block h-3 w-28 animate-pulse rounded-sm bg-[#1c1a19]/10" />
+        ) : (
+          t("results", { count: result.total })
+        )}
       </p>
 
-      {filtered.length === 0 ? (
+      {loading && products.length === 0 ? (
+        <ProductGridSkeleton count={SHOP_PAGE_SIZE} />
+      ) : products.length === 0 ? (
         <div className="py-24 text-center">
           <p className="text-sm text-[#1c1a19]/50">{t("empty")}</p>
           {priceDirty ? (
@@ -269,15 +283,30 @@ export function ProductsView({
         </div>
       ) : (
         <>
-          <StaggerGrid
-            key={`${category}-${sort}-${minPrice}-${maxPrice}-${page}`}
-            className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 md:grid-cols-3 md:gap-x-6 md:gap-y-12 lg:grid-cols-4"
+          <div
+            className={cn(
+              "transition-opacity duration-200",
+              loading && "pointer-events-none opacity-45",
+            )}
           >
-            {paged.map((product) => (
-              <ProductCard key={product.slug} product={product} />
-            ))}
-          </StaggerGrid>
-          <Pagination page={page} totalPages={totalPages} onChange={goToPage} />
+            <StaggerGrid
+              key={`${category}-${sort}-${minPrice}-${maxPrice}-${page}`}
+              className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 md:grid-cols-3 md:gap-x-6 md:gap-y-12 lg:grid-cols-4"
+            >
+              {products.map((product: Product, index: number) => (
+                <ProductCard
+                  key={product.slug}
+                  product={product}
+                  priority={index < 4}
+                />
+              ))}
+            </StaggerGrid>
+          </div>
+          <Pagination
+            page={result.page}
+            totalPages={result.totalPages}
+            onChange={goToPage}
+          />
         </>
       )}
     </div>

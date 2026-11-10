@@ -1,25 +1,35 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import gsap from "gsap";
 import { Link } from "@/i18n/navigation";
-import { heroMedia } from "@/data/hero";
+import type { HeroContent } from "@/lib/catalog";
+import { SmartImage } from "@/components/media/SmartImage";
+import { mediaUrl } from "@/lib/media";
 
 /**
  * Direction: Editorial Noir
- * Full-bleed hero — toggle image/video via `src/data/hero.ts`.
- * Mobile + desktop media are always separate.
+ * Full-bleed hero — media + copy can come from CMS (admin content block).
  */
-export function Hero() {
+export function Hero({
+  locale,
+  content,
+}: {
+  locale: string;
+  content: HeroContent;
+}) {
   const t = useTranslations("Home");
   const rootRef = useRef<HTMLElement>(null);
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
   const mobileVideoRef = useRef<HTMLVideoElement>(null);
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
 
-  const useVideo = heroMedia.mode === "video";
+  const useVideo = content.mode === "video";
+  const headline =
+    locale === "bn" ? content.headlineBn : content.headlineEn;
+  const body = locale === "bn" ? content.bodyBn : content.bodyEn;
+  const cta = locale === "bn" ? content.ctaBn : content.ctaEn;
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
@@ -30,11 +40,11 @@ export function Hero() {
   }, []);
 
   useEffect(() => {
-    if (!useVideo || isDesktop === null) return;
+    if (!useVideo || isDesktop === null || !content.video) return;
 
     const active = isDesktop ? desktopVideoRef.current : mobileVideoRef.current;
     const idle = isDesktop ? mobileVideoRef.current : desktopVideoRef.current;
-    const asset = isDesktop ? heroMedia.video.desktop : heroMedia.video.mobile;
+    const asset = isDesktop ? content.video.desktop : content.video.mobile;
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -76,7 +86,7 @@ export function Hero() {
     return () => {
       cancelled = true;
     };
-  }, [useVideo, isDesktop]);
+  }, [useVideo, isDesktop, content.video]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -121,9 +131,8 @@ export function Hero() {
       className="relative isolate flex min-h-[100svh] items-end overflow-hidden bg-[#0e0d0c] text-[#f4efe8] md:items-center"
     >
       <div className="absolute inset-0 -z-20 overflow-hidden">
-        {useVideo ? (
+        {useVideo && content.video ? (
           <>
-            {/* Desktop video */}
             <video
               ref={desktopVideoRef}
               className="absolute inset-0 hidden h-full w-full object-cover object-center md:block"
@@ -131,10 +140,9 @@ export function Hero() {
               loop
               playsInline
               preload="none"
-              poster={heroMedia.video.desktop.poster}
+              poster={mediaUrl(content.video.desktop.poster)}
               aria-hidden
             />
-            {/* Mobile video */}
             <video
               ref={mobileVideoRef}
               className="absolute inset-0 h-full w-full object-cover object-[center_20%] md:hidden"
@@ -142,56 +150,56 @@ export function Hero() {
               loop
               playsInline
               preload="none"
-              poster={heroMedia.video.mobile.poster}
+              poster={mediaUrl(content.video.mobile.poster)}
               aria-hidden
             />
-            {/* Poster fallback while video loads / reduced motion */}
-            <Image
+            <SmartImage
               data-hero-media
-              src={heroMedia.video.desktop.poster}
+              src={content.video.desktop.poster}
               alt=""
               fill
               priority
-              sizes="100vw"
+              variant="detail"
+              sizesPreset="hero"
               className="hidden object-cover object-[center_30%] opacity-0 motion-reduce:opacity-100 md:block"
             />
-            <Image
+            <SmartImage
               data-hero-media
-              src={heroMedia.video.mobile.poster}
+              src={content.video.mobile.poster}
               alt=""
               fill
               priority
-              sizes="100vw"
+              variant="card"
+              sizesPreset="hero"
               className="object-cover object-[center_25%] opacity-0 motion-reduce:opacity-100 md:hidden"
             />
           </>
         ) : (
           <>
-            {/* Desktop image */}
-            <Image
+            <SmartImage
               data-hero-media
-              src={heroMedia.image.desktop}
+              src={content.image.desktop}
               alt=""
               fill
               priority
-              sizes="100vw"
+              variant="detail"
+              sizesPreset="hero"
               className="hidden object-cover object-[center_30%] md:block"
             />
-            {/* Mobile image */}
-            <Image
+            <SmartImage
               data-hero-media
-              src={heroMedia.image.mobile}
+              src={content.image.mobile}
               alt=""
               fill
               priority
-              sizes="100vw"
+              variant="card"
+              sizesPreset="hero"
               className="object-cover object-[center_35%] md:hidden"
             />
           </>
         )}
       </div>
 
-      {/* Readability scrims — keep copy clear on any image/video */}
       <div className="absolute inset-0 -z-10 bg-[#0e0d0c]/35 md:bg-[#0e0d0c]/25" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#0e0d0c] via-[#0e0d0c]/78 to-[#0e0d0c]/15 md:via-[#0e0d0c]/55 md:to-transparent" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#0e0d0c] via-[#0e0d0c]/55 to-[#0e0d0c]/40 md:via-[#0e0d0c]/25 md:to-[#0e0d0c]/30" />
@@ -204,7 +212,7 @@ export function Hero() {
             data-hero-brand
             className="font-display text-[clamp(3.2rem,10vw,7.5rem)] leading-[0.92] tracking-[-0.03em] text-[#f4efe8] [text-shadow:0_2px_28px_rgba(14,13,12,0.55)]"
           >
-            Rose Glow
+            {content.brand || "Rose Glow"}
           </p>
 
           <div
@@ -216,14 +224,14 @@ export function Hero() {
             data-hero-copy
             className="mt-6 max-w-lg font-display text-[clamp(1.6rem,3.5vw,2.35rem)] font-normal leading-snug text-[#f4efe8] [text-shadow:0_1px_18px_rgba(14,13,12,0.5)] md:mt-8"
           >
-            {t("heroHeadline")}
+            {headline}
           </h1>
 
           <p
             data-hero-copy
             className="mt-4 max-w-md text-[15px] leading-7 text-[#f4efe8]/82 [text-shadow:0_1px_12px_rgba(14,13,12,0.45)] md:text-base"
           >
-            {t("heroSub")}
+            {body}
           </p>
 
           <div data-hero-copy className="mt-10 flex flex-wrap items-center gap-6">
@@ -231,7 +239,7 @@ export function Hero() {
               href="/products"
               className="group inline-flex items-center gap-3 border border-[#c9a08a]/70 bg-[#0e0d0c]/45 px-7 py-3.5 text-[12px] uppercase tracking-[0.22em] text-[#f4efe8] backdrop-blur-sm transition hover:border-[#c9a08a] hover:bg-[#0e0d0c]/65"
             >
-              {t("heroCta")}
+              {cta}
               <span className="transition group-hover:translate-x-1">→</span>
             </Link>
             <Link

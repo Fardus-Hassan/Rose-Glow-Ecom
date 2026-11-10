@@ -3,13 +3,18 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { categories, getCoverMedia, products } from "@/data/products";
+import { getCoverMedia } from "@/data/products";
 import { Reveal } from "@/components/motion/Reveal";
+import { CollectionsStripSkeleton } from "@/components/skeletons/ChromeSkeletons";
 import { Slider } from "@/components/ui/Slider";
+import { useCatalog } from "@/store/catalog";
 
 export function CollectionsStrip() {
   const t = useTranslations("Home");
   const tc = useTranslations("Categories");
+  const { ready, categories, products } = useCatalog();
+
+  if (!ready) return <CollectionsStripSkeleton />;
 
   const items = categories.map((category) => {
     const sample = products.find((p) => p.category === category);

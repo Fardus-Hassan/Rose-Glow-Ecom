@@ -1,27 +1,48 @@
 # Rose Glow E-commerce
 
-Frontend-first monorepo for **Rose Glow** ladies ornaments shop.
+Monorepo for **Rose Glow** ladies ornaments — storefront, NestJS API, and admin dashboard.
 
 ## Stack
 
-- Next.js (App Router) + Tailwind CSS
-- next-intl (`bn` + `en`)
-- GSAP + Lenis smooth scroll
-- pnpm workspaces + Turborepo
+- **Storefront** (`apps/web`) — Next.js App Router, Tailwind, next-intl (`bn` + `en`), GSAP + Lenis
+- **API** (`apps/api`) — NestJS 11, Prisma, PostgreSQL, JWT admin auth
+- **Admin** (`apps/admin`) — Next.js dashboard (orders, products, CMS, SEO)
+- pnpm workspaces + Turborepo + Docker Compose (Postgres)
 
 ## Develop
 
 ```bash
 pnpm install
-pnpm --filter web dev
+pnpm db:up
+pnpm --filter api prisma:migrate
+pnpm db:seed
+
+# terminals
+pnpm dev:api     # http://localhost:4000/api
+pnpm --filter web dev   # http://localhost:3001
+pnpm dev:admin   # http://localhost:3002
 ```
 
-Open [http://localhost:3001/bn](http://localhost:3001/bn)
+### Admin login (seed)
 
-> On this Windows machine, native SWC/Turbopack binaries may be blocked by Application Control. The default `dev` script uses Webpack + WASM, and Tailwind v3 (explicit content paths) for reliable CSS.
+- Email: `rose.glow.bd@gmail.com`
+- Password: `rose.glow.bd2026` (override via `apps/api/.env`)
 
-## Current pages
+### Postgres
+
+Docker service maps to **localhost:5436** (avoids clashing with other local DBs on 5432).
+
+## Apps
+
+| App | Port | Role |
+|-----|------|------|
+| web | 3001 | Customer storefront |
+| api | 4000 | REST API + admin endpoints |
+| admin | 3002 | CMS / orders / SEO dashboard |
+
+## Storefront pages
 
 - `/[locale]` — Home
-- `/[locale]/products` — Products
-- `/[locale]/product/[slug]` — Product details (image + video gallery)
+- `/[locale]/products` — Shop
+- `/[locale]/product/[slug]` — Product details
+- `/[locale]/about`, `/contact`, `/cart`, `/wishlist`, `/search`

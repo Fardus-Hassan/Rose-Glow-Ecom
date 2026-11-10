@@ -24,6 +24,7 @@ export function LandingQuickView({
   const tc = useTranslations("Categories");
   const locale = useLocale();
   const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
   const media = product.media;
 
@@ -56,6 +57,25 @@ export function LandingQuickView({
       return next;
     });
   };
+
+  useEffect(() => {
+    if (media.length < 2 || paused) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (media[active]?.type === "video") return;
+
+    const id = window.setInterval(() => {
+      setActive((current) => {
+        const next = (current + 1) % media.length;
+        const el = trackRef.current;
+        if (el) {
+          el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
+        }
+        return next;
+      });
+    }, 3000);
+
+    return () => window.clearInterval(id);
+  }, [media, active, paused]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -136,7 +156,21 @@ export function LandingQuickView({
           data-lenis-prevent
           className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-7 [-webkit-overflow-scrolling:touch]"
         >
-          <div className="relative bg-[#e2dacf]">
+          <div
+            className="relative bg-[#e2dacf]"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            onFocusCapture={() => setPaused(true)}
+            onBlurCapture={(event) => {
+              if (
+                !event.currentTarget.contains(
+                  event.relatedTarget as Node | null,
+                )
+              ) {
+                setPaused(false);
+              }
+            }}
+          >
             <div
               ref={trackRef}
               data-lenis-prevent

@@ -1,11 +1,14 @@
+"use client";
+
 import {
   IconFacebook,
   IconInstagram,
   IconTikTok,
   IconWhatsApp,
 } from "@/components/icons";
-import { socialLinks, type SocialLink } from "@/data/social";
+import type { SocialLink } from "@/data/social";
 import { cn } from "@/lib/format";
+import { useCatalog } from "@/store/catalog";
 
 const icons = {
   instagram: IconInstagram,
@@ -17,7 +20,7 @@ const icons = {
 export function SocialLinks({
   tone = "light",
   className,
-  links = socialLinks,
+  links,
   showLabels = false,
 }: {
   tone?: "light" | "dark";
@@ -25,9 +28,32 @@ export function SocialLinks({
   links?: SocialLink[];
   showLabels?: boolean;
 }) {
+  const { ready, social } = useCatalog();
+  const resolved = links ?? social;
+
+  if (!links && !ready) {
+    return (
+      <ul
+        className={cn("flex flex-wrap items-center gap-2", className)}
+        aria-hidden
+      >
+        {Array.from({ length: 4 }).map((_, i) => (
+          <li
+            key={i}
+            className={cn(
+              "animate-pulse",
+              showLabels ? "h-4 w-16" : "h-10 w-10 border border-transparent",
+              tone === "light" ? "bg-white/15" : "bg-[#1c1a19]/10",
+            )}
+          />
+        ))}
+      </ul>
+    );
+  }
+
   return (
     <ul className={cn("flex flex-wrap items-center gap-2", className)}>
-      {links.map((link) => {
+      {resolved.map((link) => {
         const Icon = icons[link.id];
         return (
           <li key={link.id}>

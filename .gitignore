@@ -8,3 +8,6 @@ dist
 .env.*
 !.env.example
 apps/web/out
+apps/web/public/uploads
+apps/**/public/uploads
+*.tsbuildinfo
