@@ -10,7 +10,12 @@ import { Button } from "@/components/admin/ui/Button";
 import { EmptyState } from "@/components/admin/ui/EmptyState";
 import { AdminCardListSkeleton } from "@/components/skeletons/AdminSkeletons";
 
-type TrashKind = "product" | "category" | "review" | "subscriber";
+type TrashKind =
+  | "product"
+  | "category"
+  | "review"
+  | "subscriber"
+  | "order";
 
 type TrashItem = {
   kind: TrashKind;
@@ -27,6 +32,7 @@ const KIND_LABEL: Record<TrashKind, string> = {
   category: "Category",
   review: "Review",
   subscriber: "Subscriber",
+  order: "Order",
 };
 
 export default function RecycleBinPage() {

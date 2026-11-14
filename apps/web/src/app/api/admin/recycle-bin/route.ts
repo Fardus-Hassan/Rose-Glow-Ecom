@@ -16,6 +16,7 @@ const KINDS = new Set<TrashKind>([
   "category",
   "review",
   "subscriber",
+  "order",
 ]);
 
 function parseKind(value: unknown): TrashKind {

@@ -139,11 +139,13 @@ model Order {
   discount       Int           @default(0)
   total          Int
   items          OrderItem[]
+  deletedAt      DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
   @@index([status, createdAt])
   @@index([customerPhone])
+  @@index([deletedAt])
 }
 
 model OrderItem {

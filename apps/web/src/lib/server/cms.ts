@@ -104,8 +104,8 @@ export async function dashboardStats() {
     prisma.contactMessage.count(),
     prisma.subscriber.count({ where: { deletedAt: null } }),
     prisma.mediaAsset.count(),
-    prisma.order.count({ where: { status: "PENDING" } }),
-    prisma.order.count(),
+    prisma.order.count({ where: { deletedAt: null, status: "PENDING" } }),
+    prisma.order.count({ where: { deletedAt: null } }),
     prisma.product.count({ where: { published: true, deletedAt: null } }),
     prisma.contactMessage.findMany({
       take: 6,
@@ -120,6 +120,7 @@ export async function dashboardStats() {
       },
     }),
     prisma.order.findMany({
+      where: { deletedAt: null },
       take: 6,
       orderBy: { createdAt: "desc" },
       include: { items: true },

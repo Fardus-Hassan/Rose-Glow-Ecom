@@ -414,6 +414,7 @@ export const orders = {
     page: PageParams;
   }) {
     const where: Prisma.OrderWhereInput = {
+      deletedAt: null,
       ...(params.status ? { status: params.status } : {}),
       ...(params.q
         ? {
@@ -441,7 +442,10 @@ export const orders = {
 
   async findOne(id: string) {
     const order = await prisma.order.findFirst({
-      where: { OR: [{ id }, { orderNumber: id }] },
+      where: {
+        deletedAt: null,
+        OR: [{ id }, { orderNumber: id }],
+      },
       include: { items: { include: { product: true } } },
     });
     if (!order) throw new HttpError(404, "Order not found");
@@ -453,6 +457,15 @@ export const orders = {
     return prisma.order.update({
       where: { id },
       data: { status },
+      include: { items: true },
+    });
+  },
+
+  async remove(id: string) {
+    const order = await this.findOne(id);
+    return prisma.order.update({
+      where: { id: order.id },
+      data: { deletedAt: new Date() },
       include: { items: true },
     });
   },
@@ -640,13 +653,19 @@ export async function dashboardOverview() {
   ] = await Promise.all([
     prisma.product.count({ where: { deletedAt: null } }),
     prisma.product.count({ where: { published: true, deletedAt: null } }),
-    prisma.order.count(),
-    prisma.order.count({ where: { status: OrderStatus.PENDING } }),
+    prisma.order.count({ where: { deletedAt: null } }),
+    prisma.order.count({
+      where: { deletedAt: null, status: OrderStatus.PENDING },
+    }),
     prisma.order.aggregate({
       _sum: { total: true },
-      where: { status: { not: OrderStatus.CANCELLED } },
+      where: {
+        deletedAt: null,
+        status: { not: OrderStatus.CANCELLED },
+      },
     }),
     prisma.order.findMany({
+      where: { deletedAt: null },
       take: 8,
       orderBy: { createdAt: "desc" },
       include: { items: true },
@@ -668,6 +687,7 @@ export async function dashboardOverview() {
 
   const statusGroups = await prisma.order.groupBy({
     by: ["status"],
+    where: { deletedAt: null },
     _count: { _all: true },
   });
 

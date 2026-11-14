@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { api } from "@/lib/admin/api";
 import { ORDER_STATUSES, type OrderStatus } from "@/lib/admin/constants";
 import type { Order } from "@/lib/admin/types";
@@ -18,6 +20,7 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [status, setStatus] = useState<OrderStatus>("PENDING");
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,10 +42,29 @@ export default function OrderDetailPage() {
         body: JSON.stringify({ status }),
       });
       setOrder(updated);
+      toast.success("Status updated");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Update failed");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function moveToTrash() {
+    if (!order) return;
+    const ok = window.confirm(
+      "Move this order to the recycle bin? You can restore it within 30 days.",
+    );
+    if (!ok) return;
+    setDeleting(true);
+    try {
+      await api(`/admin/orders/${order.id}`, { method: "DELETE" });
+      toast.success("Moved to recycle bin");
+      router.push("/admin/orders");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Delete failed");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -52,7 +74,10 @@ export default function OrderDetailPage() {
         title="Order not found"
         description={error}
         action={
-          <Button variant="secondary" onClick={() => router.push("/orders")}>
+          <Button
+            variant="secondary"
+            onClick={() => router.push("/admin/orders")}
+          >
             Back to orders
           </Button>
         }
@@ -90,6 +115,15 @@ export default function OrderDetailPage() {
         </div>
         <Button onClick={saveStatus} loading={saving} disabled={status === order.status}>
           Save status
+        </Button>
+        <Button
+          type="button"
+          variant="danger"
+          loading={deleting}
+          onClick={() => void moveToTrash()}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          Move to recycle bin
         </Button>
       </div>
 

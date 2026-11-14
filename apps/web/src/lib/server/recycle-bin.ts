@@ -3,7 +3,12 @@ import { HttpError } from "./http";
 
 export const TRASH_RETENTION_DAYS = 30;
 
-export type TrashKind = "product" | "category" | "review" | "subscriber";
+export type TrashKind =
+  | "product"
+  | "category"
+  | "review"
+  | "subscriber"
+  | "order";
 
 export type TrashItem = {
   kind: TrashKind;
@@ -39,56 +44,72 @@ function expiryMeta(deletedAt: Date) {
 /** Permanently remove items soft-deleted more than 30 days ago. */
 export async function purgeExpiredTrash() {
   const cutoff = cutoffDate();
-  const [products, categories, reviews, subscribers] = await Promise.all([
-    prisma.product.deleteMany({ where: { deletedAt: { lt: cutoff } } }),
-    prisma.category.deleteMany({ where: { deletedAt: { lt: cutoff } } }),
-    prisma.review.deleteMany({ where: { deletedAt: { lt: cutoff } } }),
-    prisma.subscriber.deleteMany({ where: { deletedAt: { lt: cutoff } } }),
-  ]);
+  const [products, categories, reviews, subscribers, orders] =
+    await Promise.all([
+      prisma.product.deleteMany({ where: { deletedAt: { lt: cutoff } } }),
+      prisma.category.deleteMany({ where: { deletedAt: { lt: cutoff } } }),
+      prisma.review.deleteMany({ where: { deletedAt: { lt: cutoff } } }),
+      prisma.subscriber.deleteMany({ where: { deletedAt: { lt: cutoff } } }),
+      prisma.order.deleteMany({ where: { deletedAt: { lt: cutoff } } }),
+    ]);
   return {
     products: products.count,
     categories: categories.count,
     reviews: reviews.count,
     subscribers: subscribers.count,
+    orders: orders.count,
   };
 }
 
 export async function listTrash(): Promise<TrashItem[]> {
   await purgeExpiredTrash();
 
-  const [products, categories, reviews, subscribers] = await Promise.all([
-    prisma.product.findMany({
-      where: { deletedAt: { not: null } },
-      select: {
-        id: true,
-        nameEn: true,
-        sku: true,
-        deletedAt: true,
-      },
-      orderBy: { deletedAt: "desc" },
-    }),
-    prisma.category.findMany({
-      where: { deletedAt: { not: null } },
-      select: { id: true, nameEn: true, slug: true, deletedAt: true },
-      orderBy: { deletedAt: "desc" },
-    }),
-    prisma.review.findMany({
-      where: { deletedAt: { not: null } },
-      select: {
-        id: true,
-        authorName: true,
-        bodyEn: true,
-        deletedAt: true,
-        product: { select: { nameEn: true } },
-      },
-      orderBy: { deletedAt: "desc" },
-    }),
-    prisma.subscriber.findMany({
-      where: { deletedAt: { not: null } },
-      select: { id: true, email: true, deletedAt: true },
-      orderBy: { deletedAt: "desc" },
-    }),
-  ]);
+  const [products, categories, reviews, subscribers, orders] =
+    await Promise.all([
+      prisma.product.findMany({
+        where: { deletedAt: { not: null } },
+        select: {
+          id: true,
+          nameEn: true,
+          sku: true,
+          deletedAt: true,
+        },
+        orderBy: { deletedAt: "desc" },
+      }),
+      prisma.category.findMany({
+        where: { deletedAt: { not: null } },
+        select: { id: true, nameEn: true, slug: true, deletedAt: true },
+        orderBy: { deletedAt: "desc" },
+      }),
+      prisma.review.findMany({
+        where: { deletedAt: { not: null } },
+        select: {
+          id: true,
+          authorName: true,
+          bodyEn: true,
+          deletedAt: true,
+          product: { select: { nameEn: true } },
+        },
+        orderBy: { deletedAt: "desc" },
+      }),
+      prisma.subscriber.findMany({
+        where: { deletedAt: { not: null } },
+        select: { id: true, email: true, deletedAt: true },
+        orderBy: { deletedAt: "desc" },
+      }),
+      prisma.order.findMany({
+        where: { deletedAt: { not: null } },
+        select: {
+          id: true,
+          orderNumber: true,
+          customerName: true,
+          customerPhone: true,
+          total: true,
+          deletedAt: true,
+        },
+        orderBy: { deletedAt: "desc" },
+      }),
+    ]);
 
   const items: TrashItem[] = [
     ...products.map((p) => ({
@@ -117,6 +138,13 @@ export async function listTrash(): Promise<TrashItem[]> {
       id: s.id,
       title: s.email,
       ...expiryMeta(s.deletedAt!),
+    })),
+    ...orders.map((o) => ({
+      kind: "order" as const,
+      id: o.id,
+      title: o.orderNumber,
+      subtitle: `${o.customerName} · ${o.customerPhone}`,
+      ...expiryMeta(o.deletedAt!),
     })),
   ];
 
@@ -183,6 +211,16 @@ export async function restoreTrashItem(kind: TrashKind, id: string) {
         data: { deletedAt: null },
       });
     }
+    case "order": {
+      const row = await prisma.order.findFirst({
+        where: { id, deletedAt: { not: null } },
+      });
+      if (!row) throw new HttpError(404, "Trash item not found");
+      return prisma.order.update({
+        where: { id },
+        data: { deletedAt: null },
+      });
+    }
     default:
       throw new HttpError(400, "Unknown trash kind");
   }
@@ -231,17 +269,26 @@ export async function destroyTrashItem(kind: TrashKind, id: string) {
       if (!row) throw new HttpError(404, "Trash item not found");
       return prisma.subscriber.delete({ where: { id } });
     }
+    case "order": {
+      const row = await prisma.order.findFirst({
+        where: { id, deletedAt: { not: null } },
+      });
+      if (!row) throw new HttpError(404, "Trash item not found");
+      return prisma.order.delete({ where: { id } });
+    }
     default:
       throw new HttpError(400, "Unknown trash kind");
   }
 }
 
 export async function trashCount() {
-  const [products, categories, reviews, subscribers] = await Promise.all([
-    prisma.product.count({ where: { deletedAt: { not: null } } }),
-    prisma.category.count({ where: { deletedAt: { not: null } } }),
-    prisma.review.count({ where: { deletedAt: { not: null } } }),
-    prisma.subscriber.count({ where: { deletedAt: { not: null } } }),
-  ]);
-  return products + categories + reviews + subscribers;
+  const [products, categories, reviews, subscribers, orders] =
+    await Promise.all([
+      prisma.product.count({ where: { deletedAt: { not: null } } }),
+      prisma.category.count({ where: { deletedAt: { not: null } } }),
+      prisma.review.count({ where: { deletedAt: { not: null } } }),
+      prisma.subscriber.count({ where: { deletedAt: { not: null } } }),
+      prisma.order.count({ where: { deletedAt: { not: null } } }),
+    ]);
+  return products + categories + reviews + subscribers + orders;
 }
