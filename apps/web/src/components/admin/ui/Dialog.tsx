@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/format";
 
@@ -11,6 +12,7 @@ export function Dialog({
   description,
   children,
   size = "lg",
+  bodyClassName,
 }: {
   open: boolean;
   onClose: () => void;
@@ -18,6 +20,8 @@ export function Dialog({
   description?: string;
   children: ReactNode;
   size?: "md" | "lg" | "xl";
+  /** Override default scrollable body (e.g. nested flex layouts). */
+  bodyClassName?: string;
 }) {
   useEffect(() => {
     if (!open) return;
@@ -33,10 +37,10 @@ export function Dialog({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
-    <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center sm:p-6">
+  return createPortal(
+    <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center sm:p-4 md:p-6">
       <button
         type="button"
         aria-label="Close dialog"
@@ -48,15 +52,15 @@ export function Dialog({
         aria-modal="true"
         aria-label={title}
         className={cn(
-          "relative z-[81] flex max-h-[92dvh] w-full flex-col overflow-hidden border border-ink/10 bg-cream shadow-2xl sm:rounded-sm",
+          "relative z-[81] flex max-h-[min(92dvh,900px)] w-full flex-col overflow-hidden border border-ink/10 bg-cream shadow-2xl sm:rounded-sm",
           size === "md" && "sm:max-w-lg",
           size === "lg" && "sm:max-w-3xl",
           size === "xl" && "sm:max-w-5xl",
         )}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-ink/10 px-5 py-4">
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-ink/10 px-4 py-3.5 sm:px-5 sm:py-4">
           <div className="min-w-0">
-            <h2 className="font-display text-xl text-ink">{title}</h2>
+            <h2 className="font-display text-lg text-ink sm:text-xl">{title}</h2>
             {description ? (
               <p className="mt-1 text-sm text-muted">{description}</p>
             ) : null}
@@ -70,8 +74,11 @@ export function Dialog({
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-auto">{children}</div>
+        <div className={cn("min-h-0 flex-1 overflow-auto", bodyClassName)}>
+          {children}
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -104,10 +104,13 @@ export function MediaLibrary({
   kind: fixedKind,
   onSelect,
   selectLabel = "Use this file",
+  variant = "page",
 }: {
   kind?: MediaKind;
   onSelect?: (media: MediaAsset) => void;
   selectLabel?: string;
+  /** `picker` = dialog embed (fixed height, sticky select bar). */
+  variant?: "page" | "picker";
 }) {
   const [items, setItems] = useState<MediaAsset[] | null>(null);
   const [kind, setKind] = useState<FilterKind>(fixedKind ?? "all");
@@ -122,6 +125,7 @@ export function MediaLibrary({
   const fileInput = useRef<HTMLInputElement>(null);
   const pageSize = ADMIN_PAGE_SIZE.media;
   const activeKind = fixedKind ?? kind;
+  const isPicker = variant === "picker";
 
   useEffect(() => {
     setPage(1);
@@ -221,7 +225,10 @@ export function MediaLibrary({
 
   return (
     <div
-      className="relative flex min-h-[28rem] flex-col"
+      className={cn(
+        "relative flex flex-col bg-cream",
+        isPicker ? "h-full min-h-0" : "min-h-[28rem]",
+      )}
       onDragOver={(e) => {
         if (!e.dataTransfer.types.includes("Files")) return;
         e.preventDefault();
@@ -238,55 +245,53 @@ export function MediaLibrary({
         void upload(Array.from(e.dataTransfer.files));
       }}
     >
-      <div className="space-y-3 border-b border-ink/10 p-3 sm:p-4">
-        <div className="relative">
-          <Search className="pointer-events-none absolute top-1/2 left-3.5 z-[1] h-4 w-4 -translate-y-1/2 text-muted" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search files…"
-            className="w-full border border-ink/15 bg-paper/80 py-2.5 pr-3 pl-10 text-sm text-ink outline-none transition placeholder:text-muted focus:border-rose/70 focus:ring-1 focus:ring-rose/30"
-          />
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {!fixedKind ? (
-            <div className="flex min-w-0 flex-1 overflow-x-auto border border-ink/15">
-              {(
-                [
-                  ["all", "All"],
-                  ["image", "Images"],
-                  ["video", "Videos"],
-                  ["document", "Docs"],
-                ] as const
-              ).map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setKind(value)}
-                  className={cn(
-                    "shrink-0 px-3 py-2 text-[10px] uppercase tracking-[0.16em]",
-                    kind === value
-                      ? "bg-night text-cream"
-                      : "text-muted hover:text-ink",
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="flex-1" />
-          )}
+      <div className="shrink-0 space-y-2.5 border-b border-ink/10 p-3 sm:p-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute top-1/2 left-3 z-[1] h-4 w-4 -translate-y-1/2 text-muted" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search files…"
+              className="w-full border border-ink/15 bg-paper/80 py-2.5 pr-3 pl-10 text-sm text-ink outline-none transition placeholder:text-muted focus:border-rose/70 focus:ring-1 focus:ring-rose/30"
+            />
+          </div>
           <Button
             type="button"
             loading={uploading}
             onClick={() => fileInput.current?.click()}
-            className="shrink-0"
+            className="w-full shrink-0 sm:w-auto"
           >
             <UploadCloud className="h-3.5 w-3.5" />
             Upload
           </Button>
         </div>
+        {!fixedKind ? (
+          <div className="flex overflow-x-auto border border-ink/15">
+            {(
+              [
+                ["all", "All"],
+                ["image", "Images"],
+                ["video", "Videos"],
+                ["document", "Docs"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setKind(value)}
+                className={cn(
+                  "shrink-0 px-3 py-2 text-[10px] uppercase tracking-[0.16em]",
+                  kind === value
+                    ? "bg-night text-cream"
+                    : "text-muted hover:text-ink",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        ) : null}
         <input
           ref={fileInput}
           type="file"
@@ -311,7 +316,14 @@ export function MediaLibrary({
             />
           ) : (
             <>
-              <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              <ul
+                className={cn(
+                  "grid gap-3",
+                  isPicker
+                    ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4"
+                    : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5",
+                )}
+              >
                 {items.map((media) => (
                   <li key={media.id}>
                     <button
@@ -326,7 +338,7 @@ export function MediaLibrary({
                       )}
                     >
                       <MediaThumb media={media} />
-                      <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-2 pt-6 pb-1.5 text-[0.7rem] text-white">
+                      <span className="absolute inset-x-0 bottom-0 truncate bg-night/80 px-2 py-1.5 text-[0.7rem] leading-tight text-cream">
                         {media.filename}
                       </span>
                       {selectedId === media.id ? (
@@ -350,7 +362,7 @@ export function MediaLibrary({
           )}
         </div>
 
-        {selected ? (
+        {selected && !isPicker ? (
           <aside className="max-h-[22rem] shrink-0 overflow-y-auto border-t border-ink/10 bg-cream p-4 lg:max-h-none lg:w-72 lg:border-t-0 lg:border-l">
             <div className="mb-3 flex items-center justify-between lg:hidden">
               <p className="text-sm font-medium text-ink">File details</p>
@@ -439,7 +451,66 @@ export function MediaLibrary({
             </div>
           </aside>
         ) : null}
+
+        {selected && isPicker ? (
+          <aside className="hidden w-64 shrink-0 overflow-y-auto border-l border-ink/10 bg-paper/40 p-4 lg:block">
+            <div className="aspect-square overflow-hidden border border-ink/10 bg-paper-deep">
+              {selected.kind === "video" ? (
+                <video
+                  src={selected.url}
+                  controls
+                  preload="metadata"
+                  className="h-full w-full bg-night object-contain"
+                />
+              ) : selected.kind === "image" ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={selected.url}
+                  alt={selected.alt || selected.filename}
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <MediaThumb media={selected} />
+              )}
+            </div>
+            <p className="mt-3 break-all text-sm font-medium text-ink">
+              {selected.filename}
+            </p>
+            <p className="mt-0.5 text-xs text-muted">
+              {formatBytes(selected.size)}
+              {selected.width && selected.height
+                ? ` · ${selected.width}×${selected.height}`
+                : ""}
+            </p>
+          </aside>
+        ) : null}
       </div>
+
+      {isPicker && onSelect ? (
+        <div className="flex shrink-0 flex-col gap-2 border-t border-ink/10 bg-cream px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+          <p className="min-w-0 truncate text-sm text-muted">
+            {selected ? (
+              <>
+                Selected:{" "}
+                <span className="font-medium text-ink">{selected.filename}</span>
+              </>
+            ) : (
+              "Select a file, or double-click to use instantly"
+            )}
+          </p>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              disabled={!selected}
+              onClick={() => selected && onSelect(selected)}
+              className="flex-1 sm:flex-none"
+            >
+              <Check className="h-3.5 w-3.5" />
+              {selectLabel}
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       {dragging ? (
         <div className="pointer-events-none absolute inset-2 z-20 flex flex-col items-center justify-center border-2 border-dashed border-rose bg-rose/10 backdrop-blur-sm">
@@ -470,16 +541,20 @@ export function MediaPickerDialog({
       onClose={onClose}
       size="xl"
       title={`Choose ${label === "image" ? "an" : "a"} ${label}`}
-      description="Pick from your library or upload a new one. Double-click to select quickly."
+      description="Pick from your library or upload a new one."
+      bodyClassName="flex min-h-0 flex-col overflow-hidden"
     >
-      <MediaLibrary
-        kind={kind}
-        selectLabel={`Use this ${label}`}
-        onSelect={(media) => {
-          onSelect(media);
-          onClose();
-        }}
-      />
+      <div className="flex h-[min(72dvh,640px)] min-h-[22rem] flex-col">
+        <MediaLibrary
+          kind={kind}
+          variant="picker"
+          selectLabel={`Use this ${label}`}
+          onSelect={(media) => {
+            onSelect(media);
+            onClose();
+          }}
+        />
+      </div>
     </Dialog>
   );
 }
