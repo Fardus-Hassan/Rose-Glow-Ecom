@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { getCoverMedia, localize, type Product } from "@/data/products";
 import type { Review } from "@/data/reviews";
@@ -14,6 +14,7 @@ import { LandingQuickView } from "@/components/landing/LandingQuickView";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { Slider } from "@/components/ui/Slider";
 import { RichText } from "@/components/ui/RichText";
+import { MetaViewContent } from "@/components/analytics/MetaViewContent";
 import {
   computeClientShippingFee,
   createStoreOrder,
@@ -21,6 +22,11 @@ import {
   fetchShippingSettings,
   type ShippingSettings,
 } from "@/lib/catalog";
+import {
+  trackAddToCart,
+  trackInitiateCheckout,
+  trackPurchase,
+} from "@/lib/meta-pixel";
 import {
   parseLandingConfig,
   type ProductLandingConfig,
@@ -164,6 +170,22 @@ export function ProductLanding({
   const total = subtotal + shippingFee;
   const itemCount = orderItems.reduce((sum, item) => sum + item.qty, 0);
 
+  const checkoutTracked = useRef(false);
+  useEffect(() => {
+    if (!product || !orderInView || checkoutTracked.current) return;
+    if (orderItems.length === 0) return;
+    checkoutTracked.current = true;
+    trackInitiateCheckout({
+      value: total,
+      numItems: itemCount,
+      contents: orderItems.map(({ product: item, qty }) => ({
+        id: item.sku || item.slug,
+        quantity: qty,
+        item_price: item.price,
+      })),
+    });
+  }, [product, orderInView, orderItems, total, itemCount]);
+
   if (!product) {
     if (!ready) return <LandingPageSkeleton />;
     return null;
@@ -184,6 +206,7 @@ export function ProductLanding({
   };
 
   const setQty = (slug: string, qty: number) => {
+    const prevQty = lines[slug] || 0;
     setLines((prev) => {
       const next = { ...prev };
       if (qty <= 0) {
@@ -195,13 +218,34 @@ export function ProductLanding({
       }
       return next;
     });
+    if (qty > prevQty) {
+      const item = getBySlug(slug);
+      if (item) {
+        const added = qty - prevQty;
+        trackAddToCart({
+          contentId: item.sku || item.slug,
+          contentName: localize(item.name, locale),
+          value: item.price * added,
+          quantity: added,
+        });
+      }
+    }
   };
 
   const addProduct = (slug: string) => {
+    const item = getBySlug(slug);
     setLines((prev) => ({
       ...prev,
       [slug]: (prev[slug] || 0) + 1,
     }));
+    if (item) {
+      trackAddToCart({
+        contentId: item.sku || item.slug,
+        contentName: localize(item.name, locale),
+        value: item.price,
+        quantity: 1,
+      });
+    }
     scrollToOrder();
   };
 
@@ -261,6 +305,16 @@ export function ProductLanding({
           quantity: qty,
         })),
       });
+      trackPurchase({
+        value: order.total ?? total,
+        orderId: order.orderNumber,
+        eventId: order.id || order.orderNumber,
+        contents: orderItems.map(({ product: item, qty }) => ({
+          id: item.sku || item.slug,
+          quantity: qty,
+          item_price: item.price,
+        })),
+      });
       setOrderNumber(order.orderNumber);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -308,6 +362,11 @@ export function ProductLanding({
 
   return (
     <div className="min-h-screen bg-[color:var(--rg-paper)]">
+      <MetaViewContent
+        contentId={product.sku || product.slug}
+        contentName={localize(product.name, locale)}
+        value={product.price}
+      />
       <LandingNav />
 
       {/* Floating bag strip when multi */}

@@ -7,6 +7,7 @@ import { ProductDetails } from "@/components/product/ProductDetails";
 import { ProductReviews } from "@/components/product/ProductReviews";
 import { ProductCard } from "@/components/products/ProductCard";
 import { StaggerGrid } from "@/components/motion/StaggerGrid";
+import { MetaViewContent } from "@/components/analytics/MetaViewContent";
 import { Link } from "@/i18n/navigation";
 import {
   fetchProductBySlug,
@@ -14,6 +15,7 @@ import {
   fetchReviews,
 } from "@/lib/catalog";
 import { buildPageMetadata } from "@/lib/seo";
+import { stripHtml } from "@/lib/rich-text";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +32,7 @@ export async function generateMetadata({
     path: `/product/${slug}`,
     locale,
     fallbackTitle: `${localize(product.name, locale)} · Rose Glow`,
-    fallbackDescription: localize(product.description, locale),
+    fallbackDescription: stripHtml(localize(product.description, locale)),
   });
 }
 
@@ -62,6 +64,11 @@ export default async function ProductPage({
 
   return (
     <div className="bg-[#f0ebe4] pb-28 md:pb-24">
+      <MetaViewContent
+        contentId={product.sku || product.slug}
+        contentName={localize(product.name, locale)}
+        value={product.price}
+      />
       <div className="container-rg pt-24 md:pt-28">
         <nav className="mb-8 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/40">
           <Link href="/" className="transition hover:text-[#1c1a19]">

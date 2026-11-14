@@ -100,6 +100,12 @@ export const sectionDefaults: Record<SectionKey, Record<string, unknown>> = {
       whatsapp: "https://wa.me/8801700000000",
       tiktok: "https://tiktok.com/@roseglo.bd",
     },
+    meta: {
+      pixelEnabled: false,
+      pixelId: "",
+      testEventCode: "",
+      capiAccessToken: "",
+    },
   },
   navigation: {
     links: [

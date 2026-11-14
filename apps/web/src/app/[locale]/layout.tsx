@@ -5,10 +5,12 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { routing } from "@/i18n/routing";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 import { BagProvider } from "@/store/bag";
 import { CatalogProvider } from "@/store/catalog";
 import { buildPageMetadata } from "@/lib/seo";
 import { mediaUrl } from "@/lib/media";
+import { getPublicMetaPixelConfig } from "@/lib/server/meta-pixel";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -52,7 +54,10 @@ export default async function LocaleLayout({
   }
 
   setRequestLocale(locale);
-  const messages = await getMessages();
+  const [messages, metaPixel] = await Promise.all([
+    getMessages(),
+    getPublicMetaPixelConfig(),
+  ]);
 
   return (
     <div className={`locale-${locale} flex min-h-full flex-col`}>
@@ -60,6 +65,7 @@ export default async function LocaleLayout({
         <CatalogProvider>
           <BagProvider>
             <SmoothScroll>
+              <MetaPixel config={metaPixel} />
               <SiteChrome>{children}</SiteChrome>
             </SmoothScroll>
           </BagProvider>

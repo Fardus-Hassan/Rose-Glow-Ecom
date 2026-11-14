@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { getCoverMedia, localize, type Product } from "@/data/products";
@@ -15,6 +15,10 @@ import {
   fetchShippingSettings,
   type ShippingSettings,
 } from "@/lib/catalog";
+import {
+  trackInitiateCheckout,
+  trackPurchase,
+} from "@/lib/meta-pixel";
 
 type FormState = {
   name: string;
@@ -96,6 +100,21 @@ export function CheckoutView() {
       ? shipping?.codNoteBn || shipping?.codNoteEn
       : shipping?.codNoteEn;
 
+  const checkoutTracked = useRef(false);
+  useEffect(() => {
+    if (!ready || lines.length === 0 || checkoutTracked.current) return;
+    checkoutTracked.current = true;
+    trackInitiateCheckout({
+      value: total,
+      numItems: lines.reduce((s, item) => s + item.line.qty, 0),
+      contents: lines.map(({ line, product }) => ({
+        id: product.sku || product.slug,
+        quantity: line.qty,
+        item_price: product.price,
+      })),
+    });
+  }, [ready, lines, total]);
+
   const validate = () => {
     const next: Partial<FormState> = {};
     if (!form.name.trim()) next.name = t("required");
@@ -137,6 +156,17 @@ export function CheckoutView() {
           productSku: product.sku,
           unitPrice: product.price,
           quantity: line.qty,
+        })),
+      });
+      const eventId = order.id || order.orderNumber;
+      trackPurchase({
+        value: order.total ?? total,
+        orderId: order.orderNumber,
+        eventId,
+        contents: lines.map(({ line, product }) => ({
+          id: product.sku || product.slug,
+          quantity: line.qty,
+          item_price: product.price,
         })),
       });
       setOrderNumber(order.orderNumber);

@@ -9,6 +9,7 @@ import { useRouter } from "@/i18n/navigation";
 import { useBag } from "@/store/bag";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { RichText } from "@/components/ui/RichText";
+import { trackAddToCart } from "@/lib/meta-pixel";
 
 export function ProductInfo({ product }: { product: Product }) {
   const t = useTranslations("Product");
@@ -28,9 +29,19 @@ export function ProductInfo({ product }: { product: Product }) {
         )
       : 0;
 
+  const fireAddToCart = () => {
+    trackAddToCart({
+      contentId: product.sku || product.slug,
+      contentName: localize(product.name, locale),
+      value: product.price * qty,
+      quantity: qty,
+    });
+  };
+
   const handleAdd = () => {
     if (!product.inStock) return;
     addToCart(product.slug, qty);
+    fireAddToCart();
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
   };
@@ -38,6 +49,7 @@ export function ProductInfo({ product }: { product: Product }) {
   const handleBuyNow = () => {
     if (!product.inStock) return;
     addToCart(product.slug, qty);
+    fireAddToCart();
     router.push("/checkout");
   };
 

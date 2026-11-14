@@ -306,6 +306,31 @@ export const sectionSchemas: SectionSchema[] = [
           url("tiktok", "TikTok"),
         ],
       },
+      {
+        title: "Meta Pixel (Facebook Ads)",
+        path: "meta",
+        description:
+          "Paste your Pixel ID from Meta Events Manager. Events (PageView, ViewContent, AddToCart, Checkout, Purchase) fire automatically on the storefront.",
+        fields: [
+          toggle(
+            "pixelEnabled",
+            "Enable Meta Pixel",
+            "Turn on after you paste a valid Pixel ID.",
+          ),
+          text("pixelId", "Pixel ID", {
+            help: "Events Manager → Data sources → your Pixel → Pixel ID",
+            placeholder: "123456789012345",
+          }),
+          text("testEventCode", "Test event code (optional)", {
+            help: "From Events Manager → Test events. Leave blank in production.",
+            placeholder: "TEST12345",
+          }),
+          text("capiAccessToken", "Conversions API token (optional)", {
+            help: "Events Manager → Settings → Generate access token. Kept server-side for Purchase events.",
+            placeholder: "EAAB…",
+          }),
+        ],
+      },
     ],
   },
   {
