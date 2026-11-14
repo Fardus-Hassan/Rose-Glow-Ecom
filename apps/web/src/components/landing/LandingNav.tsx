@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 import { mediaUrl } from "@/lib/media";
 
@@ -22,14 +21,16 @@ export function LandingNav() {
           <LocaleSwitcher size="sm" />
         </div>
 
-        <Link
-          href="/l/pearl-bloom"
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           className="flex min-w-0 items-center justify-center gap-2 justify-self-center sm:gap-2.5"
+          aria-label="Rose Glow"
         >
           <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full ring-1 ring-[#c9a08a]/35 md:h-9 md:w-9">
             <Image
               src={mediaUrl("/brand/logo.png")}
-              alt="Rose Glow"
+              alt=""
               fill
               sizes="36px"
               className="object-cover"
@@ -39,7 +40,7 @@ export function LandingNav() {
           <span className="truncate font-display text-[1rem] tracking-[0.02em] sm:text-[1.1rem] md:text-xl">
             Rose Glow
           </span>
-        </Link>
+        </button>
 
         <div className="flex justify-end">
           <button
