@@ -89,6 +89,7 @@ export default function SubscribersPage() {
                 <tr>
                   <th className="px-4 py-3">Email</th>
                   <th className="px-4 py-3">Joined</th>
+                  <th className="px-4 py-3 text-right"> </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-ink/10">
@@ -97,6 +98,46 @@ export default function SubscribersPage() {
                     <td className="px-4 py-3">{row.email}</td>
                     <td className="px-4 py-3 text-muted">
                       {formatDate(row.createdAt)}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        type="button"
+                        className="text-[11px] uppercase tracking-[0.14em] text-red-900/80 hover:text-red-900"
+                        onClick={async () => {
+                          if (
+                            !confirm(
+                              "Move this subscriber to the recycle bin? Restorable for 30 days.",
+                            )
+                          ) {
+                            return;
+                          }
+                          try {
+                            await api("/admin/subscribers", {
+                              method: "DELETE",
+                              body: JSON.stringify({ id: row.id }),
+                            });
+                            toast.success("Moved to recycle bin");
+                            setPage(1);
+                            setLoading(true);
+                            const res = await api<Paginated<Row>>(
+                              `/admin/subscribers${pageQuery(1, pageSize)}`,
+                            );
+                            setRows(res.items);
+                            setTotalPages(res.totalPages);
+                            setTotal(res.total);
+                          } catch (err) {
+                            toast.error(
+                              err instanceof Error
+                                ? err.message
+                                : "Delete failed",
+                            );
+                          } finally {
+                            setLoading(false);
+                          }
+                        }}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}

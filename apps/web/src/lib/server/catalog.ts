@@ -61,10 +61,17 @@ export const products = {
     page: PageParams;
   }) {
     const where: Prisma.ProductWhereInput = {
+      deletedAt: null,
       published: true,
       ...(params.featured ? { featured: true } : {}),
       ...(params.category
-        ? { category: { slug: params.category, isActive: true } }
+        ? {
+            category: {
+              slug: params.category,
+              isActive: true,
+              deletedAt: null,
+            },
+          }
         : {}),
       ...(params.q
         ? {
@@ -98,9 +105,16 @@ export const products = {
             : [{ featured: "desc" }, { createdAt: "desc" }];
 
     const facetWhere: Prisma.ProductWhereInput = {
+      deletedAt: null,
       published: true,
       ...(params.category
-        ? { category: { slug: params.category, isActive: true } }
+        ? {
+            category: {
+              slug: params.category,
+              isActive: true,
+              deletedAt: null,
+            },
+          }
         : {}),
       ...(params.q
         ? {
@@ -141,7 +155,7 @@ export const products = {
 
   async findOnePublic(slug: string) {
     const product = await prisma.product.findFirst({
-      where: { slug, published: true },
+      where: { slug, published: true, deletedAt: null },
       include: productInclude,
     });
     if (!product) throw new HttpError(404, "Product not found");
@@ -154,6 +168,7 @@ export const products = {
         landingEnabled: true,
         landingSlug,
         published: true,
+        deletedAt: null,
       },
       include: productInclude,
     });
@@ -165,16 +180,19 @@ export const products = {
     q: string | undefined,
     pageParams: PageParams,
   ): Promise<Paginated<Prisma.ProductGetPayload<{ include: typeof productInclude }>>> {
-    const where: Prisma.ProductWhereInput | undefined = q
-      ? {
-          OR: [
-            { nameEn: { contains: q, mode: "insensitive" } },
-            { nameBn: { contains: q, mode: "insensitive" } },
-            { sku: { contains: q, mode: "insensitive" } },
-            { slug: { contains: q, mode: "insensitive" } },
-          ],
-        }
-      : undefined;
+    const where: Prisma.ProductWhereInput = {
+      deletedAt: null,
+      ...(q
+        ? {
+            OR: [
+              { nameEn: { contains: q, mode: "insensitive" } },
+              { nameBn: { contains: q, mode: "insensitive" } },
+              { sku: { contains: q, mode: "insensitive" } },
+              { slug: { contains: q, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    };
     const [total, items] = await Promise.all([
       prisma.product.count({ where }),
       prisma.product.findMany({
@@ -189,8 +207,8 @@ export const products = {
   },
 
   async findOneAdmin(id: string) {
-    const product = await prisma.product.findUnique({
-      where: { id },
+    const product = await prisma.product.findFirst({
+      where: { id, deletedAt: null },
       include: productInclude,
     });
     if (!product) throw new HttpError(404, "Product not found");
@@ -255,22 +273,39 @@ export const products = {
 
   async remove(id: string) {
     await this.findOneAdmin(id);
-    return prisma.product.delete({ where: { id } });
+    return prisma.product.update({
+      where: { id },
+      data: { deletedAt: new Date(), published: false, landingEnabled: false },
+    });
   },
 };
 
 export const categories = {
   findAll(activeOnly = false) {
     return prisma.category.findMany({
-      where: activeOnly ? { isActive: true } : undefined,
+      where: {
+        deletedAt: null,
+        ...(activeOnly ? { isActive: true } : {}),
+      },
       orderBy: [{ sortOrder: "asc" }, { nameEn: "asc" }],
-      include: { _count: { select: { products: true } } },
+      include: {
+        _count: {
+          select: { products: { where: { deletedAt: null } } },
+        },
+      },
     });
   },
   async findOne(idOrSlug: string) {
     const category = await prisma.category.findFirst({
-      where: { OR: [{ id: idOrSlug }, { slug: idOrSlug }] },
-      include: { _count: { select: { products: true } } },
+      where: {
+        deletedAt: null,
+        OR: [{ id: idOrSlug }, { slug: idOrSlug }],
+      },
+      include: {
+        _count: {
+          select: { products: { where: { deletedAt: null } } },
+        },
+      },
     });
     if (!category) throw new HttpError(404, "Category not found");
     return category;
@@ -284,7 +319,21 @@ export const categories = {
   },
   async remove(id: string) {
     await this.findOne(id);
-    return prisma.category.delete({ where: { id } });
+    const now = new Date();
+    return prisma.$transaction(async (tx) => {
+      await tx.product.updateMany({
+        where: { categoryId: id, deletedAt: null },
+        data: {
+          deletedAt: now,
+          published: false,
+          landingEnabled: false,
+        },
+      });
+      return tx.category.update({
+        where: { id },
+        data: { deletedAt: now, isActive: false },
+      });
+    });
   },
 };
 
@@ -476,10 +525,11 @@ export const reviews = {
     page: PageParams;
   }) {
     const where: Prisma.ReviewWhereInput = {
+      deletedAt: null,
       isPublished: true,
       ...(params.productId ? { productId: params.productId } : {}),
       ...(params.productSlug
-        ? { product: { slug: params.productSlug } }
+        ? { product: { slug: params.productSlug, deletedAt: null } }
         : {}),
     };
     const [total, items] = await Promise.all([
@@ -497,9 +547,11 @@ export const reviews = {
     return paginated(items, total, params.page);
   },
   async findAdmin(pageParams: PageParams) {
+    const where: Prisma.ReviewWhereInput = { deletedAt: null };
     const [total, items] = await Promise.all([
-      prisma.review.count(),
+      prisma.review.count({ where }),
       prisma.review.findMany({
+        where,
         orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
         include: { product: { select: { slug: true, nameEn: true } } },
         skip: pageParams.skip,
@@ -512,14 +564,21 @@ export const reviews = {
     return prisma.review.create({ data });
   },
   async update(id: string, data: Prisma.ReviewUncheckedUpdateInput) {
-    const existing = await prisma.review.findUnique({ where: { id } });
+    const existing = await prisma.review.findFirst({
+      where: { id, deletedAt: null },
+    });
     if (!existing) throw new HttpError(404, "Review not found");
     return prisma.review.update({ where: { id }, data });
   },
   async remove(id: string) {
-    const existing = await prisma.review.findUnique({ where: { id } });
+    const existing = await prisma.review.findFirst({
+      where: { id, deletedAt: null },
+    });
     if (!existing) throw new HttpError(404, "Review not found");
-    return prisma.review.delete({ where: { id } });
+    return prisma.review.update({
+      where: { id },
+      data: { deletedAt: new Date(), isPublished: false },
+    });
   },
 };
 
@@ -579,8 +638,8 @@ export async function dashboardOverview() {
     lowStock,
     reviewCount,
   ] = await Promise.all([
-    prisma.product.count(),
-    prisma.product.count({ where: { published: true } }),
+    prisma.product.count({ where: { deletedAt: null } }),
+    prisma.product.count({ where: { published: true, deletedAt: null } }),
     prisma.order.count(),
     prisma.order.count({ where: { status: OrderStatus.PENDING } }),
     prisma.order.aggregate({
@@ -593,7 +652,7 @@ export async function dashboardOverview() {
       include: { items: true },
     }),
     prisma.product.findMany({
-      where: { inStock: true, stock: { lte: 5 } },
+      where: { deletedAt: null, inStock: true, stock: { lte: 5 } },
       take: 6,
       orderBy: { stock: "asc" },
       select: {
@@ -604,7 +663,7 @@ export async function dashboardOverview() {
         slug: true,
       },
     }),
-    prisma.review.count({ where: { isPublished: true } }),
+    prisma.review.count({ where: { isPublished: true, deletedAt: null } }),
   ]);
 
   const statusGroups = await prisma.order.groupBy({

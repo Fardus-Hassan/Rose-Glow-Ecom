@@ -47,21 +47,27 @@ async function main() {
 
   const categories = new Map<string, string>();
   for (const cat of categoryDefs) {
-    const row = await prisma.category.upsert({
-      where: { slug: cat.slug },
-      create: {
-        ...cat,
-        seoTitleEn: `${cat.nameEn} | Rose Glow`,
-        seoTitleBn: `${cat.nameBn} | Rose Glow`,
-        seoDescriptionEn: `Shop ${cat.nameEn.toLowerCase()} from Rose Glow atelier.`,
-        seoDescriptionBn: `Rose Glow অ্যাটেলিয়ের থেকে ${cat.nameBn} কিনুন।`,
-      },
-      update: {
-        nameEn: cat.nameEn,
-        nameBn: cat.nameBn,
-        sortOrder: cat.sortOrder,
-      },
+    const existing = await prisma.category.findFirst({
+      where: { slug: cat.slug, deletedAt: null },
     });
+    const row = existing
+      ? await prisma.category.update({
+          where: { id: existing.id },
+          data: {
+            nameEn: cat.nameEn,
+            nameBn: cat.nameBn,
+            sortOrder: cat.sortOrder,
+          },
+        })
+      : await prisma.category.create({
+          data: {
+            ...cat,
+            seoTitleEn: `${cat.nameEn} | Rose Glow`,
+            seoTitleBn: `${cat.nameBn} | Rose Glow`,
+            seoDescriptionEn: `Shop ${cat.nameEn.toLowerCase()} from Rose Glow atelier.`,
+            seoDescriptionBn: `Rose Glow অ্যাটেলিয়ের থেকে ${cat.nameBn} কিনুন।`,
+          },
+        });
     categories.set(cat.slug, row.id);
   }
 
@@ -256,59 +262,65 @@ async function main() {
 
   for (const p of products) {
     const categoryId = categories.get(p.category)!;
-    const row = await prisma.product.upsert({
-      where: { slug: p.slug },
-      create: {
-        slug: p.slug,
-        sku: p.sku,
-        nameEn: p.nameEn,
-        nameBn: p.nameBn,
-        descriptionEn: p.descriptionEn,
-        descriptionBn: p.descriptionBn,
-        price: p.price,
-        compareAtPrice: 'compareAtPrice' in p ? p.compareAtPrice : null,
-        categoryId,
-        materialEn: p.materialEn,
-        materialBn: p.materialBn,
-        colors: p.colors,
-        rating: p.rating,
-        reviewCount: p.reviewCount,
-        soldCount: p.soldCount,
-        stock: p.stock,
-        featured: 'featured' in p ? !!p.featured : false,
-        newest: 'newest' in p ? !!p.newest : false,
-        inStock: true,
-        published: true,
-        seoTitleEn: `${p.nameEn} | Rose Glow`,
-        seoTitleBn: `${p.nameBn} | Rose Glow`,
-        seoDescriptionEn: p.descriptionEn.slice(0, 155),
-        seoDescriptionBn: p.descriptionBn.slice(0, 155),
-        seoKeywords: `${p.nameEn}, Rose Glow, ornaments`,
-        canonicalPath: `/products/${p.slug}`,
-        ogImage: p.media[0]?.src ?? '',
-        media: {
-          create: p.media.map((m, i) => ({
-            type: m.type,
-            src: m.src,
-            altEn: m.altEn,
-            altBn: m.altBn,
-            sortOrder: i,
-          })),
-        },
-      },
-      update: {
-        nameEn: p.nameEn,
-        nameBn: p.nameBn,
-        descriptionEn: p.descriptionEn,
-        descriptionBn: p.descriptionBn,
-        price: p.price,
-        compareAtPrice: 'compareAtPrice' in p ? p.compareAtPrice : null,
-        categoryId,
-        stock: p.stock,
-        featured: 'featured' in p ? !!p.featured : false,
-        newest: 'newest' in p ? !!p.newest : false,
-      },
+    const existing = await prisma.product.findFirst({
+      where: { slug: p.slug, deletedAt: null },
     });
+    const row = existing
+      ? await prisma.product.update({
+          where: { id: existing.id },
+          data: {
+            nameEn: p.nameEn,
+            nameBn: p.nameBn,
+            descriptionEn: p.descriptionEn,
+            descriptionBn: p.descriptionBn,
+            price: p.price,
+            compareAtPrice: 'compareAtPrice' in p ? p.compareAtPrice : null,
+            categoryId,
+            stock: p.stock,
+            featured: 'featured' in p ? !!p.featured : false,
+            newest: 'newest' in p ? !!p.newest : false,
+          },
+        })
+      : await prisma.product.create({
+          data: {
+            slug: p.slug,
+            sku: p.sku,
+            nameEn: p.nameEn,
+            nameBn: p.nameBn,
+            descriptionEn: p.descriptionEn,
+            descriptionBn: p.descriptionBn,
+            price: p.price,
+            compareAtPrice: 'compareAtPrice' in p ? p.compareAtPrice : null,
+            categoryId,
+            materialEn: p.materialEn,
+            materialBn: p.materialBn,
+            colors: p.colors,
+            rating: p.rating,
+            reviewCount: p.reviewCount,
+            soldCount: p.soldCount,
+            stock: p.stock,
+            featured: 'featured' in p ? !!p.featured : false,
+            newest: 'newest' in p ? !!p.newest : false,
+            inStock: true,
+            published: true,
+            seoTitleEn: `${p.nameEn} | Rose Glow`,
+            seoTitleBn: `${p.nameBn} | Rose Glow`,
+            seoDescriptionEn: p.descriptionEn.slice(0, 155),
+            seoDescriptionBn: p.descriptionBn.slice(0, 155),
+            seoKeywords: `${p.nameEn}, Rose Glow, ornaments`,
+            canonicalPath: `/products/${p.slug}`,
+            ogImage: p.media[0]?.src ?? '',
+            media: {
+              create: p.media.map((m, i) => ({
+                type: m.type,
+                src: m.src,
+                altEn: m.altEn,
+                altBn: m.altBn,
+                sortOrder: i,
+              })),
+            },
+          },
+        });
     productIds.push(row.id);
   }
 

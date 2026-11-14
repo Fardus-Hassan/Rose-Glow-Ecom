@@ -51,7 +51,7 @@ model User {
 
 model Category {
   id                 String    @id @default(cuid())
-  slug               String    @unique
+  slug               String
   nameEn             String
   nameBn             String
   descriptionEn      String    @default("")
@@ -63,14 +63,18 @@ model Category {
   sortOrder          Int       @default(0)
   isActive           Boolean   @default(true)
   products           Product[]
+  deletedAt          DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+
+  @@index([deletedAt])
+  @@index([slug])
 }
 
 model Product {
   id               String         @id @default(cuid())
-  slug             String         @unique
-  sku              String         @unique
+  slug             String
+  sku              String
   nameEn           String
   nameBn           String
   descriptionEn    String
@@ -99,17 +103,21 @@ model Product {
   ogImage          String         @default("")
   /** Ad / COD landing under /l/[landingSlug] */
   landingEnabled   Boolean        @default(false)
-  landingSlug      String?        @unique
+  landingSlug      String?
   landing          Json           @default("{}")
   media            ProductMedia[]
   orderItems       OrderItem[]
   reviews          Review[]
+  deletedAt        DateTime?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
   @@index([categoryId])
   @@index([published, featured])
   @@index([landingEnabled])
+  @@index([deletedAt])
+  @@index([slug])
+  @@index([sku])
 }
 
 model ProductMedia {
@@ -167,20 +175,23 @@ model OrderItem {
 }
 
 model Review {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   productId   String?
-  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  product     Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
   authorName  String
-  locationEn  String   @default("")
-  locationBn  String   @default("")
+  locationEn  String    @default("")
+  locationBn  String    @default("")
   bodyEn      String
   bodyBn      String
-  rating      Int      @default(5)
-  imageUrls   Json     @default("[]")
-  isPublished Boolean  @default(true)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  rating      Int       @default(5)
+  imageUrls   Json      @default("[]")
+  isPublished Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([deletedAt])
 }
 
 model Page {
@@ -298,7 +309,11 @@ model MediaAsset {
 }
 
 model Subscriber {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
+  id        String    @id @default(cuid())
+  email     String
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([deletedAt])
+  @@index([email])
 }

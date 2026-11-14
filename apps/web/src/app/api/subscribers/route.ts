@@ -8,11 +8,27 @@ export async function POST(request: Request) {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       throw new HttpError(400, "Valid email required");
     }
-    const row = await prisma.subscriber.upsert({
-      where: { email },
-      create: { email },
-      update: {},
+
+    const existing = await prisma.subscriber.findFirst({
+      where: { email, deletedAt: null },
     });
+    if (existing) {
+      return json({ id: existing.id, ok: true }, 200);
+    }
+
+    const trashed = await prisma.subscriber.findFirst({
+      where: { email, deletedAt: { not: null } },
+      orderBy: { deletedAt: "desc" },
+    });
+    if (trashed) {
+      const restored = await prisma.subscriber.update({
+        where: { id: trashed.id },
+        data: { deletedAt: null },
+      });
+      return json({ id: restored.id, ok: true }, 201);
+    }
+
+    const row = await prisma.subscriber.create({ data: { email } });
     return json({ id: row.id, ok: true }, 201);
   } catch (err) {
     return handleRouteError(err);

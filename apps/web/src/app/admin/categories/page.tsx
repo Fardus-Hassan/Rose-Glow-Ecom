@@ -91,7 +91,13 @@ export default function CategoriesPage() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Delete this category?")) return;
+    if (
+      !confirm(
+        "Move this category (and its products) to the recycle bin? Restorable for 30 days.",
+      )
+    ) {
+      return;
+    }
     await api(`/admin/categories/${id}`, { method: "DELETE" });
     load();
     if (editingId === id) setEditingId(null);
@@ -323,7 +329,7 @@ export default function CategoriesPage() {
                   variant="danger"
                   onClick={() => remove(editingId)}
                 >
-                  Delete
+                  Move to recycle bin
                 </Button>
               ) : null}
             </div>

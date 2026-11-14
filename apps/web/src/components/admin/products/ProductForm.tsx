@@ -165,6 +165,7 @@ export function ProductForm({
   const [media, setMedia] = useState<GalleryItem[]>(seeded?.media || []);
   const [colors, setColors] = useState<ColorRow[]>(seeded?.colors || []);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const slugTouched = useRef(Boolean(initial?.slug));
 
@@ -254,6 +255,24 @@ export function ProductForm({
       toast.error(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function moveToTrash() {
+    if (!productId) return;
+    const ok = window.confirm(
+      "Move this product to the recycle bin? You can restore it within 30 days.",
+    );
+    if (!ok) return;
+    setDeleting(true);
+    try {
+      await api(`/admin/products/${productId}`, { method: "DELETE" });
+      toast.success("Moved to recycle bin");
+      router.push("/admin/products");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Delete failed");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -834,6 +853,18 @@ export function ProductForm({
               >
                 View on site <ExternalLink className="h-3.5 w-3.5" />
               </Link>
+            ) : null}
+            {productId ? (
+              <Button
+                type="button"
+                variant="danger"
+                className="w-full"
+                loading={deleting}
+                onClick={() => void moveToTrash()}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Move to recycle bin
+              </Button>
             ) : null}
           </div>
         </aside>

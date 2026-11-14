@@ -102,11 +102,11 @@ export async function dashboardStats() {
   ] = await Promise.all([
     prisma.contactMessage.count({ where: { read: false } }),
     prisma.contactMessage.count(),
-    prisma.subscriber.count(),
+    prisma.subscriber.count({ where: { deletedAt: null } }),
     prisma.mediaAsset.count(),
     prisma.order.count({ where: { status: "PENDING" } }),
     prisma.order.count(),
-    prisma.product.count({ where: { published: true } }),
+    prisma.product.count({ where: { published: true, deletedAt: null } }),
     prisma.contactMessage.findMany({
       take: 6,
       orderBy: { createdAt: "desc" },

@@ -85,12 +85,32 @@ export default function ReviewsPage() {
                     <p className="mt-2 text-sm text-muted">{r.bodyBn}</p>
                   ) : null}
                 </div>
-                <Button
-                  variant={r.isPublished ? "secondary" : "primary"}
-                  onClick={() => togglePublish(r)}
-                >
-                  {r.isPublished ? "Unpublish" : "Publish"}
-                </Button>
+                <div className="flex shrink-0 flex-col gap-2">
+                  <Button
+                    variant={r.isPublished ? "secondary" : "primary"}
+                    onClick={() => togglePublish(r)}
+                  >
+                    {r.isPublished ? "Unpublish" : "Publish"}
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={async () => {
+                      if (
+                        !confirm(
+                          "Move this review to the recycle bin? Restorable for 30 days.",
+                        )
+                      ) {
+                        return;
+                      }
+                      await api(`/admin/reviews/${r.id}`, {
+                        method: "DELETE",
+                      });
+                      load(page);
+                    }}
+                  >
+                    Move to bin
+                  </Button>
+                </div>
               </article>
             ))}
           </div>

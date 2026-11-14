@@ -7,6 +7,7 @@ import {
   Package,
   ShoppingBag,
   Star,
+  Trash2,
   Users,
 } from "lucide-react";
 import { sectionSchemas } from "@/lib/cms/schema";
@@ -62,6 +63,7 @@ export const navGroups: NavGroup[] = [
     items: [
       { href: "/admin/media", label: "Media library", icon: Images },
       { href: "/admin/subscribers", label: "Subscribers", icon: Users },
+      { href: "/admin/recycle-bin", label: "Recycle bin", icon: Trash2 },
     ],
   },
 ];
