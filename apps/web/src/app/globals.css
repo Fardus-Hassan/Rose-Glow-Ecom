@@ -109,7 +109,7 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Bangla locale: Hind Siliguri as primary UI type */
+  /* Bangla locale: Noto Sans Bengali (cleaner digits, esp. ১) */
   body.locale-bn {
     font-family: var(--font-sans-bn), var(--font-sans), system-ui, sans-serif;
     line-height: 1.7;

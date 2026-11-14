@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import {
   Cormorant_Garamond,
-  Hind_Siliguri,
   Manrope,
+  Noto_Sans_Bengali,
   Noto_Serif_Bengali,
 } from "next/font/google";
 import "./globals.css";
@@ -28,7 +28,8 @@ const displayBn = Noto_Serif_Bengali({
   display: "swap",
 });
 
-const sansBn = Hind_Siliguri({
+/** Cleaner Bangla numerals (esp. ১) than Hind Siliguri’s looped glyph */
+const sansBn = Noto_Sans_Bengali({
   subsets: ["bengali", "latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-sans-bn",
