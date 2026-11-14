@@ -139,6 +139,11 @@ export const sectionSchemas: SectionSchema[] = [
               { value: "video", label: "Video" },
             ],
           },
+          toggle(
+            "overlayEnabled",
+            "Dark overlay",
+            "Keeps headline/CTA readable over bright image or video. Turn off for a clean full-bleed look.",
+          ),
           image("imageDesktop", "Desktop image"),
           image("imageMobile", "Mobile image"),
           video(

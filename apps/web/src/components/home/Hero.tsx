@@ -200,11 +200,15 @@ export function Hero({
         )}
       </div>
 
-      <div className="absolute inset-0 -z-10 bg-[#0e0d0c]/35 md:bg-[#0e0d0c]/25" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#0e0d0c] via-[#0e0d0c]/78 to-[#0e0d0c]/15 md:via-[#0e0d0c]/55 md:to-transparent" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#0e0d0c] via-[#0e0d0c]/55 to-[#0e0d0c]/40 md:via-[#0e0d0c]/25 md:to-[#0e0d0c]/30" />
-      <div className="absolute inset-y-0 left-0 -z-10 w-full max-w-3xl bg-gradient-to-r from-[#0e0d0c]/55 to-transparent md:max-w-4xl" />
-      <div className="absolute -left-24 top-1/4 -z-10 h-72 w-72 rounded-full bg-[#c9a08a]/10 blur-[100px]" />
+      {content.overlayEnabled ? (
+        <>
+          <div className="absolute inset-0 -z-10 bg-[#0e0d0c]/35 md:bg-[#0e0d0c]/25" />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#0e0d0c] via-[#0e0d0c]/78 to-[#0e0d0c]/15 md:via-[#0e0d0c]/55 md:to-transparent" />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#0e0d0c] via-[#0e0d0c]/55 to-[#0e0d0c]/40 md:via-[#0e0d0c]/25 md:to-[#0e0d0c]/30" />
+          <div className="absolute inset-y-0 left-0 -z-10 w-full max-w-3xl bg-gradient-to-r from-[#0e0d0c]/55 to-transparent md:max-w-4xl" />
+          <div className="absolute -left-24 top-1/4 -z-10 h-72 w-72 rounded-full bg-[#c9a08a]/10 blur-[100px]" />
+        </>
+      ) : null}
 
       <div className="container-rg relative pb-16 pt-28 md:pb-24">
         <div className="relative max-w-3xl">

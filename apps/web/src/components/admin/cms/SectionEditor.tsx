@@ -14,6 +14,32 @@ import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { Button } from "@/components/admin/ui/Button";
 import { AdminFormSkeleton } from "@/components/skeletons/AdminSkeletons";
 
+function deepMerge(
+  base: Record<string, unknown>,
+  over: Record<string, unknown>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...base };
+  for (const [key, value] of Object.entries(over)) {
+    const prev = out[key];
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      prev &&
+      typeof prev === "object" &&
+      !Array.isArray(prev)
+    ) {
+      out[key] = deepMerge(
+        prev as Record<string, unknown>,
+        value as Record<string, unknown>,
+      );
+    } else {
+      out[key] = value;
+    }
+  }
+  return out;
+}
+
 function getAt(obj: Record<string, unknown>, path?: string) {
   if (!path) return obj;
   const parts = path.split(".");
@@ -60,7 +86,13 @@ export function SectionEditor({ sectionKey }: { sectionKey: SectionKey }) {
     )
       .then((row) => {
         if (cancelled) return;
-        setData(row.data || sectionDefaults[sectionKey] || {});
+        const defaults = sectionDefaults[sectionKey] || {};
+        setData(
+          deepMerge(
+            defaults as Record<string, unknown>,
+            (row.data || {}) as Record<string, unknown>,
+          ),
+        );
         setSeo(row.seo || {});
       })
       .catch((err) => toast.error(err.message))

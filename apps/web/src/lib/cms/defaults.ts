@@ -15,6 +15,7 @@ export const sectionDefaults: Record<SectionKey, Record<string, unknown>> = {
       ctaEn: "Enter the collection",
       ctaBn: "কালেকশনে প্রবেশ করুন",
       mode: "image",
+      overlayEnabled: true,
       imageDesktop: mediaUrl("/home/atelier-gold-spread.jpg"),
       imageMobile: mediaUrl("/home/hero-ornaments.jpg"),
       videoDesktop: "",

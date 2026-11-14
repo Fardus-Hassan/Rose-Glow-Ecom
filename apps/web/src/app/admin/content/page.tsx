@@ -32,8 +32,10 @@ export default function ContentPage() {
     setJsonText(JSON.stringify(block.value, null, 2));
     setJsonMode(!["hero", "contact", "social"].includes(block.key));
     if (block.key === "hero") {
-      const v = block.value as Record<string, string>;
-      const img = (block.value as { image?: { desktop?: string; mobile?: string } }).image;
+      const v = block.value as Record<string, unknown>;
+      const img = (
+        block.value as { image?: { desktop?: string; mobile?: string } }
+      ).image;
       setFields({
         brand: String(v.brand ?? ""),
         headlineEn: String(v.headlineEn ?? ""),
@@ -42,6 +44,10 @@ export default function ContentPage() {
         bodyBn: String(v.bodyBn ?? ""),
         ctaEn: String(v.ctaEn ?? ""),
         ctaBn: String(v.ctaBn ?? ""),
+        overlayEnabled:
+          v.overlayEnabled === false || v.overlayEnabled === "false"
+            ? "false"
+            : "true",
         imageDesktop: img?.desktop ?? "",
         imageMobile: img?.mobile ?? "",
       });
@@ -85,6 +91,7 @@ export default function ContentPage() {
           ctaEn: fields.ctaEn,
           ctaBn: fields.ctaBn,
           mode: "image",
+          overlayEnabled: fields.overlayEnabled !== "false",
           image: {
             desktop: fields.imageDesktop,
             mobile: fields.imageMobile,
@@ -119,6 +126,7 @@ export default function ContentPage() {
           ["bodyBn", "Body BN"],
           ["ctaEn", "CTA EN"],
           ["ctaBn", "CTA BN"],
+          ["overlayEnabled", "Dark overlay (true/false)"],
           ["imageDesktop", "Desktop image"],
           ["imageMobile", "Mobile image"],
         ]

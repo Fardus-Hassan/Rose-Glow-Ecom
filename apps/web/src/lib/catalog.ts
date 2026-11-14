@@ -112,6 +112,8 @@ export type HeroContent = {
   ctaEn: string;
   ctaBn: string;
   mode: "image" | "video";
+  /** Dark scrim over media so copy stays readable. Default on. */
+  overlayEnabled: boolean;
   image: { desktop: string; mobile: string };
   video?: {
     desktop: { src: string; poster: string };
@@ -416,37 +418,49 @@ export async function fetchReviews(params?: {
   return page.items;
 }
 
+function parseOverlayEnabled(value: unknown): boolean {
+  // Default on — only explicit false turns it off
+  return value !== false && value !== "false";
+}
+
 export async function fetchHeroContent(): Promise<HeroContent> {
-  const section = await apiFetch<{ data?: { hero?: Record<string, string> } }>(
-    "/cms/sections/home",
-  );
+  const section = await apiFetch<{
+    data?: { hero?: Record<string, unknown> };
+  }>("/cms/sections/home");
   const hero = section?.data?.hero;
   if (hero) {
     return {
       brand: "Rose Glow",
-      headlineEn: hero.headlineEn || "Quiet shine. Lasting presence.",
-      headlineBn: hero.headlineBn || "নরম আলো। স্থায়ী উপস্থিতি।",
-      bodyEn:
+      headlineEn: String(hero.headlineEn || "Quiet shine. Lasting presence."),
+      headlineBn: String(hero.headlineBn || "নরম আলো। স্থায়ী উপস্থিতি।"),
+      bodyEn: String(
         hero.bodyEn ||
-        "Ladies ornaments composed with soft light, fine finish, and everyday grace.",
-      bodyBn:
+          "Ladies ornaments composed with soft light, fine finish, and everyday grace.",
+      ),
+      bodyBn: String(
         hero.bodyBn ||
-        "কোমল আলো, সূক্ষ্ম ফিনিশ আর প্রতিদিনের কমনীয়তায় সাজানো লেডিস অর্নামেন্টস।",
-      ctaEn: hero.ctaEn || "Enter the collection",
-      ctaBn: hero.ctaBn || "কালেকশনে প্রবেশ করুন",
+          "কোমল আলো, সূক্ষ্ম ফিনিশ আর প্রতিদিনের কমনীয়তায় সাজানো লেডিস অর্নামেন্টস।",
+      ),
+      ctaEn: String(hero.ctaEn || "Enter the collection"),
+      ctaBn: String(hero.ctaBn || "কালেকশনে প্রবেশ করুন"),
       mode: hero.mode === "video" ? "video" : "image",
+      overlayEnabled: parseOverlayEnabled(hero.overlayEnabled),
       image: {
-        desktop: hero.imageDesktop || staticHero.image.desktop,
-        mobile: hero.imageMobile || staticHero.image.mobile,
+        desktop: String(hero.imageDesktop || staticHero.image.desktop),
+        mobile: String(hero.imageMobile || staticHero.image.mobile),
       },
       video: {
         desktop: {
-          src: hero.videoDesktop || staticHero.video.desktop.src,
-          poster: hero.imageDesktop || staticHero.video.desktop.poster,
+          src: String(hero.videoDesktop || staticHero.video.desktop.src),
+          poster: String(
+            hero.imageDesktop || staticHero.video.desktop.poster,
+          ),
         },
         mobile: {
-          src: hero.videoMobile || staticHero.video.mobile.src,
-          poster: hero.imageMobile || staticHero.video.mobile.poster,
+          src: String(hero.videoMobile || staticHero.video.mobile.src),
+          poster: String(
+            hero.imageMobile || staticHero.video.mobile.poster,
+          ),
         },
       },
     };
@@ -456,6 +470,7 @@ export async function fetchHeroContent(): Promise<HeroContent> {
   const value = (block?.value ?? {}) as Partial<HeroContent> & {
     image?: { desktop?: string; mobile?: string };
     video?: HeroContent["video"];
+    overlayEnabled?: boolean | string;
   };
 
   return {
@@ -471,6 +486,7 @@ export async function fetchHeroContent(): Promise<HeroContent> {
     ctaEn: value.ctaEn || "Enter the collection",
     ctaBn: value.ctaBn || "কালেকশনে প্রবেশ করুন",
     mode: value.mode === "video" ? "video" : "image",
+    overlayEnabled: parseOverlayEnabled(value.overlayEnabled),
     image: {
       desktop: value.image?.desktop || staticHero.image.desktop,
       mobile: value.image?.mobile || staticHero.image.mobile,
