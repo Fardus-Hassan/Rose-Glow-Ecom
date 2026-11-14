@@ -23,7 +23,10 @@ const VARIANT_WIDTH: Record<Exclude<MediaVariantName, "full">, number> = {
 export const MEDIA_SIZES = {
   thumb: "72px",
   card: "(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 280px",
-  gallery: "(max-width: 768px) 100vw, 52vw",
+  /** Display slot — keep moderate for LCP */
+  gallery: "(max-width: 768px) 100vw, min(820px, 52vw)",
+  /** Hover-zoom layer — request near-full source so CSS scale stays sharp */
+  galleryZoom: "2000px",
   hero: "100vw",
   review: "(max-width: 768px) 33vw, 160px",
   logo: "44px",

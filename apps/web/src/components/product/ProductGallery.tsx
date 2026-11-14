@@ -5,8 +5,11 @@ import { useLocale, useTranslations } from "next-intl";
 import gsap from "gsap";
 import { localize, type ProductMedia } from "@/data/products";
 import { cn } from "@/lib/format";
+import { mediaVariant } from "@/lib/media";
 import { SmartImage } from "@/components/media/SmartImage";
 import { SmartVideo } from "@/components/media/SmartVideo";
+
+const ZOOM_SCALE = 2;
 
 export function ProductGallery({
   media,
@@ -22,8 +25,9 @@ export function ProductGallery({
   const [paused, setPaused] = useState(false);
   const [ratio, setRatio] = useState(4 / 5);
   const stageRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
+  const zoomRef = useRef<HTMLDivElement>(null);
   const shouldPlayVideo = useRef(false);
+  const preloaded = useRef<Set<string>>(new Set());
   const current = media[active];
 
   useEffect(() => {
@@ -40,9 +44,9 @@ export function ProductGallery({
 
   useEffect(() => {
     setZooming(false);
-    if (imageRef.current) {
-      imageRef.current.style.transform = "scale(1)";
-      imageRef.current.style.transformOrigin = "center center";
+    if (zoomRef.current) {
+      zoomRef.current.style.transform = "scale(1)";
+      zoomRef.current.style.transformOrigin = "center center";
     }
   }, [active]);
 
@@ -74,6 +78,16 @@ export function ProductGallery({
     if (width > 0 && height > 0) setRatio(width / height);
   };
 
+  const preloadFull = (item: ProductMedia | undefined) => {
+    if (!item || item.type !== "image") return;
+    const src = mediaVariant(item.src, "full", item.variants);
+    if (!src || preloaded.current.has(src)) return;
+    preloaded.current.add(src);
+    const img = new window.Image();
+    img.decoding = "async";
+    img.src = src;
+  };
+
   const onMove = (event: React.MouseEvent<HTMLDivElement>) => {
     if (current?.type !== "image") return;
     if (window.matchMedia("(hover: none)").matches) return;
@@ -82,22 +96,27 @@ export function ProductGallery({
     const rect = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
-    const node = imageRef.current;
+    const node = zoomRef.current;
     if (!node) return;
 
     node.style.transformOrigin = `${x}% ${y}%`;
-    node.style.transform = "scale(1.85)";
+    node.style.transform = `scale(${ZOOM_SCALE})`;
     setZooming(true);
   };
 
   const onLeave = () => {
-    const node = imageRef.current;
+    const node = zoomRef.current;
     if (!node) return;
     node.style.transform = "scale(1)";
     setZooming(false);
   };
 
   if (!current) return null;
+
+  const zoomSrc =
+    current.type === "image"
+      ? mediaVariant(current.src, "full", current.variants)
+      : "";
 
   return (
     <div className="flex flex-col gap-3 md:grid md:grid-cols-[68px_minmax(0,1fr)] md:gap-3 lg:grid-cols-[72px_minmax(0,1fr)] lg:gap-4">
@@ -110,6 +129,7 @@ export function ProductGallery({
               key={`${item.src}-${index}`}
               type="button"
               onClick={() => selectMedia(index)}
+              onMouseEnter={() => preloadFull(item)}
               className={cn(
                 "relative flex aspect-[4/5] w-14 shrink-0 items-center justify-center overflow-hidden bg-[#e2dacf] transition md:w-full",
                 active === index
@@ -152,7 +172,10 @@ export function ProductGallery({
           maxWidth: `min(100%, calc(min(78vh, 820px) * ${ratio}))`,
           marginInline: "auto",
         }}
-        onMouseEnter={() => setPaused(true)}
+        onMouseEnter={() => {
+          setPaused(true);
+          preloadFull(current);
+        }}
         onMouseMove={onMove}
         onMouseLeave={() => {
           onLeave();
@@ -160,25 +183,48 @@ export function ProductGallery({
         }}
       >
         {current.type === "image" ? (
-          <div
-            ref={imageRef}
-            className="absolute inset-0 transition-transform duration-200 ease-out will-change-transform"
-          >
-            <SmartImage
-              src={current.src}
-              alt={current.alt ? localize(current.alt, locale) : t("image")}
-              fill
-              variant="detail"
-              variants={current.variants}
-              blurDataURL={current.blurDataUrl}
-              sizesPreset="gallery"
-              priority={active === 0}
-              className="object-contain"
-              onLoadingComplete={(img) => {
-                applyNaturalRatio(img.naturalWidth, img.naturalHeight);
-              }}
-            />
-          </div>
+          <>
+            {/* Display layer — optimized for LCP */}
+            <div
+              className={cn(
+                "absolute inset-0 transition-opacity duration-150",
+                zooming ? "opacity-0" : "opacity-100",
+              )}
+            >
+              <SmartImage
+                src={current.src}
+                alt={current.alt ? localize(current.alt, locale) : t("image")}
+                fill
+                variant="detail"
+                variants={current.variants}
+                blurDataURL={current.blurDataUrl}
+                sizesPreset="gallery"
+                priority={active === 0}
+                className="object-contain"
+                onLoadingComplete={(img) => {
+                  applyNaturalRatio(img.naturalWidth, img.naturalHeight);
+                }}
+              />
+            </div>
+
+            {/* Zoom layer — original full file, no Next resize (sharp at 2×) */}
+            <div
+              ref={zoomRef}
+              aria-hidden={!zooming}
+              className={cn(
+                "absolute inset-0 transition-[transform,opacity] duration-200 ease-out will-change-transform",
+                zooming ? "opacity-100" : "pointer-events-none opacity-0",
+              )}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={zoomSrc}
+                alt=""
+                decoding="async"
+                className="h-full w-full object-contain"
+              />
+            </div>
+          </>
         ) : (
           <SmartVideo
             key={current.src}
