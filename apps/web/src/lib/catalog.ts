@@ -115,6 +115,9 @@ export type HeroContent = {
   /** Dark scrim over media so copy stays readable. Default on. */
   overlayDesktop: boolean;
   overlayMobile: boolean;
+  /** 0 = lightest, 100 = deepest. */
+  overlayDepthDesktop: number;
+  overlayDepthMobile: number;
   image: { desktop: string; mobile: string };
   video?: {
     desktop: { src: string; poster: string };
@@ -431,6 +434,12 @@ function parseOverlayFlag(
   return true;
 }
 
+function parseOverlayDepth(value: unknown, fallback = 50): number {
+  const n = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(100, Math.max(0, Math.round(n)));
+}
+
 export async function fetchHeroContent(): Promise<HeroContent> {
   const section = await apiFetch<{
     data?: { hero?: Record<string, unknown> };
@@ -460,6 +469,8 @@ export async function fetchHeroContent(): Promise<HeroContent> {
         hero.overlayMobile,
         hero.overlayEnabled,
       ),
+      overlayDepthDesktop: parseOverlayDepth(hero.overlayDepthDesktop, 50),
+      overlayDepthMobile: parseOverlayDepth(hero.overlayDepthMobile, 55),
       image: {
         desktop: String(hero.imageDesktop || staticHero.image.desktop),
         mobile: String(hero.imageMobile || staticHero.image.mobile),
@@ -509,6 +520,8 @@ export async function fetchHeroContent(): Promise<HeroContent> {
       value.overlayMobile,
       value.overlayEnabled,
     ),
+    overlayDepthDesktop: parseOverlayDepth(value.overlayDepthDesktop, 50),
+    overlayDepthMobile: parseOverlayDepth(value.overlayDepthMobile, 55),
     image: {
       desktop: value.image?.desktop || staticHero.image.desktop,
       mobile: value.image?.mobile || staticHero.image.mobile,

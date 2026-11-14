@@ -107,17 +107,38 @@ export function FieldRenderer({
   }
 
   if (field.type === "number") {
+    const num = typeof value === "number" ? value : Number(value || 0);
+    const hasRange =
+      typeof field.min === "number" && typeof field.max === "number";
     return (
       <FieldShell field={field} htmlFor={id}>
-        <input
-          id={id}
-          type="number"
-          className="admin-input"
-          min={field.min}
-          max={field.max}
-          value={typeof value === "number" ? value : Number(value || 0)}
-          onChange={(e) => onChange(Number(e.target.value))}
-        />
+        <div className="space-y-2">
+          {hasRange ? (
+            <div className="flex items-center gap-3">
+              <input
+                id={id}
+                type="range"
+                className="h-2 w-full cursor-pointer accent-[color:var(--rg-pink,#e891a8)]"
+                min={field.min}
+                max={field.max}
+                value={Number.isFinite(num) ? num : field.min}
+                onChange={(e) => onChange(Number(e.target.value))}
+              />
+              <span className="w-10 shrink-0 text-right text-xs tabular-nums text-muted">
+                {Number.isFinite(num) ? Math.round(num) : field.min}
+              </span>
+            </div>
+          ) : null}
+          <input
+            id={hasRange ? `${id}-num` : id}
+            type="number"
+            className="admin-input"
+            min={field.min}
+            max={field.max}
+            value={Number.isFinite(num) ? num : 0}
+            onChange={(e) => onChange(Number(e.target.value))}
+          />
+        </div>
       </FieldShell>
     );
   }

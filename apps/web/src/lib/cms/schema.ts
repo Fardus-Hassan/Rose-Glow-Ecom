@@ -69,6 +69,12 @@ const textarea = (
   extra: Partial<Base> & { rows?: number } = {},
 ): Field => ({ type: "textarea", name, label, ...extra });
 
+const number = (
+  name: string,
+  label: string,
+  extra: Partial<Base> & { min?: number; max?: number; help?: string } = {},
+): Field => ({ type: "number", name, label, ...extra });
+
 const half = (field: Field): Field => ({ ...field, width: "half" });
 const image = (name: string, label: string, help?: string): Field => ({
   type: "image",
@@ -144,10 +150,24 @@ export const sectionSchemas: SectionSchema[] = [
             "Dark overlay — laptop / desktop",
             "Keeps headline/CTA readable on large screens. Turn off for a clean full-bleed look.",
           ),
+          half(
+            number("overlayDepthDesktop", "Overlay depth — laptop", {
+              min: 0,
+              max: 100,
+              help: "0 = very light, 50 = medium, 100 = deepest",
+            }),
+          ),
           toggle(
             "overlayMobile",
             "Dark overlay — mobile",
             "Same overlay control for phones and small tablets.",
+          ),
+          half(
+            number("overlayDepthMobile", "Overlay depth — mobile", {
+              min: 0,
+              max: 100,
+              help: "0 = very light, 50 = medium, 100 = deepest",
+            }),
           ),
           image("imageDesktop", "Desktop image"),
           image("imageMobile", "Mobile image"),

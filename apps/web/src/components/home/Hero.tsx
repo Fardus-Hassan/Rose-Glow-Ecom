@@ -7,6 +7,64 @@ import { Link } from "@/i18n/navigation";
 import type { HeroContent } from "@/lib/catalog";
 import { SmartImage } from "@/components/media/SmartImage";
 import { mediaUrl } from "@/lib/media";
+import { cn } from "@/lib/format";
+
+function clampDepth(depth: number) {
+  return Math.min(100, Math.max(0, depth)) / 100;
+}
+
+function rgba(alpha: number) {
+  return `rgba(14, 13, 12, ${Math.min(1, Math.max(0, alpha)).toFixed(3)})`;
+}
+
+/** Depth 0 = lightest wash, 100 = deepest noir. ~50 matches the original look. */
+function HeroOverlayScrim({
+  depth,
+  className,
+}: {
+  depth: number;
+  className?: string;
+}) {
+  const t = clampDepth(depth);
+  const flat = 0.06 + t * 0.52;
+  const viaSide = 0.22 + t * 0.62;
+  const edge = 0.04 + t * 0.28;
+  const viaBottom = 0.16 + t * 0.52;
+  const top = 0.1 + t * 0.38;
+  const side = 0.16 + t * 0.52;
+  const glow = 0.03 + t * 0.14;
+
+  return (
+    <div
+      className={cn("pointer-events-none absolute inset-0 -z-10", className)}
+      aria-hidden
+    >
+      <div className="absolute inset-0" style={{ background: rgba(flat) }} />
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(to right, ${rgba(viaSide)} 0%, ${rgba(viaSide * 0.72)} 48%, ${rgba(edge)} 100%)`,
+        }}
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(to top, ${rgba(viaBottom)} 0%, ${rgba(viaBottom * 0.45)} 42%, ${rgba(top)} 100%)`,
+        }}
+      />
+      <div
+        className="absolute inset-y-0 left-0 w-full max-w-4xl"
+        style={{
+          background: `linear-gradient(to right, ${rgba(side)} 0%, transparent 100%)`,
+        }}
+      />
+      <div
+        className="absolute -left-24 top-1/4 h-72 w-72 rounded-full blur-[100px]"
+        style={{ background: `rgba(201, 160, 138, ${glow.toFixed(3)})` }}
+      />
+    </div>
+  );
+}
 
 /**
  * Direction: Editorial Noir
@@ -201,22 +259,16 @@ export function Hero({
       </div>
 
       {content.overlayMobile ? (
-        <div className="pointer-events-none absolute inset-0 -z-10 md:hidden">
-          <div className="absolute inset-0 bg-[#0e0d0c]/35" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0e0d0c] via-[#0e0d0c]/78 to-[#0e0d0c]/15" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0e0d0c] via-[#0e0d0c]/55 to-[#0e0d0c]/40" />
-          <div className="absolute inset-y-0 left-0 w-full max-w-3xl bg-gradient-to-r from-[#0e0d0c]/55 to-transparent" />
-          <div className="absolute -left-24 top-1/4 h-72 w-72 rounded-full bg-[#c9a08a]/10 blur-[100px]" />
-        </div>
+        <HeroOverlayScrim
+          depth={content.overlayDepthMobile}
+          className="md:hidden"
+        />
       ) : null}
       {content.overlayDesktop ? (
-        <div className="pointer-events-none absolute inset-0 -z-10 hidden md:block">
-          <div className="absolute inset-0 bg-[#0e0d0c]/25" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0e0d0c] via-[#0e0d0c]/55 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0e0d0c] via-[#0e0d0c]/25 to-[#0e0d0c]/30" />
-          <div className="absolute inset-y-0 left-0 w-full max-w-4xl bg-gradient-to-r from-[#0e0d0c]/55 to-transparent" />
-          <div className="absolute -left-24 top-1/4 h-72 w-72 rounded-full bg-[#c9a08a]/10 blur-[100px]" />
-        </div>
+        <HeroOverlayScrim
+          depth={content.overlayDepthDesktop}
+          className="hidden md:block"
+        />
       ) : null}
 
       <div className="container-rg relative pb-16 pt-28 md:pb-24">
