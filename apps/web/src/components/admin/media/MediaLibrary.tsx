@@ -246,7 +246,7 @@ export function MediaLibrary({
       }}
     >
       <div className="shrink-0 space-y-2.5 border-b border-ink/10 p-3 sm:p-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="flex flex-row items-center gap-2">
           <div className="relative min-w-0 flex-1">
             <Search className="pointer-events-none absolute top-1/2 left-3 z-[1] h-4 w-4 -translate-y-1/2 text-muted" />
             <input
@@ -260,7 +260,7 @@ export function MediaLibrary({
             type="button"
             loading={uploading}
             onClick={() => fileInput.current?.click()}
-            className="w-full shrink-0 sm:w-auto"
+            className="shrink-0"
           >
             <UploadCloud className="h-3.5 w-3.5" />
             Upload
@@ -487,8 +487,8 @@ export function MediaLibrary({
       </div>
 
       {isPicker && onSelect ? (
-        <div className="flex shrink-0 flex-col gap-2 border-t border-ink/10 bg-cream px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
-          <p className="min-w-0 truncate text-sm text-muted">
+        <div className="flex shrink-0 flex-row items-center justify-between gap-2 border-t border-ink/10 bg-cream px-3 py-3 sm:px-4">
+          <p className="min-w-0 flex-1 truncate text-sm text-muted">
             {selected ? (
               <>
                 Selected:{" "}
@@ -498,17 +498,15 @@ export function MediaLibrary({
               "Select a file, or double-click to use instantly"
             )}
           </p>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              disabled={!selected}
-              onClick={() => selected && onSelect(selected)}
-              className="flex-1 sm:flex-none"
-            >
-              <Check className="h-3.5 w-3.5" />
-              {selectLabel}
-            </Button>
-          </div>
+          <Button
+            type="button"
+            disabled={!selected}
+            onClick={() => selected && onSelect(selected)}
+            className="shrink-0"
+          >
+            <Check className="h-3.5 w-3.5" />
+            {selectLabel}
+          </Button>
         </div>
       ) : null}
 
@@ -573,7 +571,7 @@ export function MediaField({
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="flex flex-row gap-2">
         <input
           className="admin-input min-w-0 flex-1"
           value={value}

@@ -85,7 +85,7 @@ export default function ReviewsPage() {
                     <p className="mt-2 text-sm text-muted">{r.bodyBn}</p>
                   ) : null}
                 </div>
-                <div className="flex shrink-0 flex-col gap-2">
+                <div className="flex shrink-0 flex-row flex-wrap gap-2">
                   <Button
                     variant={r.isPublished ? "secondary" : "primary"}
                     onClick={() => togglePublish(r)}

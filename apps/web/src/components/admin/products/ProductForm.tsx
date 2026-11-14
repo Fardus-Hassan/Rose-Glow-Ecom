@@ -507,9 +507,9 @@ export function ProductForm({
                     label="Landing URL slug"
                     hint={`Live at /l/${form.landingSlug || form.slug || "…"}`}
                   >
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <div className="flex flex-row items-center gap-2">
                       <input
-                        className="admin-input"
+                        className="admin-input min-w-0 flex-1"
                         value={form.landingSlug}
                         placeholder={form.slug || "pearl-bloom"}
                         onChange={(e) =>

@@ -580,11 +580,11 @@ export function ProductLanding({
                     <p className="mt-1 text-sm text-[#1c1a19]/7">
                       {formatBdt(item.price, locale)}
                     </p>
-                    <div className="mt-4 flex flex-wrap gap-2">
+                    <div className="mt-4 flex flex-row gap-2">
                       <button
                         type="button"
                         onClick={() => setPreview(item)}
-                        className="inline-flex min-h-10 flex-1 items-center justify-center border border-[#1c1a19]/2 px-3 text-[10px] uppercase tracking-[0.16em] text-[#1c1a19] transition hover:border-[#1c1a19]"
+                        className="inline-flex min-h-10 flex-1 items-center justify-center border border-[#1c1a19]/2 px-2 text-[10px] uppercase tracking-[0.14em] text-[#1c1a19] transition hover:border-[#1c1a19] sm:px-3 sm:tracking-[0.16em]"
                       >
                         {t("viewDetails")}
                       </button>
@@ -592,7 +592,7 @@ export function ProductLanding({
                         type="button"
                         onClick={() => toggleProduct(item.slug)}
                         className={cn(
-                          "inline-flex min-h-10 flex-1 items-center justify-center px-3 text-[10px] uppercase tracking-[0.16em] transition",
+                          "inline-flex min-h-10 flex-1 items-center justify-center px-2 text-[10px] uppercase tracking-[0.14em] transition sm:px-3 sm:tracking-[0.16em]",
                           inBag
                             ? "border border-[#1c1a19]/25 text-[#1c1a19] hover:border-[#1c1a19]"
                             : "bg-[#1c1a19] text-[#f4efe8] hover:bg-black",
@@ -640,7 +640,7 @@ export function ProductLanding({
                 return (
                   <li
                     key={item.slug}
-                    className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:gap-4"
+                    className="flex flex-row items-center gap-3 py-4 sm:gap-4"
                   >
                     <div className="flex min-w-0 flex-1 gap-3">
                       <div className="relative h-16 w-14 shrink-0 overflow-hidden bg-[#e2dacf]">

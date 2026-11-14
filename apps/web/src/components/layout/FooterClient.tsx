@@ -117,7 +117,7 @@ export function FooterClient() {
             <p className="text-sm text-[#c9a08a]">You’re on the list.</p>
           ) : (
             <form
-              className="flex flex-col gap-2 sm:flex-row"
+              className="flex flex-row gap-2"
               onSubmit={async (event) => {
                 event.preventDefault();
                 if (!email.trim()) return;

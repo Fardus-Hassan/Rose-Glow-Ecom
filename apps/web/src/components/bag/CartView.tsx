@@ -136,18 +136,20 @@ export function CartView() {
             <span className="text-[#1c1a19]">{formatBdt(subtotal, locale)}</span>
           </div>
           <p className="mt-3 text-xs leading-6 text-[#1c1a19]/45">{t("codNote")}</p>
-          <Link
-            href="/checkout"
-            className="mt-6 flex min-h-12 w-full items-center justify-center bg-[#1c1a19] text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition hover:bg-black"
-          >
-            {t("checkout")}
-          </Link>
-          <Link
-            href="/products"
-            className="mt-3 flex min-h-11 w-full items-center justify-center text-[11px] uppercase tracking-[0.18em] text-[#1c1a19]/55 transition hover:text-[#1c1a19]"
-          >
-            {t("continueShopping")}
-          </Link>
+          <div className="mt-6 flex flex-row gap-2">
+            <Link
+              href="/checkout"
+              className="flex min-h-11 flex-1 items-center justify-center bg-[#1c1a19] px-3 text-[10px] uppercase tracking-[0.16em] text-[#f4efe8] transition hover:bg-black sm:min-h-12 sm:text-[11px] sm:tracking-[0.2em]"
+            >
+              {t("checkout")}
+            </Link>
+            <Link
+              href="/products"
+              className="flex min-h-11 flex-1 items-center justify-center border border-[#1c1a19]/2 px-3 text-[10px] uppercase tracking-[0.16em] text-[#1c1a19]/70 transition hover:border-[#1c1a19] hover:text-[#1c1a19] sm:min-h-12 sm:text-[11px] sm:tracking-[0.18em]"
+            >
+              {t("continueShopping")}
+            </Link>
+          </div>
         </div>
       </aside>
     </div>

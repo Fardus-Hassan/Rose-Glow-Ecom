@@ -307,7 +307,7 @@ export function LandingQuickView({
           </p>
         </div>
 
-        <div className="flex shrink-0 flex-col gap-2 border-t border-[#1c1a19]/08 bg-[#f0ebe4] p-5 sm:flex-row sm:px-7">
+        <div className="flex shrink-0 flex-row gap-2 border-t border-[#1c1a19]/08 bg-[#f0ebe4] p-4 sm:p-5 sm:px-7">
           <button
             type="button"
             onClick={() => {
@@ -316,7 +316,7 @@ export function LandingQuickView({
               onClose();
             }}
             className={cn(
-              "inline-flex min-h-12 flex-1 items-center justify-center px-5 text-[11px] uppercase tracking-[0.18em]",
+              "inline-flex min-h-11 flex-1 items-center justify-center px-3 text-[10px] uppercase tracking-[0.16em] sm:min-h-12 sm:px-5 sm:text-[11px] sm:tracking-[0.18em]",
               inBag
                 ? "border border-[#1c1a19]/25 text-[#1c1a19]"
                 : "bg-[#1c1a19] text-[#f4efe8]",
@@ -326,7 +326,7 @@ export function LandingQuickView({
           </button>
           <Link
             href={`/product/${product.slug}`}
-            className="inline-flex min-h-12 flex-1 items-center justify-center border border-[#1c1a19]/2 px-5 text-[11px] uppercase tracking-[0.18em] text-[#1c1a19]"
+            className="inline-flex min-h-11 flex-1 items-center justify-center border border-[#1c1a19]/2 px-3 text-[10px] uppercase tracking-[0.16em] text-[#1c1a19] sm:min-h-12 sm:px-5 sm:text-[11px] sm:tracking-[0.18em]"
           >
             {t("fullDetails")}
           </Link>

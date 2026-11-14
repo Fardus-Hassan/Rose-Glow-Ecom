@@ -117,7 +117,7 @@ export default function RecycleBinPage() {
             return (
               <article
                 key={key}
-                className="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-row flex-wrap items-center justify-between gap-4 px-5 py-5"
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">

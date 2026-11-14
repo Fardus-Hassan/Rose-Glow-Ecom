@@ -63,15 +63,15 @@ export default function OrdersPage() {
         title="Orders"
         description="Search and filter the fulfilment queue."
       />
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="mb-6 flex flex-row flex-wrap items-center gap-3">
         <input
-          className="admin-input max-w-md"
+          className="admin-input min-w-0 flex-1 max-w-md"
           placeholder="Search name, phone, order #…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
         <select
-          className="admin-input max-w-xs"
+          className="admin-input max-w-xs shrink-0"
           value={status}
           onChange={(e) => setStatus(e.target.value as OrderStatus | "")}
         >
