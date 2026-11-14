@@ -44,8 +44,18 @@ export default function ContentPage() {
         bodyBn: String(v.bodyBn ?? ""),
         ctaEn: String(v.ctaEn ?? ""),
         ctaBn: String(v.ctaBn ?? ""),
-        overlayEnabled:
-          v.overlayEnabled === false || v.overlayEnabled === "false"
+        overlayDesktop:
+          v.overlayDesktop === false ||
+          v.overlayDesktop === "false" ||
+          (v.overlayDesktop == null &&
+            (v.overlayEnabled === false || v.overlayEnabled === "false"))
+            ? "false"
+            : "true",
+        overlayMobile:
+          v.overlayMobile === false ||
+          v.overlayMobile === "false" ||
+          (v.overlayMobile == null &&
+            (v.overlayEnabled === false || v.overlayEnabled === "false"))
             ? "false"
             : "true",
         imageDesktop: img?.desktop ?? "",
@@ -91,7 +101,8 @@ export default function ContentPage() {
           ctaEn: fields.ctaEn,
           ctaBn: fields.ctaBn,
           mode: "image",
-          overlayEnabled: fields.overlayEnabled !== "false",
+          overlayDesktop: fields.overlayDesktop !== "false",
+          overlayMobile: fields.overlayMobile !== "false",
           image: {
             desktop: fields.imageDesktop,
             mobile: fields.imageMobile,
@@ -126,7 +137,8 @@ export default function ContentPage() {
           ["bodyBn", "Body BN"],
           ["ctaEn", "CTA EN"],
           ["ctaBn", "CTA BN"],
-          ["overlayEnabled", "Dark overlay (true/false)"],
+          ["overlayDesktop", "Overlay laptop (true/false)"],
+          ["overlayMobile", "Overlay mobile (true/false)"],
           ["imageDesktop", "Desktop image"],
           ["imageMobile", "Mobile image"],
         ]

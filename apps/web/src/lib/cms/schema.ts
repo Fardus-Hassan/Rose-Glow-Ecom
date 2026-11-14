@@ -140,9 +140,14 @@ export const sectionSchemas: SectionSchema[] = [
             ],
           },
           toggle(
-            "overlayEnabled",
-            "Dark overlay",
-            "Keeps headline/CTA readable over bright image or video. Turn off for a clean full-bleed look.",
+            "overlayDesktop",
+            "Dark overlay — laptop / desktop",
+            "Keeps headline/CTA readable on large screens. Turn off for a clean full-bleed look.",
+          ),
+          toggle(
+            "overlayMobile",
+            "Dark overlay — mobile",
+            "Same overlay control for phones and small tablets.",
           ),
           image("imageDesktop", "Desktop image"),
           image("imageMobile", "Mobile image"),

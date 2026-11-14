@@ -113,7 +113,8 @@ export type HeroContent = {
   ctaBn: string;
   mode: "image" | "video";
   /** Dark scrim over media so copy stays readable. Default on. */
-  overlayEnabled: boolean;
+  overlayDesktop: boolean;
+  overlayMobile: boolean;
   image: { desktop: string; mobile: string };
   video?: {
     desktop: { src: string; poster: string };
@@ -418,9 +419,16 @@ export async function fetchReviews(params?: {
   return page.items;
 }
 
-function parseOverlayEnabled(value: unknown): boolean {
+function parseOverlayFlag(
+  value: unknown,
+  legacyFallback?: unknown,
+): boolean {
   // Default on — only explicit false turns it off
-  return value !== false && value !== "false";
+  if (value === false || value === "false") return false;
+  if (value === true || value === "true") return true;
+  // Migrate old single `overlayEnabled` if present
+  if (legacyFallback === false || legacyFallback === "false") return false;
+  return true;
 }
 
 export async function fetchHeroContent(): Promise<HeroContent> {
@@ -444,7 +452,14 @@ export async function fetchHeroContent(): Promise<HeroContent> {
       ctaEn: String(hero.ctaEn || "Enter the collection"),
       ctaBn: String(hero.ctaBn || "কালেকশনে প্রবেশ করুন"),
       mode: hero.mode === "video" ? "video" : "image",
-      overlayEnabled: parseOverlayEnabled(hero.overlayEnabled),
+      overlayDesktop: parseOverlayFlag(
+        hero.overlayDesktop,
+        hero.overlayEnabled,
+      ),
+      overlayMobile: parseOverlayFlag(
+        hero.overlayMobile,
+        hero.overlayEnabled,
+      ),
       image: {
         desktop: String(hero.imageDesktop || staticHero.image.desktop),
         mobile: String(hero.imageMobile || staticHero.image.mobile),
@@ -486,7 +501,14 @@ export async function fetchHeroContent(): Promise<HeroContent> {
     ctaEn: value.ctaEn || "Enter the collection",
     ctaBn: value.ctaBn || "কালেকশনে প্রবেশ করুন",
     mode: value.mode === "video" ? "video" : "image",
-    overlayEnabled: parseOverlayEnabled(value.overlayEnabled),
+    overlayDesktop: parseOverlayFlag(
+      value.overlayDesktop,
+      value.overlayEnabled,
+    ),
+    overlayMobile: parseOverlayFlag(
+      value.overlayMobile,
+      value.overlayEnabled,
+    ),
     image: {
       desktop: value.image?.desktop || staticHero.image.desktop,
       mobile: value.image?.mobile || staticHero.image.mobile,
