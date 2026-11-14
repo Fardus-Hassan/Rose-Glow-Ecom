@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { localize, type Product } from "@/data/products";
 import { formatBdt, cn } from "@/lib/format";
+import { stripHtml } from "@/lib/rich-text";
 
 export function LandingQuickView({
   product,
@@ -303,7 +304,7 @@ export function LandingQuickView({
             ) : null}
           </p>
           <p className="mt-3 text-sm leading-7 text-[#1c1a19]/58">
-            {localize(product.description, locale)}
+            {stripHtml(localize(product.description, locale))}
           </p>
         </div>
 

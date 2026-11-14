@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { localize, type Product } from "@/data/products";
 import { FadePanel } from "@/components/ui/FadePanel";
+import { RichText } from "@/components/ui/RichText";
 import { cn } from "@/lib/format";
 
 type Tab = "description" | "specifications" | "shipping";
@@ -64,9 +65,10 @@ export function ProductDetails({ product }: { product: Product }) {
                 <h3 className="font-display text-2xl text-[#1c1a19] md:text-3xl">
                   {t("descriptionTitle")}
                 </h3>
-                <p className="mt-4 text-sm leading-7 text-[#1c1a19]/58 md:text-[15px] md:leading-8">
-                  {localize(product.description, locale)}
-                </p>
+                <RichText
+                  html={localize(product.description, locale)}
+                  className="mt-4 text-sm leading-7 text-[#1c1a19]/58 md:text-[15px] md:leading-8"
+                />
                 <ul className="mt-6 space-y-3 text-sm text-[#1c1a19]/65">
                   <li className="flex gap-3">
                     <span className="mt-2 h-1 w-1 shrink-0 bg-[#c9a08a]" />

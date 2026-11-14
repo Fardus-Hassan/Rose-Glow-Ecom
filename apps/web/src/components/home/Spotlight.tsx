@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCoverMedia, localize, type Product } from "@/data/products";
 import { formatBdt } from "@/lib/format";
+import { stripHtml } from "@/lib/rich-text";
 import { Reveal } from "@/components/motion/Reveal";
 
 export async function Spotlight({ products }: { products: Product[] }) {
@@ -38,7 +39,7 @@ export async function Spotlight({ products }: { products: Product[] }) {
             {localize(product.name, locale)}
           </h2>
           <p className="mt-5 max-w-md text-sm leading-7 text-[#1c1a19]/65">
-            {localize(product.description, locale)}
+            {stripHtml(localize(product.description, locale))}
           </p>
           <p className="mt-8 text-lg text-[#1c1a19]">
             {formatBdt(product.price, locale)}

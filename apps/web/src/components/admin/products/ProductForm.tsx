@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/admin/api";
 import type { Category, Product } from "@/lib/admin/types";
 import { Button } from "@/components/admin/ui/Button";
+import { RichTextEditor } from "@/components/admin/ui/RichTextEditor";
 import { MediaField } from "@/components/admin/media/MediaLibrary";
 import { Field, PanelCard, Toggle } from "@/components/admin/form/PanelCard";
 import { GoogleSerpPreview } from "@/components/admin/form/GoogleSerpPreview";
@@ -23,6 +24,7 @@ import {
   parseLandingConfig,
   type ProductLandingConfig,
 } from "@/lib/landing";
+import { isRichTextEmpty, stripHtml } from "@/lib/rich-text";
 
 type ColorRow = { key: string; en: string; bn: string };
 
@@ -200,6 +202,10 @@ export function ProductForm({
       setError("Add at least one product image or video");
       return;
     }
+    if (isRichTextEmpty(form.descriptionEn) || isRichTextEmpty(form.descriptionBn)) {
+      setError("Add product description in English and Bangla");
+      return;
+    }
     setSaving(true);
     setError(null);
     const landingSlug =
@@ -317,20 +323,26 @@ export function ProductForm({
                   required
                 />
               </Field>
-              <Field label="Description (EN)" className="md:col-span-2">
-                <textarea
-                  className="admin-input min-h-[7rem]"
+              <Field
+                label="Description (EN)"
+                className="md:col-span-2"
+                hint="Bold, lists, highlight, headings, links, and paragraph gaps."
+              >
+                <RichTextEditor
                   value={form.descriptionEn}
-                  onChange={(e) => patch("descriptionEn", e.target.value)}
-                  required
+                  onChange={(html) => patch("descriptionEn", html)}
+                  placeholder="Describe the piece…"
                 />
               </Field>
-              <Field label="Description (BN)" className="md:col-span-2">
-                <textarea
-                  className="admin-input min-h-[7rem]"
+              <Field
+                label="Description (BN)"
+                className="md:col-span-2"
+                hint="Same formatting tools for Bangla copy."
+              >
+                <RichTextEditor
                   value={form.descriptionBn}
-                  onChange={(e) => patch("descriptionBn", e.target.value)}
-                  required
+                  onChange={(html) => patch("descriptionBn", html)}
+                  placeholder="পণ্যের বিবরণ লিখুন…"
                 />
               </Field>
               <Field label="Material (EN)">
@@ -700,7 +712,7 @@ export function ProductForm({
               title={form.seoTitleEn || form.nameEn || "Product title"}
               description={
                 form.seoDescriptionEn ||
-                form.descriptionEn ||
+                stripHtml(form.descriptionEn) ||
                 "Meta description preview"
               }
             />

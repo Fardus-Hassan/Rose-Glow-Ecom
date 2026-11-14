@@ -13,6 +13,7 @@ import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingQuickView } from "@/components/landing/LandingQuickView";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { Slider } from "@/components/ui/Slider";
+import { RichText } from "@/components/ui/RichText";
 import {
   computeClientShippingFee,
   createStoreOrder,
@@ -390,15 +391,16 @@ export function ProductLanding({
               </span>
             </div>
 
-            <p className="mt-5 text-[15px] leading-7 text-[#1c1a19]/58">
-              {localize(
+            <RichText
+              html={localize(
                 {
                   en: landing.bodyEn || product.description.en,
                   bn: landing.bodyBn || product.description.bn,
                 },
                 locale,
               )}
-            </p>
+              className="mt-5 text-[15px] leading-7 text-[#1c1a19]/58"
+            />
 
             <div className="mt-6 grid grid-cols-3 gap-1.5 border-y border-[#1c1a19]/10 py-4 sm:gap-2">
               {(
@@ -452,15 +454,16 @@ export function ProductLanding({
           <div className="mt-4 h-px w-12 bg-gradient-to-r from-[#c9a08a] to-transparent" />
           <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
             <div>
-              <p className="text-sm leading-7 text-[#1c1a19]/58 md:text-[15px] md:leading-8">
-                {localize(
+              <RichText
+                html={localize(
                   {
                     en: landing.bodyEn || product.description.en,
                     bn: landing.bodyBn || product.description.bn,
                   },
                   locale,
                 )}
-              </p>
+                className="text-sm leading-7 text-[#1c1a19]/58 md:text-[15px] md:leading-8"
+              />
               <ul className="mt-6 space-y-3 text-sm text-[#1c1a19]/65">
                 {landing.points
                   .map((point) => localize(point, locale).trim())

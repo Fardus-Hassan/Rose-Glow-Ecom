@@ -8,6 +8,7 @@ import { IconHeart, IconShield, IconStar, IconTruck } from "@/components/icons";
 import { useRouter } from "@/i18n/navigation";
 import { useBag } from "@/store/bag";
 import { SocialLinks } from "@/components/ui/SocialLinks";
+import { RichText } from "@/components/ui/RichText";
 
 export function ProductInfo({ product }: { product: Product }) {
   const t = useTranslations("Product");
@@ -106,9 +107,10 @@ export function ProductInfo({ product }: { product: Product }) {
         </span>
       </div>
 
-      <p className="mt-5 max-w-xl text-[15px] leading-7 text-[#1c1a19]/58 md:text-base md:leading-8">
-        {localize(product.description, locale)}
-      </p>
+      <RichText
+        html={localize(product.description, locale)}
+        className="mt-5 max-w-xl text-[15px] leading-7 text-[#1c1a19]/58 md:text-base md:leading-8"
+      />
 
       <div className="mt-7 grid grid-cols-3 gap-2 border-y border-[#1c1a19]/10 py-4 sm:gap-3 sm:py-5">
         {(
