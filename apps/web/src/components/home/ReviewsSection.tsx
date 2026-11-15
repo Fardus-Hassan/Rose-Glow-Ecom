@@ -33,6 +33,8 @@ export function ReviewsSection({ reviews }: { reviews: Review[] }) {
     };
   }, [lightbox]);
 
+  if (!reviews.length) return null;
+
   return (
     <section className="bg-[#f0ebe4] py-16 md:py-24">
       <div className="container-rg">
