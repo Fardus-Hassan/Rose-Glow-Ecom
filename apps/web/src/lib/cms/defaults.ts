@@ -131,6 +131,10 @@ export const sectionDefaults: Record<SectionKey, Record<string, unknown>> = {
     codEnabled: true,
     codNoteEn: "Cash on delivery available nationwide.",
     codNoteBn: "সারাদেশে ক্যাশ অন ডেলিভারি পাওয়া যায়।",
+    shippingReturnEn:
+      "Cash on delivery available nationwide. Easy exchange support after your piece arrives.",
+    shippingReturnBn:
+      "সারাদেশে ক্যাশ অন ডেলিভারি। পিস হাতে পেয়ে সহজ এক্সচেঞ্জ সাপোর্ট।",
   },
   seoDefaults: {
     titleEn: "Rose Glow — Ladies Ornaments",

@@ -117,6 +117,10 @@ export function ProductLanding({
             codEnabled: true,
             codNoteEn: "Cash on delivery available nationwide.",
             codNoteBn: "সারাদেশে ক্যাশ অন ডেলিভারি পাওয়া যায়।",
+            shippingReturnEn:
+              "Cash on delivery available nationwide. Easy exchange support after your piece arrives.",
+            shippingReturnBn:
+              "সারাদেশে ক্যাশ অন ডেলিভারি। পিস হাতে পেয়ে সহজ এক্সচেঞ্জ সাপোর্ট।",
           });
         }
       });
@@ -565,8 +569,14 @@ export function ProductLanding({
               <h3 className="mt-8 text-[10px] uppercase tracking-[0.22em] text-[#c9a08a]">
                 {tp("shipping")}
               </h3>
-              <p className="mt-3 text-sm leading-7 text-[#1c1a19]/58">
-                {tp("shippingCopy")}
+              <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[#1c1a19]/58">
+                {locale === "bn"
+                  ? shipping?.shippingReturnBn ||
+                    shipping?.shippingReturnEn ||
+                    tp("shippingCopy")
+                  : shipping?.shippingReturnEn ||
+                    shipping?.shippingReturnBn ||
+                    tp("shippingCopy")}
               </p>
             </div>
           </div>

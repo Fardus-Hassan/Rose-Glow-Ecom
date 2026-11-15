@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { localize, type Product } from "@/data/products";
 import { FadePanel } from "@/components/ui/FadePanel";
 import { RichText } from "@/components/ui/RichText";
 import { cn } from "@/lib/format";
+import { fetchShippingSettings } from "@/lib/catalog";
 
 type Tab = "description" | "specifications" | "shipping";
 
@@ -14,6 +15,26 @@ export function ProductDetails({ product }: { product: Product }) {
   const tc = useTranslations("Categories");
   const locale = useLocale();
   const [tab, setTab] = useState<Tab>("description");
+  const [shippingCopy, setShippingCopy] = useState(t("shippingCopy"));
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchShippingSettings()
+      .then((settings) => {
+        if (cancelled) return;
+        const copy =
+          locale === "bn"
+            ? settings.shippingReturnBn || settings.shippingReturnEn
+            : settings.shippingReturnEn || settings.shippingReturnBn;
+        if (copy.trim()) setShippingCopy(copy);
+      })
+      .catch(() => {
+        /* keep i18n fallback */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [locale]);
 
   const specs = [
     [t("material"), localize(product.material, locale)],
@@ -123,8 +144,8 @@ export function ProductDetails({ product }: { product: Product }) {
           ) : null}
 
           {tab === "shipping" ? (
-            <p className="max-w-2xl text-sm leading-7 text-[#1c1a19]/58 md:text-[15px]">
-              {t("shippingCopy")}
+            <p className="max-w-2xl whitespace-pre-line text-sm leading-7 text-[#1c1a19]/58 md:text-[15px]">
+              {shippingCopy}
             </p>
           ) : null}
         </FadePanel>

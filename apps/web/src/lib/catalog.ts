@@ -638,7 +638,14 @@ export type ShippingSettings = {
   codEnabled: boolean;
   codNoteEn: string;
   codNoteBn: string;
+  shippingReturnEn: string;
+  shippingReturnBn: string;
 };
+
+const DEFAULT_SHIPPING_RETURN_EN =
+  "Cash on delivery available nationwide. Easy exchange support after your piece arrives.";
+const DEFAULT_SHIPPING_RETURN_BN =
+  "সারাদেশে ক্যাশ অন ডেলিভারি। পিস হাতে পেয়ে সহজ এক্সচেঞ্জ সাপোর্ট।";
 
 export async function fetchShippingSettings(): Promise<ShippingSettings> {
   const section = await apiFetch<{ data?: Record<string, unknown> }>(
@@ -659,6 +666,12 @@ export async function fetchShippingSettings(): Promise<ShippingSettings> {
     ),
     codNoteBn: String(
       data.codNoteBn ?? "সারাদেশে ক্যাশ অন ডেলিভারি পাওয়া যায়।",
+    ),
+    shippingReturnEn: String(
+      data.shippingReturnEn ?? DEFAULT_SHIPPING_RETURN_EN,
+    ),
+    shippingReturnBn: String(
+      data.shippingReturnBn ?? DEFAULT_SHIPPING_RETURN_BN,
     ),
   };
 }

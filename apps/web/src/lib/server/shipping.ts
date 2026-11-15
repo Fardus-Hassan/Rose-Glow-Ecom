@@ -7,6 +7,8 @@ export type ShippingSettings = {
   codEnabled: boolean;
   codNoteEn: string;
   codNoteBn: string;
+  shippingReturnEn: string;
+  shippingReturnBn: string;
 };
 
 function asNumber(value: unknown, fallback: number) {
@@ -34,6 +36,12 @@ export async function getShippingSettings(): Promise<ShippingSettings> {
           : defaults.codEnabled,
       codNoteEn: String(data.codNoteEn ?? defaults.codNoteEn),
       codNoteBn: String(data.codNoteBn ?? defaults.codNoteBn),
+      shippingReturnEn: String(
+        data.shippingReturnEn ?? defaults.shippingReturnEn,
+      ),
+      shippingReturnBn: String(
+        data.shippingReturnBn ?? defaults.shippingReturnBn,
+      ),
     };
   } catch {
     return defaults;

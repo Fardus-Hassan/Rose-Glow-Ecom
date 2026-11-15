@@ -406,8 +406,18 @@ export const sectionSchemas: SectionSchema[] = [
             min: 0,
           }),
           toggle("codEnabled", "Cash on delivery enabled"),
-          textarea("codNoteEn", "COD note (EN)", { rows: 2 }),
+          textarea("codNoteEn", "COD note (EN)", {
+            rows: 2,
+            help: "Shown on cart / checkout.",
+          }),
           textarea("codNoteBn", "COD note (BN)", { rows: 2 }),
+          textarea("shippingReturnEn", "Shipping & return copy (EN)", {
+            rows: 3,
+            help: "Central text for every product page + landing (Shipping & return tab).",
+          }),
+          textarea("shippingReturnBn", "Shipping & return copy (BN)", {
+            rows: 3,
+          }),
         ],
       },
     ],
