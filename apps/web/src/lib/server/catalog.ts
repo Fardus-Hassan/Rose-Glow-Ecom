@@ -537,6 +537,7 @@ export const reviews = {
     productSlug?: string;
     page: PageParams;
   }) {
+    const scopedToProduct = Boolean(params.productId || params.productSlug);
     const where: Prisma.ReviewWhereInput = {
       deletedAt: null,
       isPublished: true,
@@ -544,6 +545,8 @@ export const reviews = {
       ...(params.productSlug
         ? { product: { slug: params.productSlug, deletedAt: null } }
         : {}),
+      // Homepage / no product scope → only global testimonials (no product link)
+      ...(!scopedToProduct ? { productId: null } : {}),
     };
     const [total, items] = await Promise.all([
       prisma.review.count({ where }),
@@ -566,7 +569,9 @@ export const reviews = {
       prisma.review.findMany({
         where,
         orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-        include: { product: { select: { slug: true, nameEn: true } } },
+        include: {
+          product: { select: { id: true, slug: true, nameEn: true } },
+        },
         skip: pageParams.skip,
         take: pageParams.pageSize,
       }),

@@ -173,8 +173,9 @@ export type Review = {
   bodyEn: string;
   bodyBn: string;
   rating: number;
+  imageUrls?: string[] | unknown;
   isPublished: boolean;
   sortOrder: number;
   createdAt: string;
-  product?: { nameEn: string; slug: string } | null;
+  product?: { id?: string; nameEn: string; slug: string } | null;
 };
