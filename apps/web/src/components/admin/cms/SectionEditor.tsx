@@ -143,7 +143,7 @@ export function SectionEditor({ sectionKey }: { sectionKey: SectionKey }) {
           <div className="flex flex-wrap gap-2">
             {schema.path ? (
               <Link
-                href={`/en${schema.path === "/" ? "" : schema.path}`}
+                href={`/bn${schema.path === "/" ? "" : schema.path}`}
                 target="_blank"
                 className="inline-flex min-h-10 items-center gap-2 border border-ink/15 px-4 text-[11px] uppercase tracking-[0.16em] text-ink"
               >

@@ -563,7 +563,7 @@ export function ProductForm({
                       />
                       {(form.landingSlug || form.slug) && (
                         <Link
-                          href={`/en/l/${form.landingSlug || form.slug}`}
+                          href={`/bn/l/${form.landingSlug || form.slug}`}
                           target="_blank"
                           className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 border border-ink/15 px-3 text-[11px] uppercase tracking-[0.14em] text-ink hover:border-rose"
                         >
@@ -889,7 +889,7 @@ export function ProductForm({
             </Button>
             {form.slug ? (
               <Link
-                href={`/en/product/${form.slug}`}
+                href={`/bn/product/${form.slug}`}
                 target="_blank"
                 className="inline-flex min-h-10 items-center justify-center gap-2 border border-ink/15 px-4 text-[11px] uppercase tracking-[0.16em] text-ink hover:border-rose"
               >

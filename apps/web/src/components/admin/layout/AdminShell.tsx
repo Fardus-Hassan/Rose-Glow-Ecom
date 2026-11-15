@@ -122,7 +122,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </p>
         <div className="mt-3 flex items-center gap-3">
           <Link
-            href="/en"
+            href="/bn"
             target="_blank"
             className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.16em] text-cream/50 transition hover:text-[#c9a08a]"
           >

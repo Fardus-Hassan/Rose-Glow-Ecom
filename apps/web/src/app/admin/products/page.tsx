@@ -147,7 +147,7 @@ export default function ProductsPage() {
                           </span>
                           {p.landingEnabled && p.landingSlug ? (
                             <Link
-                              href={`/en/l/${p.landingSlug}`}
+                              href={`/bn/l/${p.landingSlug}`}
                               target="_blank"
                               className="text-[10px] uppercase tracking-[0.14em] text-rose hover:underline"
                             >
