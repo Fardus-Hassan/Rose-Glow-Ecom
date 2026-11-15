@@ -56,12 +56,14 @@ export function ProductGallery({
     if (current?.type === "video") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const id = window.setInterval(() => {
+    // Restart the 3s timer whenever the active slide changes
+    // (manual arrow/thumb click or previous auto-advance).
+    const id = window.setTimeout(() => {
       setActive((prev) => (prev + 1) % media.length);
     }, 3000);
 
-    return () => window.clearInterval(id);
-  }, [media.length, paused, zooming, current?.type]);
+    return () => window.clearTimeout(id);
+  }, [active, media.length, paused, zooming, current?.type]);
 
   const selectMedia = (index: number) => {
     const next = media[index];
