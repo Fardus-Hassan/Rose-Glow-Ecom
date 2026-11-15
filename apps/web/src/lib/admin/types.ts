@@ -174,6 +174,7 @@ export type Review = {
   bodyBn: string;
   rating: number;
   imageUrls?: string[] | unknown;
+  showOnHome?: boolean;
   isPublished: boolean;
   sortOrder: number;
   createdAt: string;

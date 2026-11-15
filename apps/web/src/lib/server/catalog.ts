@@ -545,8 +545,12 @@ export const reviews = {
       ...(params.productSlug
         ? { product: { slug: params.productSlug, deletedAt: null } }
         : {}),
-      // Homepage / no product scope → only global testimonials (no product link)
-      ...(!scopedToProduct ? { productId: null } : {}),
+      // Home: global (no product) OR product reviews flagged showOnHome
+      ...(!scopedToProduct
+        ? {
+            OR: [{ productId: null }, { showOnHome: true }],
+          }
+        : {}),
     };
     const [total, items] = await Promise.all([
       prisma.review.count({ where }),

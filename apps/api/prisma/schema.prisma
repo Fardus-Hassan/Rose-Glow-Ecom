@@ -176,6 +176,7 @@ model Review {
   bodyBn      String
   rating      Int      @default(5)
   imageUrls   Json     @default("[]")
+  showOnHome  Boolean  @default(false)
   isPublished Boolean  @default(true)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())

@@ -28,6 +28,7 @@ type ReviewFormState = {
   rating: number;
   productId: string;
   imageUrls: string[];
+  showOnHome: boolean;
   isPublished: boolean;
   sortOrder: number;
 };
@@ -41,9 +42,17 @@ const emptyForm = (): ReviewFormState => ({
   rating: 5,
   productId: "",
   imageUrls: [""],
+  showOnHome: false,
   isPublished: true,
   sortOrder: 0,
 });
+
+function reviewScopeLabel(r: Review): string {
+  const hasProduct = Boolean(r.product?.nameEn || r.productId);
+  if (!hasProduct) return "Home only";
+  if (r.showOnHome) return `Product + Home · ${r.product?.nameEn || "Product"}`;
+  return `Product only · ${r.product?.nameEn || "Product"}`;
+}
 
 function asImageList(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
@@ -106,6 +115,7 @@ export default function ReviewsPage() {
       rating: review.rating,
       productId: review.productId || review.product?.id || "",
       imageUrls: images.length ? images : [""],
+      showOnHome: Boolean(review.showOnHome),
       isPublished: review.isPublished,
       sortOrder: review.sortOrder ?? 0,
     });
@@ -128,6 +138,8 @@ export default function ReviewsPage() {
       rating: Math.min(5, Math.max(1, Number(form.rating) || 5)),
       productId: form.productId || null,
       imageUrls: form.imageUrls.map((u) => u.trim()).filter(Boolean),
+      // Global (no product) always belongs on home; product reviews opt in via toggle
+      showOnHome: form.productId ? form.showOnHome : true,
       isPublished: form.isPublished,
       sortOrder: Number(form.sortOrder) || 0,
     };
@@ -169,7 +181,7 @@ export default function ReviewsPage() {
       <PageHeader
         eyebrow="Social proof"
         title="Reviews"
-        description="Product reviews show on that product/landing. Leave product empty for homepage (global) testimonials."
+        description="Pick a product, leave blank for home-only, or turn on “Also on home” for both places."
         actions={
           <Button type="button" onClick={startCreate}>
             <Plus className="h-3.5 w-3.5" />
@@ -182,7 +194,7 @@ export default function ReviewsPage() {
         <div className="mb-8">
           <PanelCard
             title={editingId ? "Edit review" : "New review"}
-            description="Images: use Library to upload/pick. Global = no product selected → home page."
+            description="Product + “Also on home” = product page, landing, and homepage together."
           >
             <div className="grid gap-4 md:grid-cols-2">
               <Field label="Author name">
@@ -230,16 +242,20 @@ export default function ReviewsPage() {
               <Field
                 label="Product (optional)"
                 className="md:col-span-2"
-                hint="Blank = global homepage review. Pick a product for product page + landing."
+                hint="Blank = home only. Pick a product for product page + landing."
               >
                 <select
                   className="admin-input"
                   value={form.productId}
                   onChange={(e) =>
-                    setForm((f) => ({ ...f, productId: e.target.value }))
+                    setForm((f) => ({
+                      ...f,
+                      productId: e.target.value,
+                      showOnHome: e.target.value ? f.showOnHome : false,
+                    }))
                   }
                 >
-                  <option value="">— Global (home page) —</option>
+                  <option value="">— Global (home page only) —</option>
                   {products.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.nameEn} ({p.sku})
@@ -247,6 +263,18 @@ export default function ReviewsPage() {
                   ))}
                 </select>
               </Field>
+              {form.productId ? (
+                <div className="md:col-span-2">
+                  <Toggle
+                    label="Also show on home page"
+                    checked={form.showOnHome}
+                    onChange={(v) =>
+                      setForm((f) => ({ ...f, showOnHome: v }))
+                    }
+                    hint="On = this product review also appears in the homepage testimonials."
+                  />
+                </div>
+              ) : null}
               <Field label="Review text (EN)" className="md:col-span-2">
                 <textarea
                   className="admin-input min-h-[6rem]"
@@ -384,11 +412,7 @@ export default function ReviewsPage() {
                     <ReviewHeading
                       name={r.authorName}
                       published={r.isPublished}
-                      scope={
-                        r.product?.nameEn
-                          ? `Product · ${r.product.nameEn}`
-                          : "Global · Home page"
-                      }
+                      scope={reviewScopeLabel(r)}
                     />
                     <p className="mt-1 text-xs text-muted">
                       {r.rating}★ · {formatDate(r.createdAt)}
