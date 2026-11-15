@@ -101,6 +101,8 @@ export type Product = {
   nameBn: string;
   descriptionEn: string;
   descriptionBn: string;
+  shortDescriptionEn?: string;
+  shortDescriptionBn?: string;
   price: number;
   compareAtPrice?: number | null;
   categoryId: string;

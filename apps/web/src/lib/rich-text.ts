@@ -107,5 +107,8 @@ export function sanitizeRichHtml(html: string): string {
     },
   );
 
+  // TipTap empty paragraphs collapse in the browser — keep Enter gaps visible
+  out = out.replace(/<p>(?:\s|&nbsp;)*<\/p>/gi, "<p><br></p>");
+
   return out;
 }

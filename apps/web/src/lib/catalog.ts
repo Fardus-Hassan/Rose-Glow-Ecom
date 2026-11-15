@@ -36,6 +36,8 @@ export type ApiProduct = {
   nameBn: string;
   descriptionEn: string;
   descriptionBn: string;
+  shortDescriptionEn?: string;
+  shortDescriptionBn?: string;
   price: number;
   compareAtPrice?: number | null;
   category?: { slug: string };
@@ -222,6 +224,10 @@ export function mapApiProduct(p: ApiProduct): Product {
     sku: p.sku,
     name: { en: p.nameEn, bn: p.nameBn },
     description: { en: p.descriptionEn, bn: p.descriptionBn },
+    shortDescription: {
+      en: p.shortDescriptionEn ?? "",
+      bn: p.shortDescriptionBn ?? "",
+    },
     price: p.price,
     compareAtPrice: p.compareAtPrice ?? undefined,
     category: asCategory(p.category?.slug),

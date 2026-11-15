@@ -35,6 +35,8 @@ type ProductPayload = {
   nameBn: string;
   descriptionEn: string;
   descriptionBn: string;
+  shortDescriptionEn: string;
+  shortDescriptionBn: string;
   materialEn: string;
   materialBn: string;
   price: number;
@@ -74,6 +76,8 @@ function emptyForm(categoryId = ""): ProductPayload {
     nameBn: "",
     descriptionEn: "",
     descriptionBn: "",
+    shortDescriptionEn: "",
+    shortDescriptionBn: "",
     materialEn: "",
     materialBn: "",
     price: 0,
@@ -125,6 +129,8 @@ function fromProduct(p: Product): {
       nameBn: p.nameBn,
       descriptionEn: p.descriptionEn,
       descriptionBn: p.descriptionBn,
+      shortDescriptionEn: p.shortDescriptionEn || "",
+      shortDescriptionBn: p.shortDescriptionBn || "",
       materialEn: p.materialEn || "",
       materialBn: p.materialBn || "",
       price: p.price,
@@ -324,9 +330,33 @@ export function ProductForm({
                 />
               </Field>
               <Field
-                label="Description (EN)"
+                label="Short description (EN)"
                 className="md:col-span-2"
-                hint="Bold, lists, highlight, headings, links, and paragraph gaps."
+                hint="Shown beside the gallery on the product page. Enter = new line / gap."
+              >
+                <RichTextEditor
+                  value={form.shortDescriptionEn}
+                  onChange={(html) => patch("shortDescriptionEn", html)}
+                  placeholder="Short blurb next to the photos…"
+                  minHeightClass="min-h-[6rem]"
+                />
+              </Field>
+              <Field
+                label="Short description (BN)"
+                className="md:col-span-2"
+                hint="Product page gallery-side blurb (Bangla)."
+              >
+                <RichTextEditor
+                  value={form.shortDescriptionBn}
+                  onChange={(html) => patch("shortDescriptionBn", html)}
+                  placeholder="ছবির পাশে সংক্ষিপ্ত বিবরণ…"
+                  minHeightClass="min-h-[6rem]"
+                />
+              </Field>
+              <Field
+                label="Full description (EN)"
+                className="md:col-span-2"
+                hint="Details tab below the gallery. Bold, lists, highlight, Enter for gaps."
               >
                 <RichTextEditor
                   value={form.descriptionEn}
@@ -335,9 +365,9 @@ export function ProductForm({
                 />
               </Field>
               <Field
-                label="Description (BN)"
+                label="Full description (BN)"
                 className="md:col-span-2"
-                hint="Same formatting tools for Bangla copy."
+                hint="Details tab — Bangla."
               >
                 <RichTextEditor
                   value={form.descriptionBn}

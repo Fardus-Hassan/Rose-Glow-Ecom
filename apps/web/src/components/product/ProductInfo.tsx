@@ -10,6 +10,7 @@ import { useBag } from "@/store/bag";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { RichText } from "@/components/ui/RichText";
 import { trackAddToCart } from "@/lib/meta-pixel";
+import { isRichTextEmpty } from "@/lib/rich-text";
 
 export function ProductInfo({ product }: { product: Product }) {
   const t = useTranslations("Product");
@@ -120,7 +121,12 @@ export function ProductInfo({ product }: { product: Product }) {
       </div>
 
       <RichText
-        html={localize(product.description, locale)}
+        html={
+          product.shortDescription &&
+          !isRichTextEmpty(localize(product.shortDescription, locale))
+            ? localize(product.shortDescription, locale)
+            : localize(product.description, locale)
+        }
         className="mt-5 max-w-xl text-[15px] leading-7 text-[#1c1a19]/58 md:text-base md:leading-8"
       />
 

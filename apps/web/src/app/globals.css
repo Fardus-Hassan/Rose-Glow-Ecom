@@ -284,6 +284,10 @@ html.lenis body {
 }
 .rg-prose p {
   margin: 0;
+  min-height: 1.35em;
+}
+.rg-prose p:empty::before {
+  content: "\00a0";
 }
 .rg-prose strong,
 .rg-prose b {
@@ -372,6 +376,9 @@ html.lenis body {
 }
 .rg-editor .ProseMirror > * + * {
   margin-top: 0.65em;
+}
+.rg-editor .ProseMirror p {
+  min-height: 1.35em;
 }
 .rg-editor .ProseMirror ul {
   list-style: disc;

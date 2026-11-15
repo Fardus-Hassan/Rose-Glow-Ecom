@@ -27,6 +27,8 @@ export type Product = {
   sku: string;
   name: LocalizedString;
   description: LocalizedString;
+  /** Optional blurb beside gallery; falls back to description when empty */
+  shortDescription?: LocalizedString;
   price: number;
   compareAtPrice?: number;
   category: ProductCategory;

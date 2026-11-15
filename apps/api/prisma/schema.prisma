@@ -75,6 +75,8 @@ model Product {
   nameBn           String
   descriptionEn    String
   descriptionBn    String
+  shortDescriptionEn String @default("")
+  shortDescriptionBn String @default("")
   price            Int
   compareAtPrice   Int?
   categoryId       String

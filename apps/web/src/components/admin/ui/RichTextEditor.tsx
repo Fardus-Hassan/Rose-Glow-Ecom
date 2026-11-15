@@ -111,7 +111,8 @@ export function RichTextEditor({
       },
     },
     onUpdate: ({ editor: ed }) => {
-      onChange(ed.getHTML());
+      // Keep Enter gaps: empty <p></p> collapses on the storefront
+      onChange(ed.getHTML().replace(/<p>\s*<\/p>/gi, "<p><br></p>"));
     },
   });
 

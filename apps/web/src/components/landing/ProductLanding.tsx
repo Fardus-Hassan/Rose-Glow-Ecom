@@ -27,6 +27,7 @@ import {
   trackInitiateCheckout,
   trackPurchase,
 } from "@/lib/meta-pixel";
+import { isRichTextEmpty } from "@/lib/rich-text";
 import {
   parseLandingConfig,
   type ProductLandingConfig,
@@ -457,8 +458,18 @@ export function ProductLanding({
             <RichText
               html={localize(
                 {
-                  en: landing.bodyEn || product.description.en,
-                  bn: landing.bodyBn || product.description.bn,
+                  en:
+                    landing.bodyEn ||
+                    (product.shortDescription?.en &&
+                    !isRichTextEmpty(product.shortDescription.en)
+                      ? product.shortDescription.en
+                      : product.description.en),
+                  bn:
+                    landing.bodyBn ||
+                    (product.shortDescription?.bn &&
+                    !isRichTextEmpty(product.shortDescription.bn)
+                      ? product.shortDescription.bn
+                      : product.description.bn),
                 },
                 locale,
               )}
