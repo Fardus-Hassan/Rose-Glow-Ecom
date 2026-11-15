@@ -318,7 +318,7 @@ export function Hero({
       </div>
 
       <div className="pointer-events-none absolute bottom-6 right-5 hidden text-[10px] uppercase tracking-[0.28em] text-[#f4efe8]/45 md:block md:right-8 lg:right-10 xl:right-12">
-        Est. atelier · Dhaka
+        {t("heroCorner")}
       </div>
     </section>
   );

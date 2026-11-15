@@ -53,7 +53,9 @@
     "newsletterTitle": "Stay close to new drops",
     "newsletterSub": "Occasional notes on new ornaments and private offers.",
     "newsletterPlaceholder": "Email address",
-    "newsletterCta": "Join"
+    "newsletterCta": "Join",
+    "newsletterSuccess": "You’re on the list.",
+    "heroCorner": "Est. atelier · Dhaka"
   },
   "Products": {
     "eyebrow": "The collection",
@@ -115,7 +117,11 @@
     "home": "Home",
     "shop": "Shop",
     "zoomHint": "Hover to zoom",
-    "descriptionTitle": "Product description"
+    "descriptionTitle": "Product description",
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity",
+    "prevMedia": "Previous media",
+    "nextMedia": "Next media"
   },
   "Categories": {
     "earrings": "Earrings",
@@ -184,6 +190,12 @@
     "placeOrder": "Place COD order",
     "order": "Your order",
     "total": "Total",
+    "subtotal": "Subtotal",
+    "shippingLabel": "Shipping",
+    "shippingFree": "Free",
+    "freeShippingOver": "Free shipping over {amount}",
+    "codUnavailable": "Cash on delivery is currently unavailable.",
+    "orderFailed": "Order failed",
     "required": "Required",
     "phoneInvalid": "Enter a valid phone number",
     "emptyTitle": "Nothing to checkout",
@@ -269,6 +281,12 @@
     "decrease": "Decrease quantity",
     "increase": "Increase quantity",
     "total": "Total",
+    "subtotal": "Subtotal",
+    "shippingLabel": "Shipping",
+    "shippingFree": "Free",
+    "freeShippingOver": "Free shipping over {amount}",
+    "codUnavailable": "Cash on delivery is currently unavailable.",
+    "orderFailed": "Order failed",
     "name": "Full name",
     "phone": "Phone",
     "district": "District / city",

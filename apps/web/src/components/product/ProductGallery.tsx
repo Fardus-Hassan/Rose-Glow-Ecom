@@ -261,7 +261,7 @@ export function ProductGallery({
               type="button"
               onClick={() => go(-1)}
               className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center border border-white/20 bg-[#0e0d0c]/45 text-[#f4efe8] backdrop-blur-sm transition hover:bg-[#0e0d0c]/70"
-              aria-label="Previous media"
+              aria-label={t("prevMedia")}
             >
               ←
             </button>
@@ -269,7 +269,7 @@ export function ProductGallery({
               type="button"
               onClick={() => go(1)}
               className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center border border-white/20 bg-[#0e0d0c]/45 text-[#f4efe8] backdrop-blur-sm transition hover:bg-[#0e0d0c]/70"
-              aria-label="Next media"
+              aria-label={t("nextMedia")}
             >
               →
             </button>

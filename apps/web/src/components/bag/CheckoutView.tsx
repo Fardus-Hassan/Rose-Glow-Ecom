@@ -135,11 +135,7 @@ export function CheckoutView() {
     event.preventDefault();
     if (!validate() || lines.length === 0) return;
     if (shipping && !shipping.codEnabled) {
-      setSubmitError(
-        locale === "bn"
-          ? "এখন ক্যাশ অন ডেলিভারি বন্ধ আছে।"
-          : "Cash on delivery is currently unavailable.",
-      );
+      setSubmitError(t("codUnavailable"));
       return;
     }
     setSubmitting(true);
@@ -177,7 +173,7 @@ export function CheckoutView() {
       setSubmitted(true);
       clearCart();
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Order failed");
+      setSubmitError(err instanceof Error ? err.message : t("orderFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -267,9 +263,7 @@ export function CheckoutView() {
             </p>
             {shipping && !shipping.codEnabled ? (
               <p className="mt-2 border border-red-800/20 bg-red-50 px-3 py-2 text-sm text-red-900">
-                {locale === "bn"
-                  ? "এখন ক্যাশ অন ডেলিভারি বন্ধ আছে।"
-                  : "Cash on delivery is currently unavailable."}
+                {t("codUnavailable")}
               </p>
             ) : null}
           </div>
@@ -397,16 +391,16 @@ export function CheckoutView() {
             </ul>
             <div className="mt-6 space-y-2 border-t border-[#1c1a19]/10 pt-4 text-sm">
               <div className="flex items-center justify-between text-[#1c1a19]/55">
-                <span>Subtotal</span>
+                <span>{t("subtotal")}</span>
                 <span>{formatBdt(subtotal, locale)}</span>
               </div>
               <div className="flex items-center justify-between text-[#1c1a19]/55">
-                <span>Shipping</span>
+                <span>{t("shippingLabel")}</span>
                 <span>
                   {shippingFee > 0
                     ? formatBdt(shippingFee, locale)
                     : shipping
-                      ? "Free"
+                      ? t("shippingFree")
                       : "…"}
                 </span>
               </div>
@@ -414,8 +408,9 @@ export function CheckoutView() {
               shipping.freeShippingOver > 0 &&
               subtotal < shipping.freeShippingOver ? (
                 <p className="text-xs text-[#1c1a19]/45">
-                  Free shipping over{" "}
-                  {formatBdt(shipping.freeShippingOver, locale)}
+                  {t("freeShippingOver", {
+                    amount: formatBdt(shipping.freeShippingOver, locale),
+                  })}
                 </p>
               ) : null}
               <div className="flex items-center justify-between border-t border-[#1c1a19]/10 pt-2">

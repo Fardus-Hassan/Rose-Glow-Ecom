@@ -114,7 +114,7 @@ export function FooterClient() {
             {home("newsletterSub")}
           </p>
           {joined ? (
-            <p className="text-sm text-[#c9a08a]">You’re on the list.</p>
+            <p className="text-sm text-[#c9a08a]">{home("newsletterSuccess")}</p>
           ) : (
             <form
               className="flex flex-row gap-2"

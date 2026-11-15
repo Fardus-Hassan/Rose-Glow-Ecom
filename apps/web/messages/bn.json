@@ -16,7 +16,7 @@
     "close": "বন্ধ",
     "shopAll": "সব পিস দেখুন",
     "featured": "স্পেশাল পিক",
-    "atelierNote": "এসট্যাবলিশড অ্যাটেলিয়ার · ঢাকা"
+    "atelierNote": "অ্যাটেলিয়ের · ঢাকা"
   },
   "Home": {
     "heroEyebrow": "Rose Glow",
@@ -53,7 +53,9 @@
     "newsletterTitle": "নতুন ড্রপের খবর রাখুন",
     "newsletterSub": "নতুন অর্নামেন্টস ও প্রাইভেট অফারের সংক্ষিপ্ত নোট।",
     "newsletterPlaceholder": "ইমেইল ঠিকানা",
-    "newsletterCta": "যোগ দিন"
+    "newsletterCta": "যোগ দিন",
+    "newsletterSuccess": "আপনি তালিকায় যুক্ত হয়েছেন।",
+    "heroCorner": "অ্যাটেলিয়ের · ঢাকা"
   },
   "Products": {
     "eyebrow": "কালেকশন",
@@ -115,7 +117,11 @@
     "home": "হোম",
     "shop": "শপ",
     "zoomHint": "জুম করতে হোভার করুন",
-    "descriptionTitle": "প্রোডাক্ট বিবরণ"
+    "descriptionTitle": "প্রোডাক্ট বিবরণ",
+    "decrease": "পরিমাণ কমান",
+    "increase": "পরিমাণ বাড়ান",
+    "prevMedia": "আগের ছবি",
+    "nextMedia": "পরের ছবি"
   },
   "Categories": {
     "earrings": "ইয়াররিংস",
@@ -184,6 +190,12 @@
     "placeOrder": "COD অর্ডার করুন",
     "order": "আপনার অর্ডার",
     "total": "মোট",
+    "subtotal": "সাবটোটাল",
+    "shippingLabel": "শিপিং",
+    "shippingFree": "ফ্রি",
+    "freeShippingOver": "{amount}-এর উপরে ফ্রি শিপিং",
+    "codUnavailable": "এখন ক্যাশ অন ডেলিভারি বন্ধ আছে।",
+    "orderFailed": "অর্ডার হয়নি",
     "required": "প্রয়োজনীয়",
     "phoneInvalid": "সঠিক ফোন নম্বর দিন",
     "emptyTitle": "চেকআউট করার কিছু নেই",
@@ -269,6 +281,12 @@
     "decrease": "পরিমাণ কমান",
     "increase": "পরিমাণ বাড়ান",
     "total": "মোট",
+    "subtotal": "সাবটোটাল",
+    "shippingLabel": "শিপিং",
+    "shippingFree": "ফ্রি",
+    "freeShippingOver": "{amount}-এর উপরে ফ্রি শিপিং",
+    "codUnavailable": "এখন ক্যাশ অন ডেলিভারি বন্ধ আছে।",
+    "orderFailed": "অর্ডার হয়নি",
     "name": "পুরো নাম",
     "phone": "ফোন",
     "district": "জেলা / শহর",

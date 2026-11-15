@@ -283,11 +283,7 @@ export function ProductLanding({
     if (orderItems.length === 0) return;
     if (!validate()) return;
     if (shipping && !shipping.codEnabled) {
-      setSubmitError(
-        locale === "bn"
-          ? "এখন ক্যাশ অন ডেলিভারি বন্ধ আছে।"
-          : "Cash on delivery is currently unavailable.",
-      );
+      setSubmitError(t("codUnavailable"));
       return;
     }
     setSubmitting(true);
@@ -324,7 +320,7 @@ export function ProductLanding({
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Order failed");
+      setSubmitError(err instanceof Error ? err.message : t("orderFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -787,9 +783,34 @@ export function ProductLanding({
               })}
             </ul>
 
-            <div className="mt-4 flex items-center justify-between text-sm">
-              <span className="text-[#1c1a19]/55">{t("total")}</span>
-              <span className="text-[#1c1a19]">{formatBdt(total, locale)}</span>
+            <div className="mt-4 space-y-2 border-t border-[#1c1a19]/10 pt-4 text-sm">
+              <div className="flex items-center justify-between text-[#1c1a19]/55">
+                <span>{t("subtotal")}</span>
+                <span>{formatBdt(subtotal, locale)}</span>
+              </div>
+              <div className="flex items-center justify-between text-[#1c1a19]/55">
+                <span>{t("shippingLabel")}</span>
+                <span>
+                  {shippingFee > 0
+                    ? formatBdt(shippingFee, locale)
+                    : shipping
+                      ? t("shippingFree")
+                      : "…"}
+                </span>
+              </div>
+              {shipping &&
+              shipping.freeShippingOver > 0 &&
+              subtotal < shipping.freeShippingOver ? (
+                <p className="text-xs text-[#1c1a19]/45">
+                  {t("freeShippingOver", {
+                    amount: formatBdt(shipping.freeShippingOver, locale),
+                  })}
+                </p>
+              ) : null}
+              <div className="flex items-center justify-between border-t border-[#1c1a19]/10 pt-2">
+                <span className="text-[#1c1a19]/55">{t("total")}</span>
+                <span className="text-[#1c1a19]">{formatBdt(total, locale)}</span>
+              </div>
             </div>
 
             <form

@@ -161,7 +161,7 @@ export function ProductInfo({ product }: { product: Product }) {
             type="button"
             className="flex h-11 w-11 items-center justify-center text-lg text-[#1c1a19]/70 transition hover:bg-[#1c1a19]/05"
             onClick={() => setQty((v) => Math.max(1, v - 1))}
-            aria-label="Decrease quantity"
+            aria-label={t("decrease")}
           >
             −
           </button>
@@ -170,7 +170,7 @@ export function ProductInfo({ product }: { product: Product }) {
             type="button"
             className="flex h-11 w-11 items-center justify-center text-lg text-[#1c1a19]/70 transition hover:bg-[#1c1a19]/05"
             onClick={() => setQty((v) => v + 1)}
-            aria-label="Increase quantity"
+            aria-label={t("increase")}
           >
             +
           </button>
