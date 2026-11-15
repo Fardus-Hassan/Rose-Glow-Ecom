@@ -713,7 +713,7 @@ export function ProductLanding({
             <p className="mt-2 text-sm text-[#1c1a19]/55">{t("codOnly")}</p>
 
             {/* Selected lines */}
-            <ul className="mt-6 divide-y divide-[#1c1a19]/10 border-y border-[#1c1a19]/10">
+            <ul className="mt-6 divide-y divide-[#1c1a19]/10 border-t border-[#1c1a19]/10">
               {orderItems.map(({ product: item, qty }) => {
                 const cover = getCoverMedia(item);
                 return (
@@ -783,7 +783,7 @@ export function ProductLanding({
               })}
             </ul>
 
-            <div className="mt-4 space-y-2 border-t border-[#1c1a19]/10 pt-4 text-sm">
+            <div className="mt-4 space-y-2 pt-2 text-sm">
               <div className="flex items-center justify-between text-[#1c1a19]/55">
                 <span>{t("subtotal")}</span>
                 <span>{formatBdt(subtotal, locale)}</span>
