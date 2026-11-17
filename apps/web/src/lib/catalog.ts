@@ -132,6 +132,8 @@ export type ContactContent = {
   phoneTel: string;
   whatsappDisplay: string;
   whatsappHref: string;
+  showCallOnProducts: boolean;
+  showWhatsappOnProducts: boolean;
   email: string;
   emailHref: string;
   addressEn: string;
@@ -539,34 +541,52 @@ export async function fetchHeroContent(): Promise<HeroContent> {
   };
 }
 
-function mapContactValue(value: Record<string, string>): ContactContent {
-  const phone = value.phone || staticContact.phoneDisplay;
+function asContactFlag(value: unknown, fallback = true): boolean {
+  if (typeof value === "boolean") return value;
+  if (value === "false" || value === 0 || value === "0") return false;
+  if (value === "true" || value === 1 || value === "1") return true;
+  return fallback;
+}
+
+function mapContactValue(
+  value: Record<string, string | boolean | number | undefined>,
+): ContactContent {
+  const phone = String(value.phone || staticContact.phoneDisplay);
   const digits = phone.replace(/[^\d+]/g, "");
-  const waRaw = value.whatsapp || digits;
+  const waRaw = String(value.whatsapp || digits);
   const wa = waRaw.replace(/[^\d]/g, "");
 
   return {
     phoneDisplay: phone,
     phoneTel: digits.startsWith("+") ? `tel:${digits}` : `tel:+${digits}`,
-    whatsappDisplay: value.whatsapp || phone,
-    whatsappHref: `https://wa.me/${wa}`,
-    email: value.email || staticContact.email,
+    whatsappDisplay: String(value.whatsapp || phone),
+    whatsappHref: wa ? `https://wa.me/${wa}` : "https://wa.me/",
+    showCallOnProducts: asContactFlag(value.showCallOnProducts, true),
+    showWhatsappOnProducts: asContactFlag(value.showWhatsappOnProducts, true),
+    email: String(value.email || staticContact.email),
     emailHref: `mailto:${value.email || staticContact.email}`,
-    addressEn: value.addressEn || staticContact.addressEn,
-    addressBn: value.addressBn || staticContact.addressBn,
-    hoursEn: value.hoursEn || staticContact.hoursEn,
-    hoursBn: value.hoursBn || staticContact.hoursBn,
+    addressEn: String(value.addressEn || staticContact.addressEn),
+    addressBn: String(value.addressBn || staticContact.addressBn),
+    hoursEn: String(value.hoursEn || staticContact.hoursEn),
+    hoursBn: String(value.hoursBn || staticContact.hoursBn),
   };
 }
 
 export async function fetchContactContent(): Promise<ContactContent> {
   const section = await apiFetch<{
-    data?: { contact?: Record<string, string> };
+    data?: {
+      contact?: Record<string, string | boolean | number | undefined>;
+    };
   }>("/cms/sections/settings");
   if (section?.data?.contact) return mapContactValue(section.data.contact);
 
   const block = await apiFetch<ApiContentBlock>("/content/blocks/contact");
-  return mapContactValue((block?.value ?? {}) as Record<string, string>);
+  return mapContactValue(
+    (block?.value ?? {}) as Record<
+      string,
+      string | boolean | number | undefined
+    >,
+  );
 }
 
 export async function fetchSocialLinks(): Promise<SocialLink[]> {

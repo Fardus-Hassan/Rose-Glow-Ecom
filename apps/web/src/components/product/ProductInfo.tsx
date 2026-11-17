@@ -9,6 +9,7 @@ import { useRouter } from "@/i18n/navigation";
 import { useBag } from "@/store/bag";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { RichText } from "@/components/ui/RichText";
+import { ProductContactActions } from "@/components/product/ProductContactActions";
 import { trackAddToCart } from "@/lib/meta-pixel";
 import { isRichTextEmpty } from "@/lib/rich-text";
 
@@ -203,6 +204,11 @@ export function ProductInfo({ product }: { product: Product }) {
           {t("buyNow")}
         </button>
       </div>
+
+      <ProductContactActions
+        className="mt-5"
+        productName={localize(product.name, locale)}
+      />
 
       <div className="mt-4 hidden flex-col gap-4 sm:flex">
         <div className="flex gap-6 text-[11px] uppercase tracking-[0.18em] text-[#1c1a19]/45">

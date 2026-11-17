@@ -126,6 +126,19 @@ export function IconFacebook(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function IconPhone(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden {...props}>
+      <path
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6.6 3.8h2.4c.5 0 .9.3 1 .8l.6 2.7c.1.4 0 .8-.3 1.1l-1.3 1.3a12.2 12.2 0 0 0 5.3 5.3l1.3-1.3c.3-.3.7-.4 1.1-.3l2.7.6c.5.1.8.5.8 1v2.4c0 .6-.5 1.1-1.1 1.1A14.2 14.2 0 0 1 5.5 4.9c0-.6.5-1.1 1.1-1.1Z"
+      />
+    </svg>
+  );
+}
+
 export function IconWhatsApp(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden {...props}>

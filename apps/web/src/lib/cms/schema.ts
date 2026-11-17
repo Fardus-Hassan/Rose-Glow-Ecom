@@ -285,10 +285,32 @@ export const sectionSchemas: SectionSchema[] = [
       },
       {
         title: "Contact",
+        description:
+          "Phone & WhatsApp numbers power Call-to-order / WhatsApp-order buttons on product details and landing pages.",
         path: "contact",
         fields: [
-          half(text("phone", "Phone")),
-          half(text("whatsapp", "WhatsApp number")),
+          half(
+            text("phone", "Phone (Call button)", {
+              help: "Shown on Call button. Example: 01700-000000",
+              placeholder: "01700-000000",
+            }),
+          ),
+          half(
+            text("whatsapp", "WhatsApp number", {
+              help: "Country code + number, no +. Example: 8801700000000",
+              placeholder: "8801700000000",
+            }),
+          ),
+          toggle(
+            "showCallOnProducts",
+            "Show Call-to-order on product & landing",
+            "Uses the Phone number above for phone orders.",
+          ),
+          toggle(
+            "showWhatsappOnProducts",
+            "Show WhatsApp-order on product & landing",
+            "Opens chat with an order message for that product.",
+          ),
           half(text("email", "Email")),
           half(text("addressEn", "Address (EN)")),
           half(text("addressBn", "Address (BN)")),

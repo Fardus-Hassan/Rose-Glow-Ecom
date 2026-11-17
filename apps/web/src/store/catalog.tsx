@@ -40,6 +40,8 @@ const emptyContact: ContactContent = {
   phoneTel: "tel:",
   whatsappDisplay: "",
   whatsappHref: "https://wa.me/",
+  showCallOnProducts: true,
+  showWhatsappOnProducts: true,
   email: "",
   emailHref: "mailto:",
   addressEn: "",
@@ -50,10 +52,19 @@ const emptyContact: ContactContent = {
 
 const CatalogContext = createContext<CatalogContextValue | null>(null);
 
-function mapContact(value: Record<string, string>): ContactContent {
-  const phone = value.phone || "";
+function asContactFlag(value: unknown, fallback = true): boolean {
+  if (typeof value === "boolean") return value;
+  if (value === "false" || value === 0 || value === "0") return false;
+  if (value === "true" || value === 1 || value === "1") return true;
+  return fallback;
+}
+
+function mapContact(
+  value: Record<string, string | boolean | number | undefined>,
+): ContactContent {
+  const phone = String(value.phone || "");
   const digits = phone.replace(/[^\d+]/g, "");
-  const wa = (value.whatsapp || digits).replace(/[^\d]/g, "");
+  const wa = String(value.whatsapp || digits).replace(/[^\d]/g, "");
   return {
     phoneDisplay: phone,
     phoneTel: digits
@@ -61,14 +72,16 @@ function mapContact(value: Record<string, string>): ContactContent {
         ? `tel:${digits}`
         : `tel:+${digits}`
       : "tel:",
-    whatsappDisplay: value.whatsapp || phone,
+    whatsappDisplay: String(value.whatsapp || phone),
     whatsappHref: wa ? `https://wa.me/${wa}` : "https://wa.me/",
-    email: value.email || "",
+    showCallOnProducts: asContactFlag(value.showCallOnProducts, true),
+    showWhatsappOnProducts: asContactFlag(value.showWhatsappOnProducts, true),
+    email: String(value.email || ""),
     emailHref: value.email ? `mailto:${value.email}` : "mailto:",
-    addressEn: value.addressEn || "",
-    addressBn: value.addressBn || "",
-    hoursEn: value.hoursEn || "",
-    hoursBn: value.hoursBn || "",
+    addressEn: String(value.addressEn || ""),
+    addressBn: String(value.addressBn || ""),
+    hoursEn: String(value.hoursEn || ""),
+    hoursBn: String(value.hoursBn || ""),
   };
 }
 
@@ -125,7 +138,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
           const section = (await settingsRes.json()) as {
             data?: {
               social?: Record<string, string>;
-              contact?: Record<string, string>;
+              contact?: Record<string, string | boolean | number | undefined>;
               storeName?: string;
               taglineEn?: string;
               taglineBn?: string;

@@ -8,6 +8,7 @@ import type { Review } from "@/data/reviews";
 import { formatBdt, cn } from "@/lib/format";
 import { IconHeart, IconShield, IconStar, IconTruck } from "@/components/icons";
 import { ProductGallery } from "@/components/product/ProductGallery";
+import { ProductContactActions } from "@/components/product/ProductContactActions";
 import { ProductReviews } from "@/components/product/ProductReviews";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingQuickView } from "@/components/landing/LandingQuickView";
@@ -506,6 +507,11 @@ export function ProductLanding({
                 {t("orderNow")} →
               </button>
             </div>
+
+            <ProductContactActions
+              className="mt-5"
+              productName={localize(product.name, locale)}
+            />
 
             <div className="mt-7">
               <p className="mb-2.5 text-[10px] uppercase tracking-[0.2em] text-[#1c1a19]/4">

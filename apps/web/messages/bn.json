@@ -121,7 +121,12 @@
     "decrease": "পরিমাণ কমান",
     "increase": "পরিমাণ বাড়ান",
     "prevMedia": "আগের ছবি",
-    "nextMedia": "পরের ছবি"
+    "nextMedia": "পরের ছবি",
+    "needHelpEyebrow": "ফোনে অর্ডার",
+    "needHelpTitle": "কল বা WhatsApp-এ অর্ডার দিতে চান?",
+    "needHelpHint": "পিস, পরিমাণ আর ঠিকানা বলুন — আমরা COD কনফার্ম করব।",
+    "callButton": "কল করে অর্ডার",
+    "whatsappButton": "WhatsApp অর্ডার"
   },
   "Categories": {
     "earrings": "ইয়াররিংস",

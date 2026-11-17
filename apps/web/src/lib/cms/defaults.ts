@@ -88,6 +88,8 @@ export const sectionDefaults: Record<SectionKey, Record<string, unknown>> = {
     contact: {
       phone: "01700-000000",
       whatsapp: "8801700000000",
+      showCallOnProducts: true,
+      showWhatsappOnProducts: true,
       email: "hello@roseglo.studio",
       addressEn: "Dhaka, Bangladesh",
       addressBn: "ঢাকা, বাংলাদেশ",

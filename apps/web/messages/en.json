@@ -121,7 +121,12 @@
     "decrease": "Decrease quantity",
     "increase": "Increase quantity",
     "prevMedia": "Previous media",
-    "nextMedia": "Next media"
+    "nextMedia": "Next media",
+    "needHelpEyebrow": "Order by phone",
+    "needHelpTitle": "Prefer to order on Call or WhatsApp?",
+    "needHelpHint": "Tell us the piece, quantity, and your address — we’ll confirm COD.",
+    "callButton": "Call to order",
+    "whatsappButton": "WhatsApp order"
   },
   "Categories": {
     "earrings": "Earrings",
