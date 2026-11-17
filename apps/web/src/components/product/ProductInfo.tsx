@@ -186,10 +186,10 @@ export function ProductInfo({ product }: { product: Product }) {
         </p>
       </div>
 
-      <div className="mt-6 hidden gap-3 sm:flex">
+      <div className="mt-6 flex gap-2 sm:gap-3">
         <button
           type="button"
-          className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 bg-[#1c1a19] px-3 text-[10px] uppercase tracking-[0.14em] text-[#f4efe8] transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-40 sm:px-6 sm:text-[11px] sm:tracking-[0.2em]"
           disabled={!product.inStock}
           onClick={handleAdd}
         >
@@ -199,7 +199,7 @@ export function ProductInfo({ product }: { product: Product }) {
           type="button"
           onClick={handleBuyNow}
           disabled={!product.inStock}
-          className="inline-flex min-h-12 flex-1 items-center justify-center border border-[#1c1a19]/25 px-6 text-[11px] uppercase tracking-[0.2em] text-[#1c1a19] transition hover:border-[#1c1a19] hover:bg-[#1c1a19] hover:text-[#f4efe8] disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex min-h-12 flex-1 items-center justify-center border border-[#1c1a19]/25 px-3 text-[10px] uppercase tracking-[0.14em] text-[#1c1a19] transition hover:border-[#1c1a19] hover:bg-[#1c1a19] hover:text-[#f4efe8] disabled:cursor-not-allowed disabled:opacity-40 sm:px-6 sm:text-[11px] sm:tracking-[0.2em]"
         >
           {t("buyNow")}
         </button>

@@ -389,7 +389,7 @@ export function ProductLanding({
         </div>
       ) : null}
 
-      <div className="container-rg pb-28 pt-6 sm:pt-8 md:pb-24 md:pt-12">
+      <div className="container-rg pt-6 sm:pt-8 md:pt-12">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start lg:gap-12 xl:gap-16">
           <div className="lg:sticky lg:top-36">
             <ProductGallery media={product.media} discount={discount} />
@@ -583,13 +583,17 @@ export function ProductLanding({
                 {tp("shipping")}
               </h3>
               <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[#1c1a19]/58">
-                {locale === "bn"
-                  ? shipping?.shippingReturnBn ||
-                    shipping?.shippingReturnEn ||
-                    tp("shippingCopy")
-                  : shipping?.shippingReturnEn ||
-                    shipping?.shippingReturnBn ||
-                    tp("shippingCopy")}
+                {(
+                  locale === "bn"
+                    ? shipping?.shippingReturnBn ||
+                      shipping?.shippingReturnEn ||
+                      tp("shippingCopy")
+                    : shipping?.shippingReturnEn ||
+                      shipping?.shippingReturnBn ||
+                      tp("shippingCopy")
+                )
+                  .replace(/\n{3,}/g, "\n\n")
+                  .trim()}
               </p>
             </div>
           </div>
@@ -696,7 +700,7 @@ export function ProductLanding({
         </section>
       ) : null}
 
-      <div className="container-rg pb-10 md:pb-24">
+      <div className="container-rg pb-28 md:pb-24">
         <div className="mt-12 flex flex-col items-center border-t border-[#1c1a19]/10 pt-10 text-center md:mt-16">
           <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
             {t("follow")}
