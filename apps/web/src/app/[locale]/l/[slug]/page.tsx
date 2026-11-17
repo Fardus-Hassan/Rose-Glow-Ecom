@@ -75,13 +75,11 @@ export default async function ProductLandingPage({
   if (!data) notFound();
 
   return (
-    <div className="pb-20 lg:pb-0">
-      <ProductLanding
-        productSlug={data.product.slug}
-        product={data.product}
-        landing={data.landing}
-        relatedSlugs={data.relatedSlugs}
-      />
-    </div>
+    <ProductLanding
+      productSlug={data.product.slug}
+      product={data.product}
+      landing={data.landing}
+      relatedSlugs={data.relatedSlugs}
+    />
   );
 }
