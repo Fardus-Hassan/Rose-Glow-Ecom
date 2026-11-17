@@ -700,7 +700,7 @@ export function ProductLanding({
         </section>
       ) : null}
 
-      <div className="container-rg pb-28 md:pb-24">
+      <div className="container-rg pb-6 md:pb-10">
         <div className="mt-12 flex flex-col items-center border-t border-[#1c1a19]/10 pt-10 text-center md:mt-16">
           <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
             {t("follow")}
