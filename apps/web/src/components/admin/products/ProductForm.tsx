@@ -172,6 +172,20 @@ export function ProductForm({
   );
   const [media, setMedia] = useState<GalleryItem[]>(seeded?.media || []);
   const [colors, setColors] = useState<ColorRow[]>(seeded?.colors || []);
+  const [variants, setVariants] = useState(
+    (initial?.variants || []).map((variant) => ({
+      sku: variant.sku,
+      nameEn: variant.nameEn,
+      nameBn: variant.nameBn || "",
+      price: String(variant.price),
+      compareAtPrice:
+        variant.compareAtPrice === null || variant.compareAtPrice === undefined
+          ? ""
+          : String(variant.compareAtPrice),
+      stock: String(variant.stock),
+      image: variant.image || "",
+    })),
+  );
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -212,6 +226,20 @@ export function ProductForm({
       setError("Add product description in English and Bangla");
       return;
     }
+    const variantSkus = variants
+      .filter((variant) => variant.sku.trim() && variant.nameEn.trim())
+      .map((variant) => variant.sku.trim().toLowerCase());
+    if (new Set(variantSkus).size !== variantSkus.length) {
+      setError("Each variant SKU must be unique");
+      return;
+    }
+    if (
+      variantSkus.includes(form.sku.trim().toLowerCase()) &&
+      variantSkus.length
+    ) {
+      setError("Variant SKU cannot match the base product SKU");
+      return;
+    }
     setSaving(true);
     setError(null);
     const landingSlug =
@@ -233,6 +261,20 @@ export function ProductForm({
       canonicalPath:
         form.canonicalPath || (form.slug ? `/products/${form.slug}` : ""),
       ogImage: form.ogImage || media.find((m) => m.type === "IMAGE" && m.src)?.src || "",
+      variants: variants
+        .filter((variant) => variant.sku.trim() && variant.nameEn.trim())
+        .map((variant) => ({
+          sku: variant.sku.trim(),
+          nameEn: variant.nameEn.trim(),
+          nameBn: variant.nameBn.trim(),
+          price: Number(variant.price) || 0,
+          compareAtPrice:
+            variant.compareAtPrice.trim() === ""
+              ? null
+              : Number(variant.compareAtPrice) || 0,
+          stock: Number(variant.stock) || 0,
+          image: (variant.image || "").trim(),
+        })),
       landingEnabled: form.landingEnabled,
       landingSlug: form.landingEnabled ? landingSlug : null,
       landing: {
@@ -523,6 +565,159 @@ export function ProductForm({
                   }}
                 />
               </Field>
+            </div>
+            <div className="mt-6 space-y-3">
+              <p className="admin-label">Variants</p>
+              <p className="text-xs text-muted">
+                Optional. Leave empty to sell the base product SKU. Each variant
+                needs a unique SKU, price, and stock.
+              </p>
+              {variants.map((variant, index) => (
+                <div key={index} className="space-y-2 border border-ink/10 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-muted">
+                      Variant {index + 1}
+                    </p>
+                    <button
+                      type="button"
+                      className="text-[10px] uppercase tracking-[0.16em] text-rose"
+                      onClick={() =>
+                        setVariants((rows) =>
+                          rows.filter((_, i) => i !== index),
+                        )
+                      }
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <div className="grid gap-2 md:grid-cols-3">
+                    <input
+                      className="admin-input"
+                      placeholder="Name (EN)"
+                      aria-label="Variant name"
+                      value={variant.nameEn}
+                      onChange={(e) =>
+                        setVariants((rows) =>
+                          rows.map((row, i) =>
+                            i === index
+                              ? { ...row, nameEn: e.target.value }
+                              : row,
+                          ),
+                        )
+                      }
+                    />
+                    <input
+                      className="admin-input"
+                      placeholder="নাম (BN)"
+                      aria-label="Variant Bangla name"
+                      value={variant.nameBn}
+                      onChange={(e) =>
+                        setVariants((rows) =>
+                          rows.map((row, i) =>
+                            i === index
+                              ? { ...row, nameBn: e.target.value }
+                              : row,
+                          ),
+                        )
+                      }
+                    />
+                    <input
+                      className="admin-input"
+                      placeholder="SKU"
+                      aria-label="Variant SKU"
+                      value={variant.sku}
+                      onChange={(e) =>
+                        setVariants((rows) =>
+                          rows.map((row, i) =>
+                            i === index ? { ...row, sku: e.target.value } : row,
+                          ),
+                        )
+                      }
+                    />
+                    <input
+                      className="admin-input"
+                      type="number"
+                      min={0}
+                      placeholder="Price"
+                      aria-label="Variant price"
+                      value={variant.price}
+                      onChange={(e) =>
+                        setVariants((rows) =>
+                          rows.map((row, i) =>
+                            i === index
+                              ? { ...row, price: e.target.value }
+                              : row,
+                          ),
+                        )
+                      }
+                    />
+                    <input
+                      className="admin-input"
+                      type="number"
+                      min={0}
+                      placeholder="Compare-at"
+                      aria-label="Variant compare-at price"
+                      value={variant.compareAtPrice}
+                      onChange={(e) =>
+                        setVariants((rows) =>
+                          rows.map((row, i) =>
+                            i === index
+                              ? { ...row, compareAtPrice: e.target.value }
+                              : row,
+                          ),
+                        )
+                      }
+                    />
+                    <input
+                      className="admin-input"
+                      type="number"
+                      min={0}
+                      placeholder="Stock"
+                      aria-label="Variant stock"
+                      value={variant.stock}
+                      onChange={(e) =>
+                        setVariants((rows) =>
+                          rows.map((row, i) =>
+                            i === index
+                              ? { ...row, stock: e.target.value }
+                              : row,
+                          ),
+                        )
+                      }
+                    />
+                  </div>
+                  <MediaField
+                    value={variant.image}
+                    onChange={(image) =>
+                      setVariants((rows) =>
+                        rows.map((row, i) =>
+                          i === index ? { ...row, image } : row,
+                        ),
+                      )
+                    }
+                  />
+                </div>
+              ))}
+              <button
+                type="button"
+                className="text-[11px] uppercase tracking-[0.16em] text-rose"
+                onClick={() =>
+                  setVariants((rows) => [
+                    ...rows,
+                    {
+                      sku: "",
+                      nameEn: "",
+                      nameBn: "",
+                      price: "",
+                      compareAtPrice: "",
+                      stock: "0",
+                      image: "",
+                    },
+                  ])
+                }
+              >
+                Add variant
+              </button>
             </div>
           </PanelCard>
 

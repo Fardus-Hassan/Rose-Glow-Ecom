@@ -21,10 +21,21 @@ export type ProductCategory =
   | "rings"
   | "sets";
 
+export type ProductOption = {
+  id: string;
+  sku: string;
+  name: LocalizedString;
+  price: number;
+  compareAtPrice?: number;
+  stock: number;
+  image?: string;
+};
+
 export type Product = {
   id?: string;
   slug: string;
   sku: string;
+  options?: ProductOption[];
   name: LocalizedString;
   description: LocalizedString;
   /** Optional blurb beside gallery; falls back to description when empty */
@@ -42,6 +53,46 @@ export type Product = {
   newest?: boolean;
   inStock: boolean;
 };
+
+export function defaultOptionId(product: Product) {
+  const options = product.options || [];
+  return (
+    options.find((item) => item.stock > 0)?.id || options[0]?.id || undefined
+  );
+}
+
+export function chosenOffer(product: Product, optionId?: string) {
+  const options = product.options || [];
+  const option =
+    options.find((item) => item.id === optionId) ||
+    options.find((item) => item.stock > 0) ||
+    options[0];
+  if (!option) {
+    return {
+      sku: product.sku,
+      price: product.price,
+      compareAtPrice: product.compareAtPrice,
+      image: undefined as string | undefined,
+      optionId: undefined as string | undefined,
+      stock: product.inStock ? Number.POSITIVE_INFINITY : 0,
+      inStock: product.inStock,
+      label: product.name,
+    };
+  }
+  return {
+    sku: option.sku,
+    price: option.price,
+    compareAtPrice: option.compareAtPrice,
+    image: option.image,
+    optionId: option.id,
+    stock: option.stock,
+    inStock: option.stock > 0,
+    label: {
+      en: `${product.name.en} · ${option.name.en}`,
+      bn: `${product.name.bn || product.name.en} · ${option.name.bn || option.name.en}`,
+    },
+  };
+}
 
 export const products: Product[] = [
   {
@@ -293,6 +344,12 @@ export function getRelatedProducts(slug: string, limit = 4) {
       ),
     )
     .slice(0, limit);
+}
+
+export function galleryForOffer(product: Product, image?: string): ProductMedia[] {
+  if (!image) return product.media;
+  if (product.media.some((item) => item.src === image)) return product.media;
+  return [{ type: "image", src: image, alt: product.name }, ...product.media];
 }
 
 export function getCoverMedia(product: Product) {

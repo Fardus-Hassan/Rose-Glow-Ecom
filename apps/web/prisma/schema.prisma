@@ -109,6 +109,7 @@ model Product {
   landingSlug      String?
   landing          Json           @default("{}")
   media            ProductMedia[]
+  variants         ProductVariant[]
   orderItems       OrderItem[]
   reviews          Review[]
   deletedAt        DateTime?
@@ -121,6 +122,23 @@ model Product {
   @@index([deletedAt])
   @@index([slug])
   @@index([sku])
+}
+
+model ProductVariant {
+  id             String   @id @default(cuid())
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku            String
+  nameEn         String
+  nameBn         String   @default("")
+  price          Int
+  compareAtPrice Int?
+  stock          Int      @default(0)
+  image          String   @default("")
+  sortOrder      Int      @default(0)
+
+  @@unique([sku])
+  @@index([productId])
 }
 
 model ProductMedia {

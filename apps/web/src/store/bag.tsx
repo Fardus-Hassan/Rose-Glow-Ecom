@@ -13,7 +13,11 @@ import {
 type CartLine = {
   slug: string;
   qty: number;
+  optionId?: string;
 };
+
+const sameLine = (line: CartLine, slug: string, optionId?: string) =>
+  line.slug === slug && (line.optionId || "") === (optionId || "");
 
 type BagState = {
   cart: CartLine[];
@@ -25,9 +29,9 @@ type BagContextValue = {
   wishlist: string[];
   cartCount: number;
   wishlistCount: number;
-  addToCart: (slug: string, qty?: number) => void;
-  setCartQty: (slug: string, qty: number) => void;
-  removeFromCart: (slug: string) => void;
+  addToCart: (slug: string, qty?: number, optionId?: string) => void;
+  setCartQty: (slug: string, qty: number, optionId?: string) => void;
+  removeFromCart: (slug: string, optionId?: string) => void;
   clearCart: () => void;
   toggleWishlist: (slug: string) => void;
   isWishlisted: (slug: string) => boolean;
@@ -75,33 +79,33 @@ export function BagProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addToCart = useCallback(
-    (slug: string, qty = 1) => {
+    (slug: string, qty = 1, optionId?: string) => {
       const amount = Math.max(1, qty);
       commit((prev) => {
-        const existing = prev.cart.find((line) => line.slug === slug);
+        const existing = prev.cart.find((line) => sameLine(line, slug, optionId));
         if (existing) {
           return {
             ...prev,
             cart: prev.cart.map((line) =>
-              line.slug === slug ? { ...line, qty: line.qty + amount } : line,
+              sameLine(line, slug, optionId) ? { ...line, qty: line.qty + amount } : line,
             ),
           };
         }
-        return { ...prev, cart: [...prev.cart, { slug, qty: amount }] };
+        return { ...prev, cart: [...prev.cart, { slug, qty: amount, optionId }] };
       });
     },
     [commit],
   );
 
   const setCartQty = useCallback(
-    (slug: string, qty: number) => {
+    (slug: string, qty: number, optionId?: string) => {
       commit((prev) => ({
         ...prev,
         cart:
           qty <= 0
-            ? prev.cart.filter((line) => line.slug !== slug)
+            ? prev.cart.filter((line) => !sameLine(line, slug, optionId))
             : prev.cart.map((line) =>
-                line.slug === slug ? { ...line, qty } : line,
+                sameLine(line, slug, optionId) ? { ...line, qty } : line,
               ),
       }));
     },
@@ -109,10 +113,10 @@ export function BagProvider({ children }: { children: ReactNode }) {
   );
 
   const removeFromCart = useCallback(
-    (slug: string) => {
+    (slug: string, optionId?: string) => {
       commit((prev) => ({
         ...prev,
-        cart: prev.cart.filter((line) => line.slug !== slug),
+        cart: prev.cart.filter((line) => !sameLine(line, slug, optionId)),
       }));
     },
     [commit],

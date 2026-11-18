@@ -92,9 +92,11 @@ export function ProductCard({
 
           <div className="mt-2 flex items-baseline gap-2.5">
             <span className="text-sm text-[#1c1a19]/85">
-              {formatBdt(product.price, locale)}
+              {(product.options?.length || 0) > 1
+                ? t("priceFrom", { price: formatBdt(product.price, locale) })
+                : formatBdt(product.price, locale)}
             </span>
-            {product.compareAtPrice ? (
+            {product.compareAtPrice && !(product.options?.length || 0) ? (
               <span className="text-xs text-[#1c1a19]/40 line-through">
                 {formatBdt(product.compareAtPrice, locale)}
               </span>

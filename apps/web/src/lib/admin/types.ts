@@ -123,6 +123,16 @@ export type Product = {
   materialBn?: string;
   colors?: ProductColor[] | unknown;
   media?: ProductMedia[];
+  variants?: Array<{
+    id?: string;
+    sku: string;
+    nameEn: string;
+    nameBn: string;
+    price: number;
+    compareAtPrice?: number | null;
+    stock: number;
+    image?: string;
+  }>;
   landingEnabled?: boolean;
   landingSlug?: string | null;
   landing?: unknown;

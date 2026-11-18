@@ -51,6 +51,16 @@ export type ApiProduct = {
   newest?: boolean;
   inStock?: boolean;
   media?: ApiMedia[];
+  variants?: Array<{
+    id: string;
+    sku: string;
+    nameEn: string;
+    nameBn: string;
+    price: number;
+    compareAtPrice?: number | null;
+    stock: number;
+    image?: string | null;
+  }>;
   seoTitleEn?: string;
   seoTitleBn?: string;
   seoDescriptionEn?: string;
@@ -220,17 +230,28 @@ export function mapApiProduct(p: ApiProduct): Product {
       },
     }));
 
+  const options = (p.variants ?? []).map((item) => ({
+    id: item.id,
+    sku: item.sku,
+    name: { en: item.nameEn, bn: item.nameBn || item.nameEn },
+    price: item.price,
+    compareAtPrice: item.compareAtPrice ?? undefined,
+    stock: item.stock,
+    image: item.image ? mediaUrl(item.image) : undefined,
+  }));
+
   return {
     id: p.id,
     slug: p.slug,
     sku: p.sku,
+    options,
     name: { en: p.nameEn, bn: p.nameBn },
     description: { en: p.descriptionEn, bn: p.descriptionBn },
     shortDescription: {
       en: p.shortDescriptionEn ?? "",
       bn: p.shortDescriptionBn ?? "",
     },
-    price: p.price,
+    price: options.length ? Math.min(...options.map((item) => item.price)) : p.price,
     compareAtPrice: p.compareAtPrice ?? undefined,
     category: asCategory(p.category?.slug),
     material: {
@@ -244,7 +265,7 @@ export function mapApiProduct(p: ApiProduct): Product {
     soldCount: p.soldCount ?? 0,
     featured: !!p.featured,
     newest: !!p.newest,
-    inStock: p.inStock !== false,
+    inStock: options.length ? options.some((item) => item.stock > 0) : p.inStock !== false,
   };
 }
 

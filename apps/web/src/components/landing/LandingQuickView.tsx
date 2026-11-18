@@ -1,12 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { localize, type Product } from "@/data/products";
+import {
+  chosenOffer,
+  defaultOptionId,
+  galleryForOffer,
+  localize,
+  type Product,
+} from "@/data/products";
 import { formatBdt, cn } from "@/lib/format";
 import { stripHtml } from "@/lib/rich-text";
+import { VariantChoices } from "@/components/product/VariantChoices";
 
 export function LandingQuickView({
   product,
@@ -18,21 +25,38 @@ export function LandingQuickView({
   product: Product;
   inBag?: boolean;
   onClose: () => void;
-  onAdd: (slug: string) => void;
+  onAdd: (slug: string, optionId?: string) => void;
   onRemove: (slug: string) => void;
 }) {
   const t = useTranslations("LandingPearl");
   const tc = useTranslations("Categories");
   const locale = useLocale();
+  const [optionId, setOptionId] = useState(defaultOptionId(product));
+  const offer = chosenOffer(product, optionId);
+  const media = useMemo(
+    () => galleryForOffer(product, offer.image),
+    [product, offer.image],
+  );
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
-  const media = product.media;
 
   useEffect(() => {
+    setOptionId(defaultOptionId(product));
     setActive(0);
     trackRef.current?.scrollTo({ left: 0 });
   }, [product.slug]);
+
+  useEffect(() => {
+    if (!offer.image) return;
+    const index = media.findIndex((item) => item.src === offer.image);
+    if (index >= 0) {
+      setActive(index);
+      trackRef.current?.scrollTo({
+        left: index * (trackRef.current.clientWidth || 0),
+      });
+    }
+  }, [offer.image, media]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -81,22 +105,8 @@ export function LandingQuickView({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight" && media.length > 1) {
-        setActive((current) => {
-          const next = (current + 1) % media.length;
-          const el = trackRef.current;
-          if (el) el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
-          return next;
-        });
-      }
-      if (e.key === "ArrowLeft" && media.length > 1) {
-        setActive((current) => {
-          const next = (current - 1 + media.length) % media.length;
-          const el = trackRef.current;
-          if (el) el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
-          return next;
-        });
-      }
+      if (e.key === "ArrowRight" && media.length > 1) go(1);
+      if (e.key === "ArrowLeft" && media.length > 1) go(-1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -117,6 +127,8 @@ export function LandingQuickView({
     if (!el) return;
     el.scrollTo({ left: index * el.clientWidth, behavior: "smooth" });
   };
+
+  const compare = offer.compareAtPrice;
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center">
@@ -247,32 +259,27 @@ export function LandingQuickView({
               <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {media.map((item, index) => {
                   const thumb =
-                    item.type === "image" ? item.src : item.poster || item.src;
+                    item.type === "video" ? item.poster || item.src : item.src;
                   return (
                     <button
                       key={`thumb-${item.src}-${index}`}
                       type="button"
                       onClick={() => jumpTo(index)}
                       className={cn(
-                        "relative h-14 w-12 shrink-0 overflow-hidden bg-[#e2dacf]",
+                        "relative h-12 w-10 shrink-0 overflow-hidden border",
                         active === index
-                          ? "ring-1 ring-[#c9a08a]"
-                          : "opacity-60 ring-1 ring-[#1c1a19]/10",
+                          ? "border-[#1c1a19]"
+                          : "border-transparent opacity-70",
                       )}
-                      aria-label={
-                        item.type === "video" ? t("video") : t("image")
-                      }
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={thumb}
-                        alt=""
-                        className="h-full w-full object-cover"
-                      />
-                      {item.type === "video" ? (
-                        <span className="absolute inset-0 flex items-center justify-center bg-[#0e0d0c]/35 text-[9px] text-[#f4efe8]">
-                          ▶
-                        </span>
+                      {thumb ? (
+                        <Image
+                          src={thumb}
+                          alt=""
+                          fill
+                          sizes="40px"
+                          className="object-cover"
+                        />
                       ) : null}
                     </button>
                   );
@@ -296,13 +303,18 @@ export function LandingQuickView({
           ) : null}
 
           <p className="mt-5 text-lg text-[#1c1a19]">
-            {formatBdt(product.price, locale)}
-            {product.compareAtPrice ? (
+            {formatBdt(offer.price, locale)}
+            {compare ? (
               <span className="ml-2 text-sm text-[#1c1a19]/4 line-through">
-                {formatBdt(product.compareAtPrice, locale)}
+                {formatBdt(compare, locale)}
               </span>
             ) : null}
           </p>
+          <VariantChoices
+            options={product.options || []}
+            selectedId={offer.optionId}
+            onSelect={setOptionId}
+          />
           <p className="mt-3 text-sm leading-7 text-[#1c1a19]/58">
             {stripHtml(localize(product.description, locale))}
           </p>
@@ -311,13 +323,14 @@ export function LandingQuickView({
         <div className="flex shrink-0 flex-row gap-2 border-t border-[#1c1a19]/08 bg-[#f0ebe4] p-4 sm:p-5 sm:px-7">
           <button
             type="button"
+            disabled={!inBag && !offer.inStock}
             onClick={() => {
               if (inBag) onRemove(product.slug);
-              else onAdd(product.slug);
+              else onAdd(product.slug, offer.optionId);
               onClose();
             }}
             className={cn(
-              "inline-flex min-h-11 flex-1 items-center justify-center px-3 text-[10px] uppercase tracking-[0.16em] sm:min-h-12 sm:px-5 sm:text-[11px] sm:tracking-[0.18em]",
+              "inline-flex min-h-11 flex-1 items-center justify-center px-3 text-[10px] uppercase tracking-[0.16em] disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-12 sm:px-5 sm:text-[11px] sm:tracking-[0.18em]",
               inBag
                 ? "border border-[#1c1a19]/25 text-[#1c1a19]"
                 : "bg-[#1c1a19] text-[#f4efe8]",

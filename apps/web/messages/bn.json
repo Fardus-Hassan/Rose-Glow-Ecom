@@ -78,6 +78,7 @@
     "results": "{count}টি পিস",
     "empty": "এই বাছাইয়ে কোনো পিস নেই।",
     "viewProduct": "পিস দেখুন",
+    "priceFrom": "{price} থেকে",
     "addToCart": "কার্টে যোগ",
     "purchased": "{count}+ কিনেছেন",
     "reviewsCount": "{count} নোট"

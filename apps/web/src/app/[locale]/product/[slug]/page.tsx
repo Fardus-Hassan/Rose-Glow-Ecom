@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { localize } from "@/data/products";
-import { ProductGallery } from "@/components/product/ProductGallery";
-import { ProductInfo } from "@/components/product/ProductInfo";
+import { ProductShowcase } from "@/components/product/ProductShowcase";
 import { ProductDetails } from "@/components/product/ProductDetails";
 import { ProductReviews } from "@/components/product/ProductReviews";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -54,14 +53,6 @@ export default async function ProductPage({
   const t = await getTranslations("Product");
   const tc = await getTranslations("Categories");
 
-  const discount =
-    product.compareAtPrice && product.compareAtPrice > product.price
-      ? Math.round(
-          ((product.compareAtPrice - product.price) / product.compareAtPrice) *
-            100,
-        )
-      : 0;
-
   return (
     <div className="bg-[#f0ebe4] pb-28 md:pb-24">
       <MetaViewContent
@@ -91,12 +82,7 @@ export default async function ProductPage({
           </span>
         </nav>
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)] lg:items-start lg:gap-10 xl:gap-14">
-          <div className="lg:sticky lg:top-28">
-            <ProductGallery media={product.media} discount={discount} />
-          </div>
-          <ProductInfo product={product} />
-        </div>
+        <ProductShowcase product={product} />
       </div>
 
       <div className="mt-12 md:mt-16">

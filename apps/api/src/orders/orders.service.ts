@@ -35,7 +35,7 @@ export class OrdersService {
     const discount = dto.discount ?? 0;
     const total = Math.max(0, subtotal + shippingFee - discount);
 
-    return this.prisma.order.create({
+    const order = await this.prisma.order.create({
       data: {
         orderNumber: await this.nextOrderNumber(),
         customerName: dto.customerName,
@@ -54,6 +54,36 @@ export class OrdersService {
       },
       include: { items: true },
     });
+    const base = process.env.LEDGER_URL?.replace(/\/$/, "");
+    const key = process.env.LEDGER_SHOP_KEY;
+    if (base && key) {
+      try {
+        await fetch(`${base}/api/shop/orders`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Shop-Key": key },
+          body: JSON.stringify({
+            orderNumber: order.orderNumber,
+            customerName: order.customerName,
+            mobile: order.customerPhone,
+            address: order.addressLine,
+            city: order.city,
+            district: order.district,
+            note: order.note || "",
+            deliveryCharge: order.shippingFee,
+            discount: order.discount,
+            items: order.items.map((item) => ({
+              sku: item.productSku,
+              name: item.productName,
+              unitPrice: item.unitPrice,
+              quantity: item.quantity,
+            })),
+          }),
+        });
+      } catch (error) {
+        console.error("Ledger did not take the order", error);
+      }
+    }
+    return order;
   }
 
   findAll(params: { status?: OrderStatus; q?: string }) {

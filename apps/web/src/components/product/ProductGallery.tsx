@@ -14,9 +14,11 @@ const ZOOM_SCALE = 2;
 export function ProductGallery({
   media,
   discount = 0,
+  focusSrc,
 }: {
   media: ProductMedia[];
   discount?: number;
+  focusSrc?: string;
 }) {
   const locale = useLocale();
   const t = useTranslations("Product");
@@ -29,6 +31,14 @@ export function ProductGallery({
   const shouldPlayVideo = useRef(false);
   const preloaded = useRef<Set<string>>(new Set());
   const current = media[active];
+
+  const mediaRef = useRef(media);
+  mediaRef.current = media;
+  useEffect(() => {
+    if (!focusSrc) return;
+    const index = mediaRef.current.findIndex((item) => item.src === focusSrc);
+    if (index >= 0) setActive(index);
+  }, [focusSrc]);
 
   useEffect(() => {
     const stage = stageRef.current;

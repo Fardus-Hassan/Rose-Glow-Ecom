@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { getCoverMedia, localize, type Product } from "@/data/products";
+import { chosenOffer, getCoverMedia, localize, type Product } from "@/data/products";
 import { formatBdt } from "@/lib/format";
 import { CartPageSkeleton } from "@/components/skeletons/StorefrontSkeletons";
 import { useBag } from "@/store/bag";
@@ -24,12 +24,12 @@ export function CartView() {
       return { line, product };
     })
     .filter(Boolean) as Array<{
-    line: { slug: string; qty: number };
+    line: { slug: string; qty: number; optionId?: string };
     product: Product;
   }>;
 
   const subtotal = lines.reduce(
-    (sum, item) => sum + item.product.price * item.line.qty,
+    (sum, item) => sum + chosenOffer(item.product, item.line.optionId).price * item.line.qty,
     0,
   );
 
@@ -56,9 +56,12 @@ export function CartView() {
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)] lg:gap-14">
       <ul className="divide-y divide-[#1c1a19]/10 border-y border-[#1c1a19]/10">
         {lines.map(({ line, product }) => {
-          const cover = getCoverMedia(product);
+          const offer = chosenOffer(product, line.optionId);
+          const cover = offer.image
+            ? { src: offer.image }
+            : getCoverMedia(product);
           return (
-            <li key={line.slug} className="flex gap-4 py-5 md:gap-6 md:py-6">
+            <li key={`${line.slug}:${line.optionId || ""}`} className="flex gap-4 py-5 md:gap-6 md:py-6">
               <Link
                 href={`/product/${product.slug}`}
                 className="relative h-28 w-24 shrink-0 overflow-hidden bg-[#e2dacf] md:h-36 md:w-28"
@@ -81,15 +84,15 @@ export function CartView() {
                       href={`/product/${product.slug}`}
                       className="font-display text-xl text-[#1c1a19] transition hover:text-[#a67c68] md:text-2xl"
                     >
-                      {localize(product.name, locale)}
+                      {localize(offer.label, locale)}
                     </Link>
                     <p className="mt-1 text-sm text-[#1c1a19]/55">
-                      {formatBdt(product.price, locale)}
+                      {formatBdt(offer.price, locale)}
                     </p>
                   </div>
                   <button
                     type="button"
-                    onClick={() => removeFromCart(line.slug)}
+                    onClick={() => removeFromCart(line.slug, line.optionId)}
                     className="text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/40 transition hover:text-[#1c1a19]"
                   >
                     {t("remove")}
@@ -101,7 +104,7 @@ export function CartView() {
                     <button
                       type="button"
                       className="flex h-10 w-10 items-center justify-center text-[#1c1a19]/70 transition hover:bg-[#1c1a19]/05"
-                      onClick={() => setCartQty(line.slug, line.qty - 1)}
+                      onClick={() => setCartQty(line.slug, line.qty - 1, line.optionId)}
                       aria-label={t("decrease")}
                     >
                       −
@@ -110,14 +113,14 @@ export function CartView() {
                     <button
                       type="button"
                       className="flex h-10 w-10 items-center justify-center text-[#1c1a19]/70 transition hover:bg-[#1c1a19]/05"
-                      onClick={() => setCartQty(line.slug, line.qty + 1)}
+                      onClick={() => setCartQty(line.slug, line.qty + 1, line.optionId)}
                       aria-label={t("increase")}
                     >
                       +
                     </button>
                   </div>
                   <p className="text-sm text-[#1c1a19]">
-                    {formatBdt(product.price * line.qty, locale)}
+                    {formatBdt(offer.price * line.qty, locale)}
                   </p>
                 </div>
               </div>

@@ -78,6 +78,7 @@
     "results": "{count} pieces",
     "empty": "No pieces found in this selection.",
     "viewProduct": "View piece",
+    "priceFrom": "From {price}",
     "addToCart": "Add to cart",
     "purchased": "{count}+ bought",
     "reviewsCount": "{count} notes"

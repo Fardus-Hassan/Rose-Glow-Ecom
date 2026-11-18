@@ -15,7 +15,36 @@ import {
 const productInclude = {
   category: true,
   media: { orderBy: { sortOrder: "asc" as const } },
+  variants: { orderBy: { sortOrder: "asc" as const } },
 };
+
+function normalizeVariants(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item, index) => {
+      const row = item as Record<string, unknown>;
+      const sku = String(row.sku || "").trim();
+      const nameEn = String(row.nameEn || "").trim();
+      if (!sku || !nameEn) return null;
+      const price = Number(row.price);
+      const stock = Number(row.stock);
+      const compare = row.compareAtPrice === null || row.compareAtPrice === undefined || row.compareAtPrice === ""
+        ? null
+        : Number(row.compareAtPrice);
+      return {
+        sku,
+        nameEn,
+        nameBn: String(row.nameBn || "").trim(),
+        price: Number.isFinite(price) && price >= 0 ? Math.round(price) : 0,
+        compareAtPrice: compare !== null && Number.isFinite(compare) ? Math.round(compare) : null,
+        stock: Number.isFinite(stock) && stock >= 0 ? Math.round(stock) : 0,
+        image: String(row.image || "").trim().slice(0, 500),
+        sortOrder: index,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => Boolean(item))
+    .slice(0, 30);
+}
 
 function normalizeMedia(media: Array<Record<string, unknown>>) {
   return media
@@ -220,16 +249,27 @@ export const products = {
       (dto.media as Array<Record<string, unknown>> | undefined) ?? [],
     );
     const colors = (dto.colors as unknown[]) ?? [];
-    const { media: _m, colors: _c, landing: _l, ...rest } = dto;
+    const variants = normalizeVariants(dto.variants);
+    const { media: _m, colors: _c, landing: _l, variants: _v, ...rest } = dto;
     const landingFields = normalizeLandingFields(dto);
+    const stockFromVariants = variants.length
+      ? variants.reduce((sum, row) => sum + row.stock, 0)
+      : undefined;
     return prisma.product.create({
       data: {
         ...(rest as Prisma.ProductUncheckedCreateInput),
         ...landingFields,
+        ...(stockFromVariants !== undefined
+          ? {
+              stock: stockFromVariants,
+              inStock: stockFromVariants > 0,
+            }
+          : {}),
         colors: colors as Prisma.InputJsonValue,
         media: {
           create: media,
         },
+        variants: { create: variants },
       },
       include: productInclude,
     });
@@ -241,7 +281,8 @@ export const products = {
       ? normalizeMedia(dto.media as Array<Record<string, unknown>>)
       : undefined;
     const colors = dto.colors as unknown[] | undefined;
-    const { media: _m, colors: _c, landing: _l, ...rest } = dto;
+    const variants = dto.variants === undefined ? undefined : normalizeVariants(dto.variants);
+    const { media: _m, colors: _c, landing: _l, variants: _v, ...rest } = dto;
     const landingFields =
       "landingEnabled" in dto || "landing" in dto || "landingSlug" in dto
         ? normalizeLandingFields(dto)
@@ -257,6 +298,18 @@ export const products = {
           })),
         });
       }
+      if (variants) {
+        await tx.productVariant.deleteMany({ where: { productId: id } });
+        if (variants.length) {
+          await tx.productVariant.createMany({
+            data: variants.map((variant) => ({ productId: id, ...variant })),
+          });
+        }
+      }
+      const stockFromVariants =
+        variants && variants.length
+          ? variants.reduce((sum, row) => sum + row.stock, 0)
+          : undefined;
       return tx.product.update({
         where: { id },
         data: {
@@ -264,6 +317,12 @@ export const products = {
           ...landingFields,
           ...(colors
             ? { colors: colors as Prisma.InputJsonValue }
+            : {}),
+          ...(stockFromVariants !== undefined
+            ? {
+                stock: stockFromVariants,
+                inStock: stockFromVariants > 0,
+              }
             : {}),
         },
         include: productInclude,
@@ -373,39 +432,173 @@ export const orders = {
       throw new HttpError(400, "Cash on delivery is currently unavailable");
     }
 
-    const items = dto.items.map((item) => ({
-      productId: item.productId,
-      productName: item.productName,
-      productSku: item.productSku,
-      unitPrice: item.unitPrice,
-      quantity: item.quantity,
-      lineTotal: item.unitPrice * item.quantity,
-    }));
-    const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
-    // Always recompute on server — never trust client shippingFee
+    type ResolvedLine = {
+      productId: string;
+      productName: string;
+      productSku: string;
+      unitPrice: number;
+      quantity: number;
+      lineTotal: number;
+      variantId?: string;
+    };
+
+    const resolved: ResolvedLine[] = [];
+    for (const item of dto.items) {
+      const qty = Math.max(1, Math.round(Number(item.quantity) || 0));
+      if (!item.productId) {
+        throw new HttpError(400, "Each order item needs a product");
+      }
+      const product = await prisma.product.findFirst({
+        where: {
+          id: item.productId,
+          deletedAt: null,
+          published: true,
+        },
+        include: { variants: { orderBy: { sortOrder: "asc" } } },
+      });
+      if (!product) {
+        throw new HttpError(400, "One or more products are unavailable");
+      }
+
+      if (product.variants.length) {
+        const variant = product.variants.find(
+          (row) => row.sku === item.productSku,
+        );
+        if (!variant) {
+          throw new HttpError(400, `Invalid option for ${product.nameEn}`);
+        }
+        if (variant.stock < qty) {
+          throw new HttpError(
+            400,
+            `Not enough stock for ${variant.nameEn}`,
+          );
+        }
+        const label =
+          item.productName?.trim() ||
+          `${product.nameEn} · ${variant.nameEn}`;
+        resolved.push({
+          productId: product.id,
+          productName: label,
+          productSku: variant.sku,
+          unitPrice: variant.price,
+          quantity: qty,
+          lineTotal: variant.price * qty,
+          variantId: variant.id,
+        });
+      } else {
+        if (!product.inStock || product.stock < qty) {
+          throw new HttpError(400, `Not enough stock for ${product.nameEn}`);
+        }
+        resolved.push({
+          productId: product.id,
+          productName: item.productName?.trim() || product.nameEn,
+          productSku: product.sku,
+          unitPrice: product.price,
+          quantity: qty,
+          lineTotal: product.price * qty,
+        });
+      }
+    }
+
+    const subtotal = resolved.reduce((sum, item) => sum + item.lineTotal, 0);
+    // Always recompute on server — never trust client shippingFee / unitPrice
     const shippingFee = computeShippingFee(subtotal, shipping);
     const discount = dto.discount ?? 0;
     const total = Math.max(0, subtotal + shippingFee - discount);
 
-    return prisma.order.create({
-      data: {
-        orderNumber: await this.nextOrderNumber(),
-        customerName: dto.customerName,
-        customerPhone: dto.customerPhone,
-        customerEmail: dto.customerEmail,
-        addressLine: dto.addressLine,
-        city: dto.city,
-        district: dto.district,
-        note: dto.note,
-        paymentMethod: PaymentMethod.COD,
-        subtotal,
-        shippingFee,
-        discount,
-        total,
-        items: { create: items },
-      },
-      include: { items: true },
+    const order = await prisma.$transaction(async (tx) => {
+      for (const line of resolved) {
+        if (line.variantId) {
+          const updated = await tx.productVariant.updateMany({
+            where: { id: line.variantId, stock: { gte: line.quantity } },
+            data: { stock: { decrement: line.quantity } },
+          });
+          if (!updated.count) {
+            throw new HttpError(400, `Not enough stock for ${line.productName}`);
+          }
+          const variants = await tx.productVariant.findMany({
+            where: { productId: line.productId },
+            select: { stock: true },
+          });
+          const stockSum = variants.reduce((sum, row) => sum + row.stock, 0);
+          await tx.product.update({
+            where: { id: line.productId },
+            data: {
+              stock: stockSum,
+              inStock: stockSum > 0,
+            },
+          });
+        } else {
+          const updated = await tx.product.updateMany({
+            where: {
+              id: line.productId,
+              stock: { gte: line.quantity },
+            },
+            data: {
+              stock: { decrement: line.quantity },
+              inStock: true,
+            },
+          });
+          if (!updated.count) {
+            throw new HttpError(400, `Not enough stock for ${line.productName}`);
+          }
+          const row = await tx.product.findUnique({
+            where: { id: line.productId },
+            select: { stock: true },
+          });
+          if (row && row.stock <= 0) {
+            await tx.product.update({
+              where: { id: line.productId },
+              data: { inStock: false, stock: 0 },
+            });
+          }
+        }
+      }
+
+      return tx.order.create({
+        data: {
+          orderNumber: await this.nextOrderNumber(),
+          customerName: dto.customerName,
+          customerPhone: dto.customerPhone,
+          customerEmail: dto.customerEmail,
+          addressLine: dto.addressLine,
+          city: dto.city,
+          district: dto.district,
+          note: dto.note,
+          paymentMethod: PaymentMethod.COD,
+          subtotal,
+          shippingFee,
+          discount,
+          total,
+          items: {
+            create: resolved.map(
+              ({ variantId: _v, ...item }) => item,
+            ),
+          },
+        },
+        include: { items: true },
+      });
     });
+
+    const { pushLedgerOrder } = await import("@/lib/server/ledger");
+    await pushLedgerOrder({
+      orderNumber: order.orderNumber,
+      customerName: order.customerName,
+      mobile: order.customerPhone,
+      address: order.addressLine,
+      city: order.city,
+      district: order.district,
+      note: order.note || "",
+      deliveryCharge: order.shippingFee,
+      discount: order.discount,
+      items: order.items.map((item) => ({
+        sku: item.productSku,
+        name: item.productName,
+        unitPrice: item.unitPrice,
+        quantity: item.quantity,
+      })),
+    });
+    return order;
   },
 
   async findAll(params: {

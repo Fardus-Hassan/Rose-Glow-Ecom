@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { localize, type Product } from "@/data/products";
+import {
+  chosenOffer,
+  defaultOptionId,
+  localize,
+  type Product,
+} from "@/data/products";
 import { formatBdt, cn } from "@/lib/format";
 import { IconHeart, IconShield, IconStar, IconTruck } from "@/components/icons";
 import { useRouter } from "@/i18n/navigation";
@@ -10,47 +15,64 @@ import { useBag } from "@/store/bag";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { RichText } from "@/components/ui/RichText";
 import { ProductContactActions } from "@/components/product/ProductContactActions";
+import { VariantChoices } from "@/components/product/VariantChoices";
 import { trackAddToCart } from "@/lib/meta-pixel";
 import { isRichTextEmpty } from "@/lib/rich-text";
 
-export function ProductInfo({ product }: { product: Product }) {
+export function ProductInfo({
+  product,
+  optionId: optionIdProp,
+  onOptionId,
+}: {
+  product: Product;
+  optionId?: string;
+  onOptionId?: (id: string) => void;
+}) {
   const t = useTranslations("Product");
   const tc = useTranslations("Categories");
   const locale = useLocale();
   const router = useRouter();
   const { addToCart, toggleWishlist, isWishlisted } = useBag();
   const [qty, setQty] = useState(1);
+  const [optionId, setOptionId] = useState(
+    optionIdProp || defaultOptionId(product),
+  );
   const [added, setAdded] = useState(false);
+  const selectedId = optionIdProp || optionId;
+  const offer = chosenOffer(product, selectedId);
+  const canBuy = offer.inStock;
   const wishlisted = isWishlisted(product.slug);
+  const choose = (id: string) => {
+    setOptionId(id);
+    onOptionId?.(id);
+  };
 
+  const compare = offer.compareAtPrice;
   const discount =
-    product.compareAtPrice && product.compareAtPrice > product.price
-      ? Math.round(
-          ((product.compareAtPrice - product.price) / product.compareAtPrice) *
-            100,
-        )
+    compare && compare > offer.price
+      ? Math.round(((compare - offer.price) / compare) * 100)
       : 0;
 
   const fireAddToCart = () => {
     trackAddToCart({
-      contentId: product.sku || product.slug,
-      contentName: localize(product.name, locale),
-      value: product.price * qty,
+      contentId: offer.sku || product.sku || product.slug,
+      contentName: localize(offer.label, locale),
+      value: offer.price * qty,
       quantity: qty,
     });
   };
 
   const handleAdd = () => {
-    if (!product.inStock) return;
-    addToCart(product.slug, qty);
+    if (!canBuy) return;
+    addToCart(product.slug, qty, offer.optionId);
     fireAddToCart();
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
   };
 
   const handleBuyNow = () => {
-    if (!product.inStock) return;
-    addToCart(product.slug, qty);
+    if (!canBuy) return;
+    addToCart(product.slug, qty, offer.optionId);
     fireAddToCart();
     router.push("/checkout");
   };
@@ -86,11 +108,11 @@ export function ProductInfo({ product }: { product: Product }) {
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <span className="text-2xl text-[#1c1a19] md:text-[1.75rem]">
-          {formatBdt(product.price, locale)}
+          {formatBdt(offer.price, locale)}
         </span>
-        {product.compareAtPrice ? (
+        {compare ? (
           <span className="text-sm text-[#1c1a19]/40 line-through">
-            {formatBdt(product.compareAtPrice, locale)}
+            {formatBdt(compare, locale)}
           </span>
         ) : null}
         {discount > 0 ? (
@@ -99,6 +121,11 @@ export function ProductInfo({ product }: { product: Product }) {
           </span>
         ) : null}
       </div>
+      <VariantChoices
+        options={product.options || []}
+        selectedId={offer.optionId}
+        onSelect={choose}
+      />
 
       <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
         <div className="flex items-center gap-1 text-[#c9a08a]">
@@ -179,10 +206,10 @@ export function ProductInfo({ product }: { product: Product }) {
         <p
           className={cn(
             "text-[11px] uppercase tracking-[0.16em]",
-            product.inStock ? "text-[#1c1a19]/45" : "text-red-700/70",
+            canBuy ? "text-[#1c1a19]/45" : "text-red-700/70",
           )}
         >
-          {product.inStock ? t("inStock") : t("outOfStock")}
+          {canBuy ? t("inStock") : t("outOfStock")}
         </p>
       </div>
 
@@ -190,7 +217,7 @@ export function ProductInfo({ product }: { product: Product }) {
         <button
           type="button"
           className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 bg-[#1c1a19] px-3 text-[10px] uppercase tracking-[0.14em] text-[#f4efe8] transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-40 sm:px-6 sm:text-[11px] sm:tracking-[0.2em]"
-          disabled={!product.inStock}
+          disabled={!canBuy}
           onClick={handleAdd}
         >
           {added ? "✓" : t("addToCart")}
@@ -198,7 +225,7 @@ export function ProductInfo({ product }: { product: Product }) {
         <button
           type="button"
           onClick={handleBuyNow}
-          disabled={!product.inStock}
+          disabled={!canBuy}
           className="inline-flex min-h-12 flex-1 items-center justify-center border border-[#1c1a19]/25 px-3 text-[10px] uppercase tracking-[0.14em] text-[#1c1a19] transition hover:border-[#1c1a19] hover:bg-[#1c1a19] hover:text-[#f4efe8] disabled:cursor-not-allowed disabled:opacity-40 sm:px-6 sm:text-[11px] sm:tracking-[0.2em]"
         >
           {t("buyNow")}
@@ -264,14 +291,14 @@ export function ProductInfo({ product }: { product: Product }) {
             type="button"
             onClick={handleAdd}
             className="inline-flex h-12 flex-1 items-center justify-center bg-[#1c1a19] text-[11px] uppercase tracking-[0.18em] text-[#f4efe8] disabled:opacity-40"
-            disabled={!product.inStock}
+            disabled={!canBuy}
           >
             {added ? "✓" : t("addToCart")}
           </button>
           <button
             type="button"
             onClick={handleBuyNow}
-            disabled={!product.inStock}
+            disabled={!canBuy}
             className="inline-flex h-12 flex-1 items-center justify-center border border-[#1c1a19]/25 text-[11px] uppercase tracking-[0.18em] text-[#1c1a19] disabled:opacity-40"
           >
             {t("buyNow")}

@@ -3,11 +3,19 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { getCoverMedia, localize, type Product } from "@/data/products";
+import {
+  chosenOffer,
+  defaultOptionId,
+  galleryForOffer,
+  getCoverMedia,
+  localize,
+  type Product,
+} from "@/data/products";
 import type { Review } from "@/data/reviews";
-import { formatBdt, cn } from "@/lib/format";
+import { bdMobile, formatBdt, cn } from "@/lib/format";
 import { IconHeart, IconShield, IconStar, IconTruck } from "@/components/icons";
 import { ProductGallery } from "@/components/product/ProductGallery";
+import { VariantChoices } from "@/components/product/VariantChoices";
 import { ProductContactActions } from "@/components/product/ProductContactActions";
 import { ProductReviews } from "@/components/product/ProductReviews";
 import { LandingNav } from "@/components/landing/LandingNav";
@@ -80,6 +88,11 @@ export function ProductLanding({
     ? relatedSlugsProp
     : landing.relatedSlugs;
   const [lines, setLines] = useState<LineMap>({ [productSlug]: 1 });
+  const [lineOptions, setLineOptions] = useState<Record<string, string>>(() => {
+    const id = defaultOptionId(productProp as Product);
+    return id ? { [productSlug]: id } : {};
+  });
+  const [optionId, setOptionId] = useState(defaultOptionId(productProp as Product));
   const [form, setForm] = useState<FormState>(emptyForm);
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -166,10 +179,15 @@ export function ProductLanding({
       .filter(Boolean) as Array<{ product: Product; qty: number }>;
   }, [lines, getBySlug]);
 
-  const subtotal = orderItems.reduce(
-    (sum, item) => sum + item.product.price * item.qty,
-    0,
-  );
+  const offerFor = (item: Product) =>
+    chosenOffer(
+      item,
+      item.slug === productSlug ? optionId : lineOptions[item.slug],
+    );
+
+  const subtotal = orderItems.reduce((sum, item) => {
+    return sum + offerFor(item.product).price * item.qty;
+  }, 0);
   const shippingFee = shipping
     ? computeClientShippingFee(subtotal, shipping)
     : 0;
@@ -184,25 +202,28 @@ export function ProductLanding({
     trackInitiateCheckout({
       value: total,
       numItems: itemCount,
-      contents: orderItems.map(({ product: item, qty }) => ({
-        id: item.sku || item.slug,
-        quantity: qty,
-        item_price: item.price,
-      })),
+      contents: orderItems.map(({ product: item, qty }) => {
+        const lineOffer = offerFor(item);
+        return {
+          id: lineOffer.sku || item.sku || item.slug,
+          quantity: qty,
+          item_price: lineOffer.price,
+        };
+      }),
     });
-  }, [product, orderInView, orderItems, total, itemCount]);
+  }, [product, orderInView, orderItems, total, itemCount, optionId, lineOptions]);
 
   if (!product) {
     if (!ready) return <LandingPageSkeleton />;
     return null;
   }
 
+  const offer = chosenOffer(product, optionId);
+  const gallery = galleryForOffer(product, offer.image);
+  const compare = offer.compareAtPrice;
   const discount =
-    product.compareAtPrice && product.compareAtPrice > product.price
-      ? Math.round(
-          ((product.compareAtPrice - product.price) / product.compareAtPrice) *
-            100,
-        )
+    compare && compare > offer.price
+      ? Math.round(((compare - offer.price) / compare) * 100)
       : 0;
 
   const scrollToOrder = () => {
@@ -211,8 +232,14 @@ export function ProductLanding({
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const setQty = (slug: string, qty: number) => {
+  const rememberOption = (slug: string, nextOptionId?: string) => {
+    if (!nextOptionId) return;
+    setLineOptions((prev) => ({ ...prev, [slug]: nextOptionId }));
+  };
+
+  const setQty = (slug: string, qty: number, nextOptionId?: string) => {
     const prevQty = lines[slug] || 0;
+    if (nextOptionId) rememberOption(slug, nextOptionId);
     setLines((prev) => {
       const next = { ...prev };
       if (qty <= 0) {
@@ -224,31 +251,50 @@ export function ProductLanding({
       }
       return next;
     });
+    if (qty <= 0) {
+      setLineOptions((prev) => {
+        if (!(slug in prev) || slug === productSlug) return prev;
+        const next = { ...prev };
+        delete next[slug];
+        return next;
+      });
+    }
     if (qty > prevQty) {
       const item = getBySlug(slug);
       if (item) {
         const added = qty - prevQty;
+        const lineOffer = chosenOffer(
+          item,
+          nextOptionId ||
+            (slug === productSlug ? optionId : lineOptions[slug]),
+        );
         trackAddToCart({
-          contentId: item.sku || item.slug,
-          contentName: localize(item.name, locale),
-          value: item.price * added,
+          contentId: lineOffer.sku || item.sku || item.slug,
+          contentName: localize(lineOffer.label, locale),
+          value: lineOffer.price * added,
           quantity: added,
         });
       }
     }
   };
 
-  const addProduct = (slug: string) => {
+  const addProduct = (slug: string, nextOptionId?: string) => {
     const item = getBySlug(slug);
+    const resolvedOption =
+      nextOptionId ||
+      lineOptions[slug] ||
+      (item ? defaultOptionId(item) : undefined);
+    if (resolvedOption) rememberOption(slug, resolvedOption);
     setLines((prev) => ({
       ...prev,
       [slug]: (prev[slug] || 0) + 1,
     }));
     if (item) {
+      const lineOffer = chosenOffer(item, resolvedOption);
       trackAddToCart({
-        contentId: item.sku || item.slug,
-        contentName: localize(item.name, locale),
-        value: item.price,
+        contentId: lineOffer.sku || item.sku || item.slug,
+        contentName: localize(lineOffer.label, locale),
+        value: lineOffer.price,
         quantity: 1,
       });
     }
@@ -270,7 +316,7 @@ export function ProductLanding({
   const validate = () => {
     const next: Partial<FormState> = {};
     if (!form.name.trim()) next.name = t("required");
-    if (!form.phone.trim() || form.phone.replace(/\D/g, "").length < 10) {
+    if (!bdMobile(form.phone)) {
       next.phone = t("phoneInvalid");
     }
     if (!form.address.trim()) next.address = t("required");
@@ -292,20 +338,23 @@ export function ProductLanding({
     try {
       const order = await createStoreOrder({
         customerName: form.name.trim(),
-        customerPhone: form.phone.trim(),
+        customerPhone: bdMobile(form.phone),
         addressLine: form.address.trim(),
         city: form.district.trim(),
         district: form.district.trim(),
         note: form.note.trim() || undefined,
         shippingFee,
         discount: 0,
-        items: orderItems.map(({ product: item, qty }) => ({
-          productId: item.id,
-          productName: localize(item.name, locale),
-          productSku: item.sku,
-          unitPrice: item.price,
-          quantity: qty,
-        })),
+        items: orderItems.map(({ product: item, qty }) => {
+          const lineOffer = offerFor(item);
+          return {
+            productId: item.id,
+            productName: localize(lineOffer.label, locale),
+            productSku: lineOffer.sku,
+            unitPrice: lineOffer.price,
+            quantity: qty,
+          };
+        }),
       });
       trackPurchase({
         value: order.total ?? total,
@@ -392,7 +441,7 @@ export function ProductLanding({
       <div className="container-rg pt-6 sm:pt-8 md:pt-12">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start lg:gap-12 xl:gap-16">
           <div className="lg:sticky lg:top-36">
-            <ProductGallery media={product.media} discount={discount} />
+            <ProductGallery media={gallery} discount={discount} focusSrc={offer.image} />
           </div>
 
           <div>
@@ -417,11 +466,11 @@ export function ProductLanding({
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
               <span className="text-2xl text-[#1c1a19]">
-                {formatBdt(product.price, locale)}
+                {formatBdt(offer.price, locale)}
               </span>
-              {product.compareAtPrice ? (
+              {compare ? (
                 <span className="text-sm text-[#1c1a19]/40 line-through">
-                  {formatBdt(product.compareAtPrice, locale)}
+                  {formatBdt(compare, locale)}
                 </span>
               ) : null}
               {discount > 0 ? (
@@ -430,6 +479,14 @@ export function ProductLanding({
                 </span>
               ) : null}
             </div>
+            <VariantChoices
+              options={product.options || []}
+              selectedId={offer.optionId}
+              onSelect={(id) => {
+                setOptionId(id);
+                rememberOption(productSlug, id);
+              }}
+            />
 
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
               <div className="flex items-center gap-1 text-[#c9a08a]">
@@ -727,10 +784,13 @@ export function ProductLanding({
             {/* Selected lines */}
             <ul className="mt-6 divide-y divide-[#1c1a19]/10 border-t border-[#1c1a19]/10">
               {orderItems.map(({ product: item, qty }) => {
-                const cover = getCoverMedia(item);
+                const lineOffer = offerFor(item);
+                const cover = lineOffer.image
+                  ? { src: lineOffer.image }
+                  : getCoverMedia(item);
                 return (
                   <li
-                    key={item.slug}
+                    key={`${item.slug}:${lineOffer.optionId || ""}`}
                     className="flex flex-row items-center gap-3 py-4 sm:gap-4"
                   >
                     <div className="flex min-w-0 flex-1 gap-3">
@@ -747,13 +807,13 @@ export function ProductLanding({
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm leading-snug text-[#1c1a19]">
-                          {localize(item.name, locale)}
+                          {localize(lineOffer.label, locale)}
                         </p>
                         <p className="mt-0.5 text-xs text-[#1c1a19]/45">
-                          {formatBdt(item.price, locale)}
+                          {formatBdt(lineOffer.price, locale)}
                         </p>
                         <p className="mt-2 text-sm text-[#1c1a19] sm:hidden">
-                          {formatBdt(item.price * qty, locale)}
+                          {formatBdt(lineOffer.price * qty, locale)}
                         </p>
                       </div>
                     </div>
@@ -786,7 +846,7 @@ export function ProductLanding({
                           {t("remove")}
                         </button>
                         <p className="hidden text-sm text-[#1c1a19] sm:block">
-                          {formatBdt(item.price * qty, locale)}
+                          {formatBdt(lineOffer.price * qty, locale)}
                         </p>
                       </div>
                     </div>

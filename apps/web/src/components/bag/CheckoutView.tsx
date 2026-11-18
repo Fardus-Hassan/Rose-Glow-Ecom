@@ -4,8 +4,8 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
-import { getCoverMedia, localize, type Product } from "@/data/products";
-import { formatBdt, cn } from "@/lib/format";
+import { chosenOffer, getCoverMedia, localize, type Product } from "@/data/products";
+import { bdMobile, formatBdt, cn } from "@/lib/format";
 import { CheckoutPageSkeleton } from "@/components/skeletons/StorefrontSkeletons";
 import { useBag } from "@/store/bag";
 import { useCatalog } from "@/store/catalog";
@@ -85,14 +85,14 @@ export function CheckoutView() {
           return { line, product };
         })
         .filter(Boolean) as Array<{
-        line: { slug: string; qty: number };
+        line: { slug: string; qty: number; optionId?: string };
         product: Product;
       }>,
     [cart, getBySlug],
   );
 
   const subtotal = lines.reduce(
-    (sum, item) => sum + item.product.price * item.line.qty,
+    (sum, item) => sum + chosenOffer(item.product, item.line.optionId).price * item.line.qty,
     0,
   );
   const shippingFee = shipping
@@ -122,7 +122,7 @@ export function CheckoutView() {
   const validate = () => {
     const next: Partial<FormState> = {};
     if (!form.name.trim()) next.name = t("required");
-    if (!form.phone.trim() || form.phone.replace(/\D/g, "").length < 10) {
+    if (!bdMobile(form.phone)) {
       next.phone = t("phoneInvalid");
     }
     if (!form.address.trim()) next.address = t("required");
@@ -143,20 +143,23 @@ export function CheckoutView() {
     try {
       const order = await createStoreOrder({
         customerName: form.name.trim(),
-        customerPhone: form.phone.trim(),
+        customerPhone: bdMobile(form.phone),
         addressLine: form.address.trim(),
         city: form.district.trim(),
         district: form.district.trim(),
         note: form.note.trim() || undefined,
         shippingFee,
         discount: 0,
-        items: lines.map(({ line, product }) => ({
-          productId: product.id,
-          productName: localize(product.name, locale),
-          productSku: product.sku,
-          unitPrice: product.price,
-          quantity: line.qty,
-        })),
+        items: lines.map(({ line, product }) => {
+          const offer = chosenOffer(product, line.optionId);
+          return {
+            productId: product.id,
+            productName: localize(offer.label, locale),
+            productSku: offer.sku,
+            unitPrice: offer.price,
+            quantity: line.qty,
+          };
+        }),
       });
       const eventId = order.id || order.orderNumber;
       trackPurchase({
@@ -362,9 +365,10 @@ export function CheckoutView() {
             </p>
             <ul className="mt-5 space-y-4">
               {lines.map(({ line, product }) => {
-                const cover = getCoverMedia(product);
+                const offer = chosenOffer(product, line.optionId);
+                const cover = offer.image ? { src: offer.image } : getCoverMedia(product);
                 return (
-                  <li key={line.slug} className="flex gap-3">
+                  <li key={`${line.slug}:${line.optionId || ""}`} className="flex gap-3">
                     <div className="relative h-16 w-14 shrink-0 overflow-hidden bg-[#e2dacf]">
                       {cover ? (
                         <Image
@@ -382,7 +386,7 @@ export function CheckoutView() {
                       </p>
                       <p className="mt-1 text-xs text-[#1c1a19]/45">
                         ×{line.qty} ·{" "}
-                        {formatBdt(product.price * line.qty, locale)}
+                        {formatBdt(offer.price * line.qty, locale)}
                       </p>
                     </div>
                   </li>
