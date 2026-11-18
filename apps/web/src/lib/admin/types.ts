@@ -132,6 +132,7 @@ export type Product = {
     compareAtPrice?: number | null;
     stock: number;
     image?: string;
+    media?: ProductMedia[];
   }>;
   landingEnabled?: boolean;
   landingSlug?: string | null;

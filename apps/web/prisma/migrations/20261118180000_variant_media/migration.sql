@@ -1,0 +1,1 @@
+ALTER TABLE "ProductVariant" ADD COLUMN "media" JSONB NOT NULL DEFAULT '[]';

@@ -34,8 +34,8 @@ export function LandingQuickView({
   const [optionId, setOptionId] = useState(defaultOptionId(product));
   const offer = chosenOffer(product, optionId);
   const media = useMemo(
-    () => galleryForOffer(product, offer.image),
-    [product, offer.image],
+    () => galleryForOffer(product, offer.media),
+    [product, offer.media],
   );
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -48,15 +48,9 @@ export function LandingQuickView({
   }, [product.slug]);
 
   useEffect(() => {
-    if (!offer.image) return;
-    const index = media.findIndex((item) => item.src === offer.image);
-    if (index >= 0) {
-      setActive(index);
-      trackRef.current?.scrollTo({
-        left: index * (trackRef.current.clientWidth || 0),
-      });
-    }
-  }, [offer.image, media]);
+    setActive(0);
+    trackRef.current?.scrollTo({ left: 0 });
+  }, [offer.optionId]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;

@@ -38,12 +38,31 @@ function normalizeVariants(value: unknown) {
         price: Number.isFinite(price) && price >= 0 ? Math.round(price) : 0,
         compareAtPrice: compare !== null && Number.isFinite(compare) ? Math.round(compare) : null,
         stock: Number.isFinite(stock) && stock >= 0 ? Math.round(stock) : 0,
-        image: String(row.image || "").trim().slice(0, 500),
+        ...variantMedia(row),
         sortOrder: index,
       };
     })
     .filter((item): item is NonNullable<typeof item> => Boolean(item))
     .slice(0, 30);
+}
+
+function variantMedia(row: Record<string, unknown>) {
+  const listed = Array.isArray(row.media)
+    ? normalizeMedia(row.media as Array<Record<string, unknown>>)
+    : [];
+  const media = listed.length
+    ? listed
+    : String(row.image || "").trim()
+      ? normalizeMedia([{ type: "IMAGE", src: String(row.image) }])
+      : [];
+  const cover =
+    media.find((item) => item.type === MediaType.IMAGE)?.src ||
+    media.find((item) => item.poster)?.poster ||
+    "";
+  return {
+    image: cover.slice(0, 500),
+    media: media as Prisma.InputJsonValue,
+  };
 }
 
 function normalizeMedia(media: Array<Record<string, unknown>>) {

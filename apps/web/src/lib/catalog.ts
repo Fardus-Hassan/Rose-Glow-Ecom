@@ -60,6 +60,7 @@ export type ApiProduct = {
     compareAtPrice?: number | null;
     stock: number;
     image?: string | null;
+    media?: ApiMedia[] | unknown;
   }>;
   seoTitleEn?: string;
   seoTitleBn?: string;
@@ -206,6 +207,29 @@ function asColors(value: unknown): ApiLocalized[] {
   );
 }
 
+function variantSlides(value: unknown, name: string): ProductMedia[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item, index) => {
+      const row = item as ApiMedia;
+      const src = String(row?.src || "").trim();
+      if (!src) return null;
+      return {
+        type:
+          String(row.type || "").toUpperCase() === "VIDEO"
+            ? ("video" as const)
+            : ("image" as const),
+        src: mediaUrl(src),
+        poster: row.poster ? mediaUrl(row.poster) : undefined,
+        alt: { en: row.altEn || name, bn: row.altBn || name },
+        sort: row.sortOrder ?? index,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => Boolean(item))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ sort: _sort, ...slide }) => slide);
+}
+
 function asImages(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.filter((item): item is string => typeof item === "string");
@@ -230,15 +254,22 @@ export function mapApiProduct(p: ApiProduct): Product {
       },
     }));
 
-  const options = (p.variants ?? []).map((item) => ({
-    id: item.id,
-    sku: item.sku,
-    name: { en: item.nameEn, bn: item.nameBn || item.nameEn },
-    price: item.price,
-    compareAtPrice: item.compareAtPrice ?? undefined,
-    stock: item.stock,
-    image: item.image ? mediaUrl(item.image) : undefined,
-  }));
+  const options = (p.variants ?? []).map((item) => {
+    const ownMedia = variantSlides(item.media, item.nameEn);
+    const image = ownMedia.find((slide) => slide.type === "image")?.src
+      || ownMedia.find((slide) => slide.type === "video")?.poster
+      || (item.image ? mediaUrl(item.image) : undefined);
+    return {
+      id: item.id,
+      sku: item.sku,
+      name: { en: item.nameEn, bn: item.nameBn || item.nameEn },
+      price: item.price,
+      compareAtPrice: item.compareAtPrice ?? undefined,
+      stock: item.stock,
+      image,
+      media: ownMedia.length ? ownMedia : undefined,
+    };
+  });
 
   return {
     id: p.id,

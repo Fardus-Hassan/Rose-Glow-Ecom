@@ -219,7 +219,7 @@ export function ProductLanding({
   }
 
   const offer = chosenOffer(product, optionId);
-  const gallery = galleryForOffer(product, offer.image);
+  const gallery = galleryForOffer(product, offer.media);
   const compare = offer.compareAtPrice;
   const discount =
     compare && compare > offer.price
@@ -441,7 +441,11 @@ export function ProductLanding({
       <div className="container-rg pt-6 sm:pt-8 md:pt-12">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start lg:gap-12 xl:gap-16">
           <div className="lg:sticky lg:top-36">
-            <ProductGallery media={gallery} discount={discount} focusSrc={offer.image} />
+            <ProductGallery
+              key={offer.optionId || "product"}
+              media={gallery}
+              discount={discount}
+            />
           </div>
 
           <div>

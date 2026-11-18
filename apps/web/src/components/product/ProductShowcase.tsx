@@ -14,8 +14,8 @@ export function ProductShowcase({ product }: { product: Product }) {
   const [optionId, setOptionId] = useState(defaultOptionId(product));
   const offer = chosenOffer(product, optionId);
   const media = useMemo(
-    () => galleryForOffer(product, offer.image),
-    [product, offer.image],
+    () => galleryForOffer(product, offer.media),
+    [product, offer.media],
   );
   const compare = offer.compareAtPrice;
   const discount =
@@ -26,7 +26,11 @@ export function ProductShowcase({ product }: { product: Product }) {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)] lg:items-start lg:gap-10 xl:gap-14">
       <div className="lg:sticky lg:top-28">
-        <ProductGallery media={media} discount={discount} focusSrc={offer.image} />
+        <ProductGallery
+          key={offer.optionId || "product"}
+          media={media}
+          discount={discount}
+        />
       </div>
       <ProductInfo product={product} optionId={optionId} onOptionId={setOptionId} />
     </div>

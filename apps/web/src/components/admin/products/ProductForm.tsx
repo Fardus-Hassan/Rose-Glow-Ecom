@@ -183,7 +183,13 @@ export function ProductForm({
           ? ""
           : String(variant.compareAtPrice),
       stock: String(variant.stock),
-      image: variant.image || "",
+      media: galleryFromProduct(
+        variant.media?.length
+          ? variant.media
+          : variant.image
+            ? [{ type: "IMAGE", src: variant.image }]
+            : [],
+      ),
     })),
   );
   const [saving, setSaving] = useState(false);
@@ -273,7 +279,7 @@ export function ProductForm({
               ? null
               : Number(variant.compareAtPrice) || 0,
           stock: Number(variant.stock) || 0,
-          image: (variant.image || "").trim(),
+          media: galleryToPayload(variant.media),
         })),
       landingEnabled: form.landingEnabled,
       landingSlug: form.landingEnabled ? landingSlug : null,
@@ -569,8 +575,9 @@ export function ProductForm({
             <div className="mt-6 space-y-3">
               <p className="admin-label">Variants</p>
               <p className="text-xs text-muted">
-                Optional. Leave empty to sell the base product SKU. Each variant
-                needs a unique SKU, price, and stock.
+                Optional. Leave the list empty to sell the product SKU. A variant
+                with no photos uses the product gallery, which suits a size-only
+                option. Add photos or video when that variant looks different.
               </p>
               {variants.map((variant, index) => (
                 <div key={index} className="space-y-2 border border-ink/10 p-3">
@@ -686,16 +693,24 @@ export function ProductForm({
                       }
                     />
                   </div>
-                  <MediaField
-                    value={variant.image}
-                    onChange={(image) =>
-                      setVariants((rows) =>
-                        rows.map((row, i) =>
-                          i === index ? { ...row, image } : row,
-                        ),
-                      )
-                    }
-                  />
+                  <div className="border-t border-ink/10 pt-3">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-muted">
+                      Photos and video
+                    </p>
+                    <p className="mb-3 mt-1 text-xs text-muted">
+                      Leave empty to keep the product gallery.
+                    </p>
+                    <ProductMediaGallery
+                      value={variant.media}
+                      onChange={(next) =>
+                        setVariants((rows) =>
+                          rows.map((row, i) =>
+                            i === index ? { ...row, media: next } : row,
+                          ),
+                        )
+                      }
+                    />
+                  </div>
                 </div>
               ))}
               <button
@@ -711,7 +726,7 @@ export function ProductForm({
                       price: "",
                       compareAtPrice: "",
                       stock: "0",
-                      image: "",
+                      media: [],
                     },
                   ])
                 }

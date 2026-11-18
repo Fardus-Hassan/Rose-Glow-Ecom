@@ -29,6 +29,7 @@ export type ProductOption = {
   compareAtPrice?: number;
   stock: number;
   image?: string;
+  media?: ProductMedia[];
 };
 
 export type Product = {
@@ -73,6 +74,7 @@ export function chosenOffer(product: Product, optionId?: string) {
       price: product.price,
       compareAtPrice: product.compareAtPrice,
       image: undefined as string | undefined,
+      media: undefined as ProductMedia[] | undefined,
       optionId: undefined as string | undefined,
       stock: product.inStock ? Number.POSITIVE_INFINITY : 0,
       inStock: product.inStock,
@@ -84,6 +86,7 @@ export function chosenOffer(product: Product, optionId?: string) {
     price: option.price,
     compareAtPrice: option.compareAtPrice,
     image: option.image,
+    media: option.media?.length ? option.media : undefined,
     optionId: option.id,
     stock: option.stock,
     inStock: option.stock > 0,
@@ -346,10 +349,9 @@ export function getRelatedProducts(slug: string, limit = 4) {
     .slice(0, limit);
 }
 
-export function galleryForOffer(product: Product, image?: string): ProductMedia[] {
-  if (!image) return product.media;
-  if (product.media.some((item) => item.src === image)) return product.media;
-  return [{ type: "image", src: image, alt: product.name }, ...product.media];
+export function galleryForOffer(product: Product, media?: ProductMedia[]): ProductMedia[] {
+  if (media?.length) return media;
+  return product.media;
 }
 
 export function getCoverMedia(product: Product) {

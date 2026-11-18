@@ -135,6 +135,7 @@ model ProductVariant {
   compareAtPrice Int?
   stock          Int      @default(0)
   image          String   @default("")
+  media          Json     @default("[]")
   sortOrder      Int      @default(0)
 
   @@unique([sku])
