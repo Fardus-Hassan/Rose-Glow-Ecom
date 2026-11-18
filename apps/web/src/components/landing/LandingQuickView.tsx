@@ -249,7 +249,7 @@ export function LandingQuickView({
           </div>
 
           {media.length > 1 ? (
-            <div className="mt-3 flex items-center justify-between gap-3">
+            <div className="mt-3">
               <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {media.map((item, index) => {
                   const thumb =
@@ -260,10 +260,10 @@ export function LandingQuickView({
                       type="button"
                       onClick={() => jumpTo(index)}
                       className={cn(
-                        "relative h-12 w-10 shrink-0 overflow-hidden border",
+                        "relative aspect-[4/5] w-14 shrink-0 overflow-hidden bg-[#e2dacf] transition",
                         active === index
-                          ? "border-[#1c1a19]"
-                          : "border-transparent opacity-70",
+                          ? "ring-1 ring-[#c9a08a]"
+                          : "opacity-65 ring-1 ring-[#1c1a19]/10",
                       )}
                     >
                       {thumb ? (
@@ -271,15 +271,15 @@ export function LandingQuickView({
                           src={thumb}
                           alt=""
                           fill
-                          sizes="40px"
-                          className="object-cover"
+                          sizes="56px"
+                          className="object-contain"
                         />
                       ) : null}
                     </button>
                   );
                 })}
               </div>
-              <div className="flex shrink-0 gap-1.5">
+              <div className="mt-3 flex shrink-0 gap-1.5">
                 {media.map((item, index) => (
                   <button
                     key={`dot-${item.src}-${index}`}
