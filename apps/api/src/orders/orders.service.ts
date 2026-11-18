@@ -58,7 +58,7 @@ export class OrdersService {
     const key = process.env.LEDGER_SHOP_KEY;
     if (base && key) {
       try {
-        await fetch(`${base}/api/shop/orders`, {
+        const response = await fetch(`${base}/api/shop/orders`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "X-Shop-Key": key },
           body: JSON.stringify({
@@ -79,6 +79,21 @@ export class OrdersService {
             })),
           }),
         });
+        const text = await response.text();
+        if (!response.ok) {
+          console.error("Ledger did not take the order", response.status, text);
+        } else {
+          const body = JSON.parse(text) as { order?: { number?: string } };
+          const number = String(body.order?.number || "").trim();
+          if (/^RG-\d{4,}$/.test(number) && number !== order.orderNumber) {
+            const saved = await this.prisma.order.update({
+              where: { id: order.id },
+              data: { orderNumber: number },
+              include: { items: true },
+            });
+            return saved;
+          }
+        }
       } catch (error) {
         console.error("Ledger did not take the order", error);
       }

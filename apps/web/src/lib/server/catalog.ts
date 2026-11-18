@@ -581,7 +581,7 @@ export const orders = {
     });
 
     const { pushLedgerOrder } = await import("@/lib/server/ledger");
-    await pushLedgerOrder({
+    const ledgerNumber = await pushLedgerOrder({
       orderNumber: order.orderNumber,
       customerName: order.customerName,
       mobile: order.customerPhone,
@@ -598,7 +598,17 @@ export const orders = {
         quantity: item.quantity,
       })),
     });
-    return order;
+    if (!ledgerNumber || ledgerNumber === order.orderNumber) return order;
+    try {
+      return await prisma.order.update({
+        where: { id: order.id },
+        data: { orderNumber: ledgerNumber },
+        include: { items: true },
+      });
+    } catch (error) {
+      console.error("Could not save the ledger order number", error);
+      return { ...order, orderNumber: ledgerNumber };
+    }
   },
 
   async findAll(params: {
