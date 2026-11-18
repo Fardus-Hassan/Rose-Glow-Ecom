@@ -61,7 +61,7 @@ export function VariantChoices({
       <p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-[#1c1a19]/45">
         {label}
       </p>
-      <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="-mx-1 flex gap-3 overflow-x-auto px-1.5 pb-1.5 pt-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {options.map((option) => {
           const selected = option.id === selectedId;
           const soldOut = option.stock <= 0;
