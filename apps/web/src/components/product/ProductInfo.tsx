@@ -127,26 +127,40 @@ export function ProductInfo({
         onSelect={choose}
       />
 
+      {product.rating > 0 || product.soldCount > 0 ? (
       <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <div className="flex items-center gap-1 text-[#c9a08a]">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <IconStar
-              key={i}
-              className={`h-3.5 w-3.5 ${i < Math.round(product.rating) ? "opacity-100" : "opacity-25"}`}
-            />
-          ))}
-        </div>
-        <span className="text-xs text-[#1c1a19]/50">
-          {t("rating", {
-            rating: product.rating.toFixed(1),
-            count: product.reviewCount,
-          })}
-        </span>
-        <span className="text-[#1c1a19]/25">·</span>
-        <span className="text-xs text-[#1c1a19]/50">
-          {t("purchased", { count: product.soldCount })}
-        </span>
+        {product.rating > 0 ? (
+          <>
+            <div className="flex items-center gap-1 text-[#c9a08a]">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <IconStar
+                  key={i}
+                  className={`h-3.5 w-3.5 ${i < Math.round(product.rating) ? "opacity-100" : "opacity-25"}`}
+                />
+              ))}
+            </div>
+            <span className="text-xs text-[#1c1a19]/50">
+              {product.reviewCount > 0
+                ? t("rating", {
+                    rating: product.rating.toFixed(1),
+                    count: product.reviewCount,
+                  })
+                : product.rating.toFixed(1)}
+            </span>
+          </>
+        ) : null}
+        {product.soldCount > 0 ? (
+          <>
+            {product.rating > 0 ? (
+              <span className="text-[#1c1a19]/25">·</span>
+            ) : null}
+            <span className="text-xs text-[#1c1a19]/50">
+              {t("purchased", { count: product.soldCount })}
+            </span>
+          </>
+        ) : null}
       </div>
+      ) : null}
 
       <RichText
         html={

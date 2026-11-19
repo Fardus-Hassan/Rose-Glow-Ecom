@@ -94,6 +94,7 @@
     "reviewsEyebrow": "কাস্টমার নোট",
     "reviewsTitle": "কাস্টমাররা যা বলছেন",
     "reviewsSummary": "{count}টি নোটের ভিত্তিতে",
+    "reviewsEmpty": "এই পিসের জন্য পাবলিশ করা নোট এখানে দেখা যাবে।",
     "reviewPhoto": "রিভিউ ছবি",
     "closePhoto": "বন্ধ",
     "shipping": "শিপিং ও রিটার্ন",

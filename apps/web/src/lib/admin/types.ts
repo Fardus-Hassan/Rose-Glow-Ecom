@@ -108,6 +108,7 @@ export type Product = {
   categoryId: string;
   category?: Category;
   stock: number;
+  rating?: number;
   featured: boolean;
   newest: boolean;
   inStock: boolean;

@@ -72,23 +72,35 @@ export function ProductCard({
             {localize(product.name, locale)}
           </h3>
 
+          {product.rating > 0 || product.soldCount > 0 ? (
           <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-            <div className="flex items-center gap-0.5 text-[#c9a08a]">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <IconStar
-                  key={i}
-                  className={`h-3 w-3 ${i < filledStars ? "opacity-100" : "opacity-25"}`}
-                />
-              ))}
-            </div>
-            <span className="text-[11px] text-[#1c1a19]/45">
-              {product.rating.toFixed(1)}
-            </span>
-            <span className="text-[11px] text-[#1c1a19]/35">·</span>
-            <span className="text-[11px] text-[#1c1a19]/45">
-              {t("purchased", { count: product.soldCount })}
-            </span>
+            {product.rating > 0 ? (
+              <>
+                <div className="flex items-center gap-0.5 text-[#c9a08a]">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <IconStar
+                      key={i}
+                      className={`h-3 w-3 ${i < filledStars ? "opacity-100" : "opacity-25"}`}
+                    />
+                  ))}
+                </div>
+                <span className="text-[11px] text-[#1c1a19]/45">
+                  {product.rating.toFixed(1)}
+                </span>
+              </>
+            ) : null}
+            {product.soldCount > 0 ? (
+              <>
+                {product.rating > 0 ? (
+                  <span className="text-[11px] text-[#1c1a19]/35">·</span>
+                ) : null}
+                <span className="text-[11px] text-[#1c1a19]/45">
+                  {t("purchased", { count: product.soldCount })}
+                </span>
+              </>
+            ) : null}
           </div>
+          ) : null}
 
           <div className="mt-2 flex items-baseline gap-2.5">
             <span className="text-sm text-[#1c1a19]/85">

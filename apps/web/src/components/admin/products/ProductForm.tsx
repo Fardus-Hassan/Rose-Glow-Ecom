@@ -43,6 +43,7 @@ type ProductPayload = {
   compareAtPrice?: number | null;
   categoryId: string;
   stock: number;
+  rating: number;
   featured: boolean;
   newest: boolean;
   inStock: boolean;
@@ -84,6 +85,7 @@ function emptyForm(categoryId = ""): ProductPayload {
     compareAtPrice: null,
     categoryId,
     stock: 0,
+    rating: 0,
     featured: false,
     newest: false,
     inStock: true,
@@ -137,6 +139,7 @@ function fromProduct(p: Product): {
       compareAtPrice: p.compareAtPrice ?? null,
       categoryId: p.categoryId,
       stock: p.stock,
+      rating: p.rating ?? 0,
       featured: p.featured,
       newest: p.newest,
       inStock: p.inStock,
@@ -255,6 +258,7 @@ export function ProductForm({
       ...form,
       price: Number(form.price),
       stock: Number(form.stock),
+      rating: Math.round(Math.min(5, Math.max(0, Number(form.rating) || 0)) * 10) / 10,
       compareAtPrice:
         form.compareAtPrice === null || form.compareAtPrice === undefined
           ? null
@@ -569,6 +573,22 @@ export function ProductForm({
                       inStock: stock > 0 ? f.inStock || true : false,
                     }));
                   }}
+                />
+              </Field>
+            </div>
+            <div className="mt-4 max-w-xs">
+              <Field
+                label="Star rating"
+                hint="0 to 5. Shown on the product page and the landing page. Customer notes come from Reviews. How many people bought is counted from orders."
+              >
+                <input
+                  type="number"
+                  min={0}
+                  max={5}
+                  step={0.1}
+                  className="admin-input"
+                  value={form.rating}
+                  onChange={(e) => patch("rating", Number(e.target.value))}
                 />
               </Field>
             </div>

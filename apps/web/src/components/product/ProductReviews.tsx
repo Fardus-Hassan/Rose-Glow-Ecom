@@ -67,27 +67,44 @@ export function ProductReviews({
         <div className="mt-4 h-px w-12 bg-gradient-to-r from-[#c9a08a] to-transparent" />
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(220px,0.35fr)_minmax(0,1fr)] lg:gap-14">
+      <div
+        className={
+          reviews.length
+            ? "grid gap-10 lg:grid-cols-[minmax(220px,0.35fr)_minmax(0,1fr)] lg:gap-14"
+            : ""
+        }
+      >
         <div className="border-t border-[#1c1a19]/10 pt-6 lg:border-t-0 lg:pt-0">
-          <p className="font-display text-5xl text-[#1c1a19] md:text-6xl">
-            {product.rating.toFixed(1)}
-          </p>
-          <div className="mt-3 flex items-center gap-1 text-[#c9a08a]">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <IconStar
-                key={i}
-                className={`h-4 w-4 ${i < filled ? "opacity-100" : "opacity-25"}`}
-              />
-            ))}
-          </div>
-          <p className="mt-3 text-sm text-[#1c1a19]/55">
-            {t("reviewsSummary", { count: product.reviewCount })}
-          </p>
-          <p className="mt-1 text-xs text-[#1c1a19]/4">
-            {t("purchased", { count: product.soldCount })}
-          </p>
+          {product.rating > 0 ? (
+            <>
+              <p className="font-display text-5xl text-[#1c1a19] md:text-6xl">
+                {product.rating.toFixed(1)}
+              </p>
+              <div className="mt-3 flex items-center gap-1 text-[#c9a08a]">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <IconStar
+                    key={i}
+                    className={`h-4 w-4 ${i < filled ? "opacity-100" : "opacity-25"}`}
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
+          {product.reviewCount > 0 ? (
+            <p className="mt-3 text-sm text-[#1c1a19]/55">
+              {t("reviewsSummary", { count: product.reviewCount })}
+            </p>
+          ) : (
+            <p className="mt-3 text-sm text-[#1c1a19]/55">{t("reviewsEmpty")}</p>
+          )}
+          {product.soldCount > 0 ? (
+            <p className="mt-1 text-xs text-[#1c1a19]/45">
+              {t("purchased", { count: product.soldCount })}
+            </p>
+          ) : null}
         </div>
 
+        {reviews.length > 0 ? (
         <div>
           <ul className="divide-y divide-[#1c1a19]/10 border-y border-[#1c1a19]/10">
             {notes.map((review) => (
@@ -102,7 +119,7 @@ export function ProductReviews({
                     {localize(review.name, locale)}
                   </p>
                   <span className="text-[#1c1a19]/25">·</span>
-                  <p className="text-[11px] uppercase tracking-[0.14em] text-[#1c1a19]/4">
+                  <p className="text-[11px] uppercase tracking-[0.14em] text-[#1c1a19]/45">
                     {localize(review.place, locale)}
                   </p>
                 </div>
@@ -143,6 +160,7 @@ export function ProductReviews({
             className="mt-8 border-t-0 pt-0 md:mt-10 md:pt-0"
           />
         </div>
+        ) : null}
       </div>
 
       {lightbox ? (

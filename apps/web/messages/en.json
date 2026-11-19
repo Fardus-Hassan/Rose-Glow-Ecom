@@ -94,6 +94,7 @@
     "reviewsEyebrow": "Customer notes",
     "reviewsTitle": "What customers say",
     "reviewsSummary": "Based on {count} notes",
+    "reviewsEmpty": "Notes you publish for this piece will show here.",
     "reviewPhoto": "Review photo",
     "closePhoto": "Close",
     "shipping": "Shipping & return",

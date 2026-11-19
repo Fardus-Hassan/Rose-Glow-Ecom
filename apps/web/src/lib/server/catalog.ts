@@ -18,6 +18,73 @@ const productInclude = {
   variants: { orderBy: { sortOrder: "asc" as const } },
 };
 
+function clampRating(value: unknown) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0 || n > 5) {
+    throw new HttpError(400, "Rating must be from 0 to 5");
+  }
+  return Math.round(n * 10) / 10;
+}
+
+function takeStorefrontRating(dto: Record<string, unknown>) {
+  delete dto.soldCount;
+  delete dto.reviewCount;
+  if ("rating" in dto) dto.rating = clampRating(dto.rating);
+}
+
+async function withSocialProof<T extends { id: string; rating: number }>(
+  rows: T[],
+) {
+  const ids = rows.map((row) => row.id);
+  if (!ids.length) return rows;
+
+  const [reviewGroups, soldGroups] = await Promise.all([
+    prisma.review.groupBy({
+      by: ["productId"],
+      where: {
+        productId: { in: ids },
+        isPublished: true,
+        deletedAt: null,
+      },
+      _count: { _all: true },
+      _avg: { rating: true },
+    }),
+    prisma.orderItem.groupBy({
+      by: ["productId"],
+      where: {
+        productId: { in: ids },
+        order: { deletedAt: null, status: { not: OrderStatus.CANCELLED } },
+      },
+      _sum: { quantity: true },
+    }),
+  ]);
+
+  const notes = new Map(
+    reviewGroups
+      .filter((row) => row.productId)
+      .map((row) => [
+        row.productId as string,
+        { count: row._count._all, avg: row._avg.rating ?? 0 },
+      ]),
+  );
+  const sold = new Map(
+    soldGroups
+      .filter((row) => row.productId)
+      .map((row) => [row.productId as string, row._sum.quantity ?? 0]),
+  );
+
+  return rows.map((row) => {
+    const note = notes.get(row.id);
+    const chosen = row.rating > 0 ? row.rating : (note?.avg ?? 0);
+    return {
+      ...row,
+      rating: Math.round(chosen * 10) / 10,
+      reviewCount: note?.count ?? 0,
+      soldCount: sold.get(row.id) ?? 0,
+    };
+  });
+}
+
 function normalizeVariants(value: unknown) {
   if (!Array.isArray(value)) return [];
   return value
@@ -192,8 +259,10 @@ export const products = {
       }),
     ]);
 
+    const page = paginated(items, total, params.page);
     return {
-      ...paginated(items, total, params.page),
+      ...page,
+      items: await withSocialProof(page.items),
       facets: {
         minPrice: priceAgg._min.price ?? 0,
         maxPrice: priceAgg._max.price ?? 0,
@@ -207,7 +276,8 @@ export const products = {
       include: productInclude,
     });
     if (!product) throw new HttpError(404, "Product not found");
-    return product;
+    const [withProof] = await withSocialProof([product]);
+    return withProof;
   },
 
   async findLandingPublic(landingSlug: string) {
@@ -221,7 +291,8 @@ export const products = {
       include: productInclude,
     });
     if (!product) throw new HttpError(404, "Landing not found");
-    return product;
+    const [withProof] = await withSocialProof([product]);
+    return withProof;
   },
 
   async findAdmin(
@@ -269,6 +340,7 @@ export const products = {
     );
     const colors = (dto.colors as unknown[]) ?? [];
     const variants = normalizeVariants(dto.variants);
+    takeStorefrontRating(dto);
     const { media: _m, colors: _c, landing: _l, variants: _v, ...rest } = dto;
     const landingFields = normalizeLandingFields(dto);
     const stockFromVariants = variants.length
@@ -301,6 +373,7 @@ export const products = {
       : undefined;
     const colors = dto.colors as unknown[] | undefined;
     const variants = dto.variants === undefined ? undefined : normalizeVariants(dto.variants);
+    takeStorefrontRating(dto);
     const { media: _m, colors: _c, landing: _l, variants: _v, ...rest } = dto;
     const landingFields =
       "landingEnabled" in dto || "landing" in dto || "landingSlug" in dto

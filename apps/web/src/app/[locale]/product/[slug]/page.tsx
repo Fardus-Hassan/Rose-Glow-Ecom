@@ -48,7 +48,7 @@ export default async function ProductPage({
 
   const [related, reviews] = await Promise.all([
     fetchRelatedProducts(slug, 4),
-    fetchReviews({ productSlug: slug, pageSize: 50 }),
+    fetchReviews({ productSlug: slug, pageSize: 100 }),
   ]);
   const t = await getTranslations("Product");
   const tc = await getTranslations("Categories");
