@@ -1,13 +1,31 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+function scrollToTop() {
+  const lenis = (window as Window & { __rgLenis?: Lenis }).__rgLenis;
+  if (lenis) {
+    lenis.scrollTo(0, { immediate: true, force: true });
+    return;
+  }
+  window.scrollTo(0, 0);
+}
+
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    scrollToTop();
+    const frame = requestAnimationFrame(scrollToTop);
+    return () => cancelAnimationFrame(frame);
+  }, [pathname]);
+
   useEffect(() => {
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
