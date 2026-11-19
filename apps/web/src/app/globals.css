@@ -42,12 +42,22 @@
   }
 
   .rg-beat {
-    animation: rg-heartbeat 1.7s ease-in-out infinite;
-    transform-origin: center;
+    background-image: linear-gradient(
+      105deg,
+      transparent 0%,
+      transparent 38%,
+      rgba(255, 255, 255, 0.42) 50%,
+      transparent 62%,
+      transparent 100%
+    );
+    background-repeat: no-repeat;
+    background-size: 240% 100%;
+    animation: rg-wave 2.2s linear infinite;
   }
 
   .rg-beat:disabled {
     animation: none;
+    background-image: none;
   }
 }
 
@@ -71,28 +81,19 @@
   }
 }
 
-@keyframes rg-heartbeat {
-  0%,
+@keyframes rg-wave {
+  0% {
+    background-position: 140% 0;
+  }
   100% {
-    transform: scale(1);
-  }
-  12% {
-    transform: scale(1.035);
-  }
-  24% {
-    transform: scale(1);
-  }
-  36% {
-    transform: scale(1.02);
-  }
-  48% {
-    transform: scale(1);
+    background-position: -140% 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .rg-beat {
     animation: none;
+    background-image: none;
   }
 }
 
