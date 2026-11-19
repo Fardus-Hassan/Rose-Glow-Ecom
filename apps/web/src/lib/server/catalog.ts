@@ -75,7 +75,7 @@ async function withSocialProof<T extends { id: string; rating: number }>(
 
   return rows.map((row) => {
     const note = notes.get(row.id);
-    const chosen = row.rating > 0 ? row.rating : (note?.avg ?? 0);
+    const chosen = note && note.count > 0 ? note.avg : row.rating;
     return {
       ...row,
       rating: Math.round(chosen * 10) / 10,

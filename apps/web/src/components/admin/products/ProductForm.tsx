@@ -579,7 +579,7 @@ export function ProductForm({
             <div className="mt-4 max-w-xs">
               <Field
                 label="Star rating"
-                hint="0 to 5. Shown on the product page and the landing page. Customer notes come from Reviews. How many people bought is counted from orders."
+                hint="Used only when this product has no published reviews. Once you publish reviews, the score is their average."
               >
                 <input
                   type="number"
