@@ -556,14 +556,14 @@ export function ProductLanding({
               ))}
             </div>
 
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-7">
               <button
                 type="button"
                 onClick={() => {
                   if (!lines[productSlug]) setQty(productSlug, 1);
                   scrollToOrder();
                 }}
-                className="inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition hover:bg-black sm:w-auto"
+                className="inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition hover:bg-black"
               >
                 {t("orderNow")} →
               </button>
