@@ -55,7 +55,7 @@ async function withSocialProof<T extends { id: string; rating: number }>(
         productId: { in: ids },
         order: { deletedAt: null, status: { not: OrderStatus.CANCELLED } },
       },
-      _sum: { quantity: true },
+      _sum: { quantity: true, returnedQty: true },
     }),
   ]);
 
@@ -70,7 +70,10 @@ async function withSocialProof<T extends { id: string; rating: number }>(
   const sold = new Map(
     soldGroups
       .filter((row) => row.productId)
-      .map((row) => [row.productId as string, row._sum.quantity ?? 0]),
+      .map((row) => [
+        row.productId as string,
+        Math.max(0, (row._sum.quantity ?? 0) - (row._sum.returnedQty ?? 0)),
+      ]),
   );
 
   return rows.map((row) => {
@@ -763,6 +766,84 @@ export const orders = {
       data: { deletedAt: new Date() },
       include: { items: true },
     });
+  },
+
+  async applyLedgerReturn(body: {
+    orderNumber?: string;
+    shopOrderNumber?: string;
+    returned?: boolean;
+    items?: Array<{ sku?: string; returned?: number }>;
+  }) {
+    const numbers = [body.orderNumber, body.shopOrderNumber]
+      .map((value) => String(value || "").trim())
+      .filter(Boolean);
+    if (!numbers.length) throw new HttpError(400, "Order number is required");
+    const wanted = new Map(
+      (body.items || [])
+        .map((item) => [String(item.sku || "").trim().toLowerCase(), Math.max(0, Math.round(Number(item.returned) || 0))] as const)
+        .filter((item) => item[0]),
+    );
+    const order = await prisma.order.findFirst({
+      where: { deletedAt: null, orderNumber: { in: numbers } },
+      include: { items: true },
+    });
+    if (!order) throw new HttpError(404, "Order not found");
+
+    await prisma.$transaction(async (tx) => {
+      for (const item of order.items) {
+        const sku = item.productSku.trim().toLowerCase();
+        if (!wanted.has(sku)) continue;
+        const returned = Math.min(item.quantity, wanted.get(sku) || 0);
+        const delta = returned - item.returnedQty;
+        if (delta === 0 && item.returnedQty === returned) continue;
+        await tx.orderItem.update({
+          where: { id: item.id },
+          data: { returnedQty: returned },
+        });
+        if (!delta) continue;
+        const variant = await tx.productVariant.findUnique({ where: { sku: item.productSku } });
+        if (variant) {
+          await tx.productVariant.update({
+            where: { id: variant.id },
+            data: { stock: { increment: delta } },
+          });
+          const variants = await tx.productVariant.findMany({
+            where: { productId: variant.productId },
+            select: { stock: true },
+          });
+          const stock = variants.reduce((sum, row) => sum + row.stock, 0);
+          await tx.product.update({
+            where: { id: variant.productId },
+            data: { stock, inStock: stock > 0 },
+          });
+          continue;
+        }
+        if (!item.productId) continue;
+        const product = await tx.product.findFirst({
+          where: { id: item.productId, deletedAt: null },
+          select: { stock: true },
+        });
+        if (!product) continue;
+        const stock = product.stock + delta;
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock, inStock: stock > 0 },
+        });
+      }
+      const items = await tx.orderItem.findMany({ where: { orderId: order.id } });
+      const kept = items.reduce((sum, item) => sum + item.unitPrice * (item.quantity - item.returnedQty), 0);
+      const allBack = items.length > 0 && items.every((item) => item.returnedQty >= item.quantity);
+      const anyBack = items.some((item) => item.returnedQty > 0);
+      await tx.order.update({
+        where: { id: order.id },
+        data: {
+          status: body.returned || anyBack ? OrderStatus.RETURNED : order.status,
+          subtotal: kept,
+          total: allBack ? 0 : Math.max(0, kept - order.discount + order.shippingFee),
+        },
+      });
+    });
+    return { ok: true };
   },
 };
 

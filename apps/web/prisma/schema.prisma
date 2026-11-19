@@ -19,6 +19,7 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+  RETURNED
 }
 
 enum PaymentMethod {
@@ -193,6 +194,7 @@ model OrderItem {
   productSku  String
   unitPrice   Int
   quantity    Int
+  returnedQty Int      @default(0)
   lineTotal   Int
 
   @@index([orderId])
