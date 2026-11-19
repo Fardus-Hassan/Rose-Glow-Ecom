@@ -352,7 +352,7 @@ export function CheckoutView() {
           <button
             type="submit"
             disabled={submitting || (shipping ? !shipping.codEnabled : false)}
-            className="inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition hover:bg-black disabled:opacity-50 sm:w-auto"
+            className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition-colors hover:bg-black disabled:opacity-50 sm:w-auto"
           >
             {submitting ? "…" : t("placeOrder")}
           </button>

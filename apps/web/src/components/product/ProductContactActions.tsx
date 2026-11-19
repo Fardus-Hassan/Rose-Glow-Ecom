@@ -66,7 +66,7 @@ export function ProductContactActions({ productName, className }: Props) {
         {showCall ? (
           <a
             href={contact.phoneTel}
-            className="group inline-flex min-h-12 items-center justify-center gap-2 border border-[#1c1a19]/18 bg-[#f4efe8] px-3 text-[11px] uppercase tracking-[0.16em] text-[#1c1a19] transition hover:border-[#1c1a19] hover:bg-[#1c1a19] hover:text-[#f4efe8] active:scale-[0.99]"
+            className="rg-beat group inline-flex min-h-12 items-center justify-center gap-2 border border-[#1c1a19]/18 bg-[#f4efe8] px-3 text-[11px] uppercase tracking-[0.16em] text-[#1c1a19] transition-colors hover:border-[#1c1a19] hover:bg-[#1c1a19] hover:text-[#f4efe8]"
           >
             <IconPhone className="h-4 w-4 shrink-0 transition group-hover:scale-105" />
             <span className="truncate">{t("callButton")}</span>
@@ -78,7 +78,7 @@ export function ProductContactActions({ productName, className }: Props) {
             href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex min-h-12 items-center justify-center gap-2 border border-[#1f6b4a]/25 bg-[#1f6b4a] px-3 text-[11px] uppercase tracking-[0.16em] text-[#f4efe8] transition hover:bg-[#185a3e] active:scale-[0.99]"
+            className="rg-beat group inline-flex min-h-12 items-center justify-center gap-2 border border-[#1f6b4a]/25 bg-[#1f6b4a] px-3 text-[11px] uppercase tracking-[0.16em] text-[#f4efe8] transition-colors hover:bg-[#185a3e]"
           >
             <IconWhatsApp className="h-4 w-4 shrink-0 transition group-hover:scale-105" />
             <span className="truncate">{t("whatsappButton")}</span>

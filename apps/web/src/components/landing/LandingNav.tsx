@@ -46,7 +46,7 @@ export function LandingNav() {
           <button
             type="button"
             onClick={scrollToOrder}
-            className="inline-flex min-h-10 items-center justify-center bg-[#1c1a19] px-2.5 text-[10px] uppercase tracking-[0.14em] text-[#f4efe8] transition hover:bg-black sm:px-4 sm:tracking-[0.16em] sm:text-[11px]"
+            className="rg-beat inline-flex min-h-10 items-center justify-center bg-[#1c1a19] px-2.5 text-[10px] uppercase tracking-[0.14em] text-[#f4efe8] transition-colors hover:bg-black sm:px-4 sm:tracking-[0.16em] sm:text-[11px]"
           >
             {t("orderNow")}
           </button>

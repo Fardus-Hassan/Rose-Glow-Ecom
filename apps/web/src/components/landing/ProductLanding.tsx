@@ -548,7 +548,7 @@ export function ProductLanding({
               className="mt-5 text-[15px] leading-7 text-[#1c1a19]/58"
             />
 
-            <div className="mt-6 grid grid-cols-3 gap-1.5 border-y border-[#1c1a19]/10 py-4 sm:gap-2">
+            <div className="mt-6 grid grid-cols-3 gap-1.5 bg-[#f6efe8] px-2 py-4 ring-1 ring-[#c9a08a]/55 sm:gap-2 sm:px-3">
               {(
                 [
                   [IconShield, t("trust1")],
@@ -560,10 +560,10 @@ export function ProductLanding({
                   key={label}
                   className="flex flex-col items-center gap-1.5 text-center sm:gap-2"
                 >
-                  <span className="flex h-8 w-8 items-center justify-center border border-[#c9a08a]/35 text-[#a67c68]">
+                  <span className="flex h-8 w-8 items-center justify-center bg-[#c9a08a]/20 text-[#8d5e48] ring-1 ring-[#c9a08a]/55">
                     <Icon className="h-3.5 w-3.5" />
                   </span>
-                  <p className="max-w-[6.5rem] text-[9px] leading-snug text-[#1c1a19]/65 sm:text-[10px]">
+                  <p className="max-w-[6.5rem] text-[9px] font-medium leading-snug text-[#1c1a19]/85 sm:text-[10px]">
                     {label}
                   </p>
                 </div>
@@ -577,7 +577,7 @@ export function ProductLanding({
                   if (!lines[productSlug]) setQty(productSlug, 1);
                   scrollToOrder();
                 }}
-                className="inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition hover:bg-black"
+                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition-colors hover:bg-black"
               >
                 {t("orderNow")} →
               </button>
@@ -981,7 +981,7 @@ export function ProductLanding({
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition hover:bg-black disabled:opacity-50"
+                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition-colors hover:bg-black disabled:opacity-50"
               >
                 {submitting ? "…" : t("placeOrder")}
               </button>
@@ -1005,7 +1005,7 @@ export function ProductLanding({
             <button
               type="button"
               onClick={scrollToOrder}
-              className="pointer-events-auto inline-flex h-12 shrink-0 items-center justify-center bg-[#1c1a19] px-5 text-[11px] uppercase tracking-[0.18em] text-[#f4efe8]"
+              className="rg-beat pointer-events-auto inline-flex h-12 shrink-0 items-center justify-center bg-[#1c1a19] px-5 text-[11px] uppercase tracking-[0.18em] text-[#f4efe8]"
             >
               {t("orderNow")}
             </button>

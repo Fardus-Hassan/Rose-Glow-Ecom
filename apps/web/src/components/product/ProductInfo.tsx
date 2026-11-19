@@ -172,7 +172,7 @@ export function ProductInfo({
         className="mt-5 max-w-xl text-[15px] leading-7 text-[#1c1a19]/58 md:text-base md:leading-8"
       />
 
-      <div className="mt-7 grid grid-cols-3 gap-2 border-y border-[#1c1a19]/10 py-4 sm:gap-3 sm:py-5">
+      <div className="mt-7 grid grid-cols-3 gap-2 bg-[#f6efe8] px-2 py-4 ring-1 ring-[#c9a08a]/55 sm:gap-3 sm:px-3 sm:py-5">
         {(
           [
             [IconShield, t("trustMaterial")],
@@ -184,10 +184,10 @@ export function ProductInfo({
             key={label}
             className="flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:gap-3 sm:text-left"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-[#c9a08a]/35 text-[#a67c68] sm:h-9 sm:w-9">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-[#c9a08a]/20 text-[#8d5e48] ring-1 ring-[#c9a08a]/55 sm:h-9 sm:w-9">
               <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </span>
-            <p className="text-[10px] leading-snug text-[#1c1a19]/65 sm:text-[11px]">
+            <p className="text-[10px] font-medium leading-snug text-[#1c1a19]/85 sm:text-[11px]">
               {label}
             </p>
           </div>
@@ -240,7 +240,7 @@ export function ProductInfo({
           type="button"
           onClick={handleBuyNow}
           disabled={!canBuy}
-          className="inline-flex min-h-12 flex-1 items-center justify-center border border-[#1c1a19]/25 px-3 text-[10px] uppercase tracking-[0.14em] text-[#1c1a19] transition hover:border-[#1c1a19] hover:bg-[#1c1a19] hover:text-[#f4efe8] disabled:cursor-not-allowed disabled:opacity-40 sm:px-6 sm:text-[11px] sm:tracking-[0.2em]"
+          className="rg-beat inline-flex min-h-12 flex-1 items-center justify-center border border-[#c9a08a] bg-[#f6efe8] px-3 text-[10px] uppercase tracking-[0.14em] text-[#1c1a19] transition-colors hover:border-[#1c1a19] hover:bg-[#1c1a19] hover:text-[#f4efe8] disabled:cursor-not-allowed disabled:opacity-40 sm:px-6 sm:text-[11px] sm:tracking-[0.2em]"
         >
           {t("buyNow")}
         </button>
@@ -313,7 +313,7 @@ export function ProductInfo({
             type="button"
             onClick={handleBuyNow}
             disabled={!canBuy}
-            className="inline-flex h-12 flex-1 items-center justify-center border border-[#1c1a19]/25 text-[11px] uppercase tracking-[0.18em] text-[#1c1a19] disabled:opacity-40"
+            className="rg-beat inline-flex h-12 flex-1 items-center justify-center border border-[#c9a08a] bg-[#f6efe8] text-[11px] uppercase tracking-[0.18em] text-[#1c1a19] disabled:opacity-40"
           >
             {t("buyNow")}
           </button>
