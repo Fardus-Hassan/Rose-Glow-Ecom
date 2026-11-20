@@ -165,95 +165,105 @@ export function ProductsView({
           </label>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-[#1c1a19]/08 pt-5 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
-          <div className="min-w-0 flex-1 sm:max-w-md">
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-[#1c1a19]/45">
-                {t("priceRange")}
-              </p>
-              {priceDirty ? (
-                <button
-                  type="button"
-                  onClick={resetPrice}
-                  className="text-[10px] uppercase tracking-[0.16em] text-[#1c1a19]/4 transition hover:text-[#1c1a19]"
-                >
-                  {t("resetPrice")}
-                </button>
-              ) : null}
-            </div>
-
-            <div className="relative h-6">
-              <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-[#1c1a19]/15" />
-              <div
-                className="absolute top-1/2 h-px -translate-y-1/2 bg-[#c9a08a]"
-                style={{ left: `${leftPct}%`, right: `${rightPct}%` }}
-              />
-              <input
-                type="range"
-                min={bounds.min}
-                max={bounds.max}
-                step={10}
-                value={minPrice}
-                onChange={(e) => onMinChange(Number(e.target.value))}
-                aria-label={t("minPrice")}
-                className="price-range-input pointer-events-none absolute inset-0 w-full appearance-none bg-transparent [&::-moz-range-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:pointer-events-auto"
-              />
-              <input
-                type="range"
-                min={bounds.min}
-                max={bounds.max}
-                step={10}
-                value={maxPrice}
-                onChange={(e) => onMaxChange(Number(e.target.value))}
-                aria-label={t("maxPrice")}
-                className="price-range-input pointer-events-none absolute inset-0 w-full appearance-none bg-transparent [&::-moz-range-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:pointer-events-auto"
-              />
-            </div>
-
-            <div className="mt-2 flex items-center justify-between text-sm text-[#1c1a19]">
-              <span>{formatBdt(minPrice, locale)}</span>
-              <span className="text-[#1c1a19]/35">—</span>
-              <span>{formatBdt(maxPrice, locale)}</span>
-            </div>
+        <div className="border-t border-[#1c1a19]/08 pt-5">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[#1c1a19]/45">
+              {t("priceRange")}
+            </p>
+            {priceDirty ? (
+              <button
+                type="button"
+                onClick={resetPrice}
+                className="text-[10px] uppercase tracking-[0.16em] text-[#1c1a19]/4 transition hover:text-[#1c1a19]"
+              >
+                {t("resetPrice")}
+              </button>
+            ) : null}
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {(
-              [
-                [
-                  bounds.min,
-                  1000,
-                  t("under", { amount: formatBdt(1000, locale) }),
-                ],
-                [1000, 2000, t("midRange")],
-                [
-                  2000,
-                  bounds.max,
-                  t("above", { amount: formatBdt(2000, locale) }),
-                ],
-              ] as const
-            ).map(([lo, hi, label]) => {
-              const isActive = minPrice === lo && maxPrice === hi;
-              return (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => {
-                    setMinPrice(lo);
-                    setMaxPrice(hi);
-                    setPage(1);
+          <div className="flex max-w-lg flex-col gap-4">
+            <div className="min-w-0">
+              <div className="relative h-6 px-1.5">
+                <div className="absolute inset-x-1.5 top-1/2 h-px -translate-y-1/2 bg-[#1c1a19]/15" />
+                <div
+                  className="absolute top-1/2 h-px -translate-y-1/2 bg-[#c9a08a]"
+                  style={{
+                    left: `calc(${leftPct}% + 0.125rem)`,
+                    right: `calc(${rightPct}% + 0.125rem)`,
                   }}
-                  className={cn(
-                    "border px-3 py-2 text-[10px] uppercase tracking-[0.14em] transition",
-                    isActive
-                      ? "border-[#1c1a19] bg-[#1c1a19] text-[#f4efe8]"
-                      : "border-[#1c1a19]/25 bg-[#e7e0d6]/60 text-[#1c1a19] hover:border-[#1c1a19]/55",
-                  )}
-                >
-                  {label}
-                </button>
-              );
-            })}
+                />
+                <input
+                  type="range"
+                  min={bounds.min}
+                  max={bounds.max}
+                  step={10}
+                  value={minPrice}
+                  onChange={(e) => onMinChange(Number(e.target.value))}
+                  aria-label={t("minPrice")}
+                  className="price-range-input pointer-events-none absolute inset-0 w-full appearance-none bg-transparent [&::-moz-range-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:pointer-events-auto"
+                />
+                <input
+                  type="range"
+                  min={bounds.min}
+                  max={bounds.max}
+                  step={10}
+                  value={maxPrice}
+                  onChange={(e) => onMaxChange(Number(e.target.value))}
+                  aria-label={t("maxPrice")}
+                  className="price-range-input pointer-events-none absolute inset-0 w-full appearance-none bg-transparent [&::-moz-range-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:pointer-events-auto"
+                />
+              </div>
+
+              <div className="mt-2 flex items-center justify-between gap-3 text-sm text-[#1c1a19]">
+                <span className="tabular-nums">{formatBdt(minPrice, locale)}</span>
+                <span className="text-[#1c1a19]/35">—</span>
+                <span className="tabular-nums">{formatBdt(maxPrice, locale)}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {(
+                [
+                  [
+                    bounds.min,
+                    Math.min(1000, bounds.max),
+                    t("under", { amount: formatBdt(1000, locale) }),
+                  ],
+                  [
+                    Math.max(1000, bounds.min),
+                    Math.min(2000, bounds.max),
+                    t("midRange"),
+                  ],
+                  [
+                    Math.min(2000, bounds.max),
+                    bounds.max,
+                    t("above", { amount: formatBdt(2000, locale) }),
+                  ],
+                ] as const
+              ).map(([lo, hi, label]) => {
+                if (lo >= hi) return null;
+                const isActive = minPrice === lo && maxPrice === hi;
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => {
+                      setMinPrice(lo);
+                      setMaxPrice(hi);
+                      setPage(1);
+                    }}
+                    className={cn(
+                      "border px-3 py-2 text-[10px] uppercase tracking-[0.14em] transition",
+                      isActive
+                        ? "border-[#1c1a19] bg-[#1c1a19] text-[#f4efe8]"
+                        : "border-[#1c1a19]/25 bg-[#e7e0d6]/60 text-[#1c1a19] hover:border-[#1c1a19]/55",
+                    )}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
