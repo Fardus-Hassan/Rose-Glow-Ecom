@@ -9,7 +9,7 @@ import {
   type Product,
 } from "@/data/products";
 import { formatBdt, cn } from "@/lib/format";
-import { IconHeart, IconShield, IconStar, IconTruck } from "@/components/icons";
+import { IconGem, IconHeart, IconShield, IconStar, IconTruck } from "@/components/icons";
 import { useRouter } from "@/i18n/navigation";
 import { useBag } from "@/store/bag";
 import { SocialLinks } from "@/components/ui/SocialLinks";
@@ -172,22 +172,22 @@ export function ProductInfo({
         className="mt-5 max-w-xl text-[15px] leading-7 text-[#1c1a19]/58 md:text-base md:leading-8"
       />
 
-      <div className="mt-7 grid grid-cols-3 gap-2 bg-[#f6efe8] px-2 py-4 ring-1 ring-[#c9a08a]/55 sm:gap-3 sm:px-3 sm:py-5">
+      <div className="mt-6 grid grid-cols-3 gap-1.5 bg-[#f6efe8] px-2 py-4 ring-1 ring-[#c9a08a]/55 sm:gap-2 sm:px-3">
         {(
           [
             [IconShield, t("trustMaterial")],
             [IconTruck, t("trustShipping")],
-            [IconHeart, t("trustReturn")],
+            [IconGem, t("trustReturn")],
           ] as const
         ).map(([Icon, label]) => (
           <div
             key={label}
-            className="flex flex-col items-center gap-2 text-center sm:flex-row sm:items-center sm:gap-3 sm:text-left"
+            className="flex flex-col items-center gap-1.5 text-center sm:gap-2"
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-[#c9a08a]/20 text-[#8d5e48] ring-1 ring-[#c9a08a]/55 sm:h-9 sm:w-9">
-              <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="flex h-8 w-8 items-center justify-center bg-[#c9a08a]/20 text-[#8d5e48] ring-1 ring-[#c9a08a]/55">
+              <Icon className="h-3.5 w-3.5" />
             </span>
-            <p className="text-[10px] font-medium leading-snug text-[#1c1a19]/85 sm:text-[11px]">
+            <p className="max-w-[6.5rem] text-[9px] font-medium leading-snug text-[#1c1a19]/85 sm:text-[10px]">
               {label}
             </p>
           </div>
