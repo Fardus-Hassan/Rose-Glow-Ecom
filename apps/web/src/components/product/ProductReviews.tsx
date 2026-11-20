@@ -57,27 +57,25 @@ export function ProductReviews({
 
   return (
     <section id="product-reviews" className="container-rg scroll-mt-28">
-      <div className="mb-8 md:mb-10">
-        <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
-          {t("reviewsEyebrow")}
-        </p>
-        <h2 className="mt-3 font-display text-3xl text-[#1c1a19] md:text-4xl">
-          {t("reviewsTitle")}
-        </h2>
-        <div className="mt-4 h-px w-12 bg-gradient-to-r from-[#c9a08a] to-transparent" />
-      </div>
-
       <div
         className={
           reviews.length
-            ? "grid gap-10 lg:grid-cols-[minmax(220px,0.35fr)_minmax(0,1fr)] lg:gap-14"
+            ? "grid gap-10 lg:grid-cols-[minmax(220px,0.35fr)_minmax(0,1fr)] lg:items-start lg:gap-14"
             : ""
         }
       >
-        <div className="border-t border-[#1c1a19]/10 pt-6 lg:border-t-0 lg:pt-0">
+        <div className="border-t border-[#1c1a19]/10 pt-6 lg:sticky lg:top-28 lg:border-t-0 lg:pt-0">
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
+            {t("reviewsEyebrow")}
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-[#1c1a19] md:text-4xl">
+            {t("reviewsTitle")}
+          </h2>
+          <div className="mt-4 h-px w-12 bg-gradient-to-r from-[#c9a08a] to-transparent" />
+
           {product.rating > 0 ? (
             <>
-              <p className="font-display text-5xl text-[#1c1a19] md:text-6xl">
+              <p className="mt-8 font-display text-5xl text-[#1c1a19] md:text-6xl">
                 {product.rating.toFixed(1)}
               </p>
               <div className="mt-3 flex items-center gap-1 text-[#c9a08a]">
