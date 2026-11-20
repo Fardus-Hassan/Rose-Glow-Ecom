@@ -640,7 +640,6 @@ export function ProductLanding({
                       tp("color"),
                       product.colors.map((c) => localize(c, locale)).join(" · "),
                     ],
-                    [tp("sku"), product.sku],
                     [tp("category"), tc(product.category)],
                   ] as const
                 ).map(([label, value]) => (

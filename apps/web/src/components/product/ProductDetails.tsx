@@ -39,7 +39,6 @@ export function ProductDetails({ product }: { product: Product }) {
   const specs = [
     [t("material"), localize(product.material, locale)],
     [t("color"), product.colors.map((c) => localize(c, locale)).join(" · ")],
-    [t("sku"), product.sku],
     [t("category"), tc(product.category)],
   ] as const;
 
