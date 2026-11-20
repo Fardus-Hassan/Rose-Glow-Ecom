@@ -228,7 +228,7 @@ export function ProductGallery({
         tabIndex={current.type === "image" ? 0 : undefined}
         aria-label={current.type === "image" ? t("tapToZoom") : undefined}
         className={cn(
-          "relative order-1 flex w-full max-w-full items-center justify-center overflow-hidden bg-[#1c1a19] md:order-2 md:bg-[#e2dacf]",
+          "relative order-1 flex w-full max-w-full items-center justify-center overflow-hidden bg-[#1a1816] md:order-2 md:bg-[#e2dacf]",
           current.type === "image" && "cursor-zoom-in",
         )}
         style={{

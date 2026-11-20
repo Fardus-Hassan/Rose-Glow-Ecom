@@ -209,7 +209,7 @@ export function MobileGalleryZoom({
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex flex-col bg-[#0e0d0c]/92 backdrop-blur-md rg-fade-in"
+      className="fixed inset-0 z-[80] flex flex-col bg-[#141211] rg-fade-in"
       role="dialog"
       aria-modal="true"
       aria-label={t("zoomTitle")}
@@ -229,7 +229,7 @@ export function MobileGalleryZoom({
       </div>
 
       <div
-        className="relative min-h-0 flex-1 touch-none overflow-hidden bg-transparent"
+        className="relative min-h-0 flex-1 touch-none overflow-hidden bg-[#141211]"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
