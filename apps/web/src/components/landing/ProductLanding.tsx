@@ -676,9 +676,11 @@ export function ProductLanding({
         </section>
       </div>
 
-      <div className="mt-14 md:mt-20">
-        <ProductReviews product={product} reviews={reviews} />
-      </div>
+      {reviews.length > 0 ? (
+        <div className="mt-14 md:mt-20">
+          <ProductReviews product={product} reviews={reviews} />
+        </div>
+      ) : null}
 
       {/* Related */}
       {!ready ? (

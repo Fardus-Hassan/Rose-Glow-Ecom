@@ -89,9 +89,11 @@ export default async function ProductPage({
         <ProductDetails product={product} />
       </div>
 
-      <div className="mt-14 md:mt-20">
-        <ProductReviews product={product} reviews={reviews} />
-      </div>
+      {reviews.length > 0 ? (
+        <div className="mt-14 md:mt-20">
+          <ProductReviews product={product} reviews={reviews} />
+        </div>
+      ) : null}
 
       {related.length > 0 ? (
         <section className="container-rg pt-10 md:pt-16">
