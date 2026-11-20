@@ -8,6 +8,7 @@ import { cn } from "@/lib/format";
 import { mediaVariant } from "@/lib/media";
 import { SmartImage } from "@/components/media/SmartImage";
 import { SmartVideo } from "@/components/media/SmartVideo";
+import { MobileGalleryZoom } from "@/components/product/MobileGalleryZoom";
 
 const ZOOM_SCALE = 2;
 
@@ -28,6 +29,7 @@ export function ProductGallery({
   const [inView, setInView] = useState(true);
   const [tabVisible, setTabVisible] = useState(true);
   const [ratio, setRatio] = useState(4 / 5);
+  const [mobileZoomOpen, setMobileZoomOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const zoomRef = useRef<HTMLDivElement>(null);
@@ -157,6 +159,15 @@ export function ProductGallery({
     setZooming(false);
   };
 
+  const openMobileZoom = () => {
+    if (current?.type !== "image") return;
+    // Desktop keeps hover-zoom; mobile/tablet get fullscreen lightbox.
+    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    preloadFull(current);
+    setMobileZoomOpen(true);
+    setHoverPaused(true);
+  };
+
   if (!current) return null;
 
   const zoomSrc =
@@ -210,6 +221,9 @@ export function ProductGallery({
 
       <div
         ref={stageRef}
+        role={current.type === "image" ? "button" : undefined}
+        tabIndex={current.type === "image" ? 0 : undefined}
+        aria-label={current.type === "image" ? t("tapToZoom") : undefined}
         className={cn(
           "relative order-1 flex w-full max-w-full items-center justify-center overflow-hidden bg-[#e2dacf] md:order-2",
           current.type === "image" && "cursor-zoom-in",
@@ -221,6 +235,13 @@ export function ProductGallery({
           maxWidth: `min(100%, calc(min(78vh, 820px) * ${ratio}))`,
           marginInline: "auto",
         }}
+        onClick={openMobileZoom}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openMobileZoom();
+          }
+        }}
         onMouseEnter={() => {
           setHoverPaused(true);
           preloadFull(current);
@@ -228,7 +249,7 @@ export function ProductGallery({
         onMouseMove={onMove}
         onMouseLeave={() => {
           onLeave();
-          setHoverPaused(false);
+          if (!mobileZoomOpen) setHoverPaused(false);
         }}
       >
         {current.type === "image" ? (
@@ -309,7 +330,10 @@ export function ProductGallery({
           <>
             <button
               type="button"
-              onClick={() => go(-1)}
+              onClick={(e) => {
+                e.stopPropagation();
+                go(-1);
+              }}
               className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center border border-white/20 bg-[#0e0d0c]/45 text-[#f4efe8] backdrop-blur-sm transition hover:bg-[#0e0d0c]/70"
               aria-label={t("prevMedia")}
             >
@@ -317,7 +341,10 @@ export function ProductGallery({
             </button>
             <button
               type="button"
-              onClick={() => go(1)}
+              onClick={(e) => {
+                e.stopPropagation();
+                go(1);
+              }}
               className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center border border-white/20 bg-[#0e0d0c]/45 text-[#f4efe8] backdrop-blur-sm transition hover:bg-[#0e0d0c]/70"
               aria-label={t("nextMedia")}
             >
@@ -327,16 +354,35 @@ export function ProductGallery({
         ) : null}
 
         {current.type === "image" ? (
-          <span
-            className={cn(
-              "pointer-events-none absolute bottom-3 right-3 z-10 hidden text-[10px] uppercase tracking-[0.18em] text-[#f4efe8]/80 md:inline",
-              zooming ? "opacity-100" : "opacity-0",
-            )}
-          >
-            {t("zoomHint")}
-          </span>
+          <>
+            <span
+              className={cn(
+                "pointer-events-none absolute bottom-3 right-3 z-10 hidden text-[10px] uppercase tracking-[0.18em] text-[#f4efe8]/80 md:inline",
+                zooming ? "opacity-100" : "opacity-0",
+              )}
+            >
+              {t("zoomHint")}
+            </span>
+            <span className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-sm bg-[#0e0d0c]/55 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#f4efe8]/90 md:hidden">
+              {t("tapToZoom")}
+            </span>
+          </>
         ) : null}
       </div>
+
+      {mobileZoomOpen && current.type === "image" ? (
+        <MobileGalleryZoom
+          media={media}
+          index={active}
+          onClose={() => {
+            setMobileZoomOpen(false);
+            setHoverPaused(false);
+          }}
+          onIndexChange={(next) => {
+            selectMedia(next);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
