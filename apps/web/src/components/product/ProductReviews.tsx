@@ -56,7 +56,7 @@ export function ProductReviews({
   };
 
   return (
-    <section id="product-reviews" className="container-rg scroll-mt-28">
+    <section id="product-reviews" className="container-rg scroll-mt-36">
       <div
         className={
           reviews.length
@@ -64,7 +64,7 @@ export function ProductReviews({
             : ""
         }
       >
-        <div className="border-t border-[#1c1a19]/10 pt-6 lg:sticky lg:top-28 lg:border-t-0 lg:pt-0">
+        <div className="border-t border-[#1c1a19]/10 pt-6 lg:sticky lg:top-36 lg:border-t-0 lg:pt-2">
           <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
             {t("reviewsEyebrow")}
           </p>
