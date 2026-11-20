@@ -13,7 +13,7 @@ import {
 } from "@/data/products";
 import type { Review } from "@/data/reviews";
 import { bdMobile, formatBdt, cn } from "@/lib/format";
-import { IconHeart, IconShield, IconStar, IconTruck } from "@/components/icons";
+import { IconGem, IconShield, IconStar, IconTruck } from "@/components/icons";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { VariantChoices } from "@/components/product/VariantChoices";
 import { ProductContactActions } from "@/components/product/ProductContactActions";
@@ -554,7 +554,7 @@ export function ProductLanding({
                 [
                   [IconShield, t("trust1")],
                   [IconTruck, t("trust2")],
-                  [IconHeart, t("trust3")],
+                  [IconGem, t("trust3")],
                 ] as const
               ).map(([Icon, label]) => (
                 <div
