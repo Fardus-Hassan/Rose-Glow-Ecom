@@ -18,6 +18,7 @@ import { ProductGallery } from "@/components/product/ProductGallery";
 import { VariantChoices } from "@/components/product/VariantChoices";
 import { ProductContactActions } from "@/components/product/ProductContactActions";
 import { ProductReviews } from "@/components/product/ProductReviews";
+import { ProductCard } from "@/components/products/ProductCard";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingQuickView } from "@/components/landing/LandingQuickView";
 import { SocialLinks } from "@/components/ui/SocialLinks";
@@ -713,38 +714,11 @@ export function ProductLanding({
               labelNext={t("sliderNext")}
             >
               {related.map((item) => {
-                const cover = getCoverMedia(item);
                 const inBag = (lines[item.slug] || 0) > 0;
                 return (
-                  <div
-                    key={item.slug}
-                    className="flex h-full flex-col border-t border-[#1c1a19]/10 pt-5"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setPreview(item)}
-                      className="relative aspect-[4/5] w-full overflow-hidden bg-[#e2dacf] text-left"
-                    >
-                      {cover ? (
-                        <Image
-                          src={cover.src}
-                          alt={localize(item.name, locale)}
-                          fill
-                          sizes="(max-width: 768px) 80vw, 33vw"
-                          className="object-cover transition duration-500 hover:scale-[1.03]"
-                        />
-                      ) : null}
-                    </button>
-                    <p className="mt-3 text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/4">
-                      {tc(item.category)}
-                    </p>
-                    <h3 className="mt-1 font-display text-xl text-[#1c1a19]">
-                      {localize(item.name, locale)}
-                    </h3>
-                    <p className="mt-1 text-sm text-[#1c1a19]/7">
-                      {formatBdt(item.price, locale)}
-                    </p>
-                    <div className="mt-4 flex flex-row gap-2">
+                  <div key={item.slug} className="flex h-full flex-col">
+                    <ProductCard product={item} />
+                    <div className="mt-3 flex flex-row gap-2">
                       <button
                         type="button"
                         onClick={() => setPreview(item)}

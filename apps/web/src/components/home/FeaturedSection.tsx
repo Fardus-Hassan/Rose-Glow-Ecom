@@ -1,18 +1,14 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { getCoverMedia, localize, type Product } from "@/data/products";
-import { formatBdt } from "@/lib/format";
+import type { Product } from "@/data/products";
 import { Reveal } from "@/components/motion/Reveal";
 import { Slider } from "@/components/ui/Slider";
-import { SmartImage } from "@/components/media/SmartImage";
+import { ProductCard } from "@/components/products/ProductCard";
 
 export function FeaturedSection({ products }: { products: Product[] }) {
   const t = useTranslations("Home");
-  const tc = useTranslations("Categories");
-  const locale = useLocale();
-  const showcase = products;
 
   return (
     <section className="bg-[#f0ebe4] py-16 md:py-24">
@@ -41,44 +37,13 @@ export function FeaturedSection({ products }: { products: Product[] }) {
           labelNext={t("sliderNext")}
           slideClassName="basis-[70%] sm:basis-[45%] md:basis-[32%] lg:basis-[24%]"
         >
-          {showcase.map((product, index) => {
-            const cover = getCoverMedia(product);
-            const coverSrc =
-              cover?.type === "video" ? cover.poster || cover.src : cover?.src;
-            return (
-              <article key={product.slug}>
-                <Link href={`/product/${product.slug}`} className="group block">
-                  <div
-                    className="relative aspect-[4/5] overflow-hidden bg-[#ebe4dc]"
-                    style={{ position: "relative" }}
-                  >
-                    {coverSrc ? (
-                      <SmartImage
-                        src={coverSrc}
-                        alt={localize(product.name, locale)}
-                        fill
-                        variant="card"
-                        variants={cover?.variants}
-                        blurDataURL={cover?.blurDataUrl}
-                        sizesPreset="card"
-                        priority={index < 2}
-                        className="object-cover transition duration-700 group-hover:scale-[1.04]"
-                      />
-                    ) : null}
-                  </div>
-                  <p className="mt-4 text-[10px] uppercase tracking-[0.2em] text-[#1c1a19]/45">
-                    {tc(product.category)}
-                  </p>
-                  <h3 className="mt-1 font-display text-xl text-[#1c1a19] md:text-2xl">
-                    {localize(product.name, locale)}
-                  </h3>
-                  <p className="mt-2 text-sm text-[#1c1a19]/75">
-                    {formatBdt(product.price, locale)}
-                  </p>
-                </Link>
-              </article>
-            );
-          })}
+          {products.map((product, index) => (
+            <ProductCard
+              key={product.slug}
+              product={product}
+              priority={index < 2}
+            />
+          ))}
         </Slider>
       </div>
     </section>
