@@ -717,7 +717,10 @@ export function ProductLanding({
                 const inBag = (lines[item.slug] || 0) > 0;
                 return (
                   <div key={item.slug} className="flex h-full flex-col">
-                    <ProductCard product={item} />
+                    <ProductCard
+                      product={item}
+                      onSelect={() => setPreview(item)}
+                    />
                     <div className="mt-3 flex flex-row gap-2">
                       <button
                         type="button"

@@ -10,9 +10,12 @@ import { SmartImage } from "@/components/media/SmartImage";
 export function ProductCard({
   product,
   priority = false,
+  onSelect,
 }: {
   product: Product;
   priority?: boolean;
+  /** When set, card opens this handler instead of navigating to PDP. */
+  onSelect?: () => void;
 }) {
   const locale = useLocale();
   const t = useTranslations("Products");
@@ -29,50 +32,49 @@ export function ProductCard({
   const coverSrc =
     cover?.type === "video" ? cover.poster || cover.src : cover?.src;
 
-  return (
-    <article data-stagger-item className="group flex flex-col">
-      <Link href={`/product/${product.slug}`} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden bg-[#e2dacf]">
-          {coverSrc ? (
-            <SmartImage
-              src={coverSrc}
-              alt={
-                cover?.alt
-                  ? localize(cover.alt, locale)
-                  : localize(product.name, locale)
-              }
-              fill
-              variant="card"
-              variants={cover?.variants}
-              blurDataURL={cover?.blurDataUrl}
-              sizesPreset="card"
-              priority={priority}
-              className="object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
-            />
-          ) : null}
+  const body = (
+    <>
+      <div className="relative aspect-[4/5] overflow-hidden bg-[#e2dacf]">
+        {coverSrc ? (
+          <SmartImage
+            src={coverSrc}
+            alt={
+              cover?.alt
+                ? localize(cover.alt, locale)
+                : localize(product.name, locale)
+            }
+            fill
+            variant="card"
+            variants={cover?.variants}
+            blurDataURL={cover?.blurDataUrl}
+            sizesPreset="card"
+            priority={priority}
+            className="object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
+          />
+        ) : null}
 
-          {discount > 0 ? (
-            <span className="absolute left-3 top-3 bg-[#0e0d0c]/78 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#f4efe8] backdrop-blur-sm">
-              −{discount}%
-            </span>
-          ) : null}
+        {discount > 0 ? (
+          <span className="absolute left-3 top-3 bg-[#0e0d0c]/78 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#f4efe8] backdrop-blur-sm">
+            −{discount}%
+          </span>
+        ) : null}
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-[#0e0d0c]/70 to-transparent p-3 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-            <span className="block text-center text-[10px] uppercase tracking-[0.2em] text-[#f4efe8]">
-              {t("viewProduct")} →
-            </span>
-          </div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-[#0e0d0c]/70 to-transparent p-3 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <span className="block text-center text-[10px] uppercase tracking-[0.2em] text-[#f4efe8]">
+            {t("viewProduct")} →
+          </span>
         </div>
+      </div>
 
-        <div className="flex flex-1 flex-col pt-3.5 md:pt-4">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-[#1c1a19]/45">
-            {tc(product.category)}
-          </p>
-          <h3 className="mt-1 font-display text-lg leading-snug text-[#1c1a19] md:text-xl">
-            {localize(product.name, locale)}
-          </h3>
+      <div className="flex flex-1 flex-col pt-3.5 text-left md:pt-4">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[#1c1a19]/45">
+          {tc(product.category)}
+        </p>
+        <h3 className="mt-1 font-display text-lg leading-snug text-[#1c1a19] md:text-xl">
+          {localize(product.name, locale)}
+        </h3>
 
-          {product.rating > 0 || product.soldCount > 0 ? (
+        {product.rating > 0 || product.soldCount > 0 ? (
           <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
             {product.rating > 0 ? (
               <>
@@ -100,22 +102,35 @@ export function ProductCard({
               </>
             ) : null}
           </div>
-          ) : null}
+        ) : null}
 
-          <div className="mt-2 flex items-baseline gap-2.5">
-            <span className="text-sm text-[#1c1a19]/85">
-              {(product.options?.length || 0) > 1
-                ? t("priceFrom", { price: formatBdt(product.price, locale) })
-                : formatBdt(product.price, locale)}
+        <div className="mt-2 flex items-baseline gap-2.5">
+          <span className="text-sm text-[#1c1a19]/85">
+            {(product.options?.length || 0) > 1
+              ? t("priceFrom", { price: formatBdt(product.price, locale) })
+              : formatBdt(product.price, locale)}
+          </span>
+          {product.compareAtPrice && !(product.options?.length || 0) ? (
+            <span className="text-xs text-[#1c1a19]/40 line-through">
+              {formatBdt(product.compareAtPrice, locale)}
             </span>
-            {product.compareAtPrice && !(product.options?.length || 0) ? (
-              <span className="text-xs text-[#1c1a19]/40 line-through">
-                {formatBdt(product.compareAtPrice, locale)}
-              </span>
-            ) : null}
-          </div>
+          ) : null}
         </div>
-      </Link>
+      </div>
+    </>
+  );
+
+  return (
+    <article data-stagger-item className="group flex flex-col">
+      {onSelect ? (
+        <button type="button" onClick={onSelect} className="block w-full text-left">
+          {body}
+        </button>
+      ) : (
+        <Link href={`/product/${product.slug}`} className="block">
+          {body}
+        </Link>
+      )}
     </article>
   );
 }
