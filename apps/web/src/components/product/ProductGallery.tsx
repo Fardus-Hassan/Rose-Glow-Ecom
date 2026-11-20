@@ -24,13 +24,18 @@ export function ProductGallery({
   const t = useTranslations("Product");
   const [active, setActive] = useState(0);
   const [zooming, setZooming] = useState(false);
-  const [paused, setPaused] = useState(false);
+  const [hoverPaused, setHoverPaused] = useState(false);
+  const [inView, setInView] = useState(true);
+  const [tabVisible, setTabVisible] = useState(true);
   const [ratio, setRatio] = useState(4 / 5);
+  const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const zoomRef = useRef<HTMLDivElement>(null);
   const shouldPlayVideo = useRef(false);
   const preloaded = useRef<Set<string>>(new Set());
   const current = media[active];
+  const autoplayOn =
+    inView && tabVisible && !hoverPaused && !zooming;
 
   const mediaRef = useRef(media);
   mediaRef.current = media;
@@ -39,6 +44,35 @@ export function ProductGallery({
     const index = mediaRef.current.findIndex((item) => item.src === focusSrc);
     if (index >= 0) setActive(index);
   }, [focusSrc]);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry.isIntersecting && entry.intersectionRatio >= 0.4);
+      },
+      { threshold: [0, 0.2, 0.4, 0.6, 0.8, 1] },
+    );
+    io.observe(root);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const onVisibility = () => {
+      setTabVisible(document.visibilityState === "visible");
+    };
+    onVisibility();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, []);
+
+  useEffect(() => {
+    if (inView && tabVisible) return;
+    rootRef.current?.querySelectorAll("video").forEach((video) => {
+      video.pause();
+    });
+  }, [inView, tabVisible, active]);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -62,7 +96,7 @@ export function ProductGallery({
 
   useEffect(() => {
     if (media.length < 2) return;
-    if (paused || zooming) return;
+    if (!autoplayOn) return;
     if (current?.type === "video") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
@@ -73,7 +107,7 @@ export function ProductGallery({
     }, 3000);
 
     return () => window.clearTimeout(id);
-  }, [active, media.length, paused, zooming, current?.type]);
+  }, [active, media.length, autoplayOn, current?.type]);
 
   const selectMedia = (index: number) => {
     const next = media[index];
@@ -131,7 +165,10 @@ export function ProductGallery({
       : "";
 
   return (
-    <div className="flex flex-col gap-3 md:grid md:grid-cols-[68px_minmax(0,1fr)] md:gap-3 lg:grid-cols-[72px_minmax(0,1fr)] lg:gap-4">
+    <div
+      ref={rootRef}
+      className="flex flex-col gap-3 md:grid md:grid-cols-[68px_minmax(0,1fr)] md:gap-3 lg:grid-cols-[72px_minmax(0,1fr)] lg:gap-4"
+    >
       <div className="order-2 -mx-5 flex gap-2 overflow-x-auto px-5 [-ms-overflow-style:none] [scrollbar-width:none] sm:-mx-6 sm:px-6 md:order-1 md:mx-0 md:flex-col md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
         {media.map((item, index) => {
           const thumb =
@@ -185,13 +222,13 @@ export function ProductGallery({
           marginInline: "auto",
         }}
         onMouseEnter={() => {
-          setPaused(true);
+          setHoverPaused(true);
           preloadFull(current);
         }}
         onMouseMove={onMove}
         onMouseLeave={() => {
           onLeave();
-          setPaused(false);
+          setHoverPaused(false);
         }}
       >
         {current.type === "image" ? (
@@ -244,7 +281,10 @@ export function ProductGallery({
             poster={current.poster}
             className="h-full w-full object-contain"
             controls
-            autoPlay={shouldPlayVideo.current || active === 0}
+            loop
+            muted
+            playsInline
+            autoPlay={inView && tabVisible}
             lazy={active !== 0}
             onLoadedMetadata={(event) => {
               const video = event.currentTarget;
