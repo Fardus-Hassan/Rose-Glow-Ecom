@@ -161,8 +161,11 @@ export function ProductGallery({
 
   const openMobileZoom = () => {
     if (current?.type !== "image") return;
-    // Desktop keeps hover-zoom; mobile/tablet get fullscreen lightbox.
-    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    // Desktop (wide + fine pointer) keeps hover-zoom; phones/tablets get lightbox.
+    const fineDesktop =
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+      window.matchMedia("(min-width: 768px)").matches;
+    if (fineDesktop) return;
     preloadFull(current);
     setMobileZoomOpen(true);
     setHoverPaused(true);
@@ -225,7 +228,7 @@ export function ProductGallery({
         tabIndex={current.type === "image" ? 0 : undefined}
         aria-label={current.type === "image" ? t("tapToZoom") : undefined}
         className={cn(
-          "relative order-1 flex w-full max-w-full items-center justify-center overflow-hidden bg-[#e2dacf] md:order-2",
+          "relative order-1 flex w-full max-w-full items-center justify-center overflow-hidden bg-[#1c1a19] md:order-2 md:bg-[#e2dacf]",
           current.type === "image" && "cursor-zoom-in",
         )}
         style={{
