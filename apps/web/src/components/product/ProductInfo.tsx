@@ -194,7 +194,7 @@ export function ProductInfo({
         ))}
       </div>
 
-      <div className="mt-7 flex flex-wrap items-center gap-4">
+      <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
         <p className="text-[10px] uppercase tracking-[0.22em] text-[#1c1a19]/45">
           {t("quantity")}
         </p>
@@ -272,19 +272,19 @@ export function ProductInfo({
             {t("share")}
           </button>
         </div>
-        <div>
+        <div className="flex flex-col items-center text-center">
           <p className="mb-2.5 text-[10px] uppercase tracking-[0.2em] text-[#1c1a19]/4">
             {t("follow")}
           </p>
-          <SocialLinks tone="dark" />
+          <SocialLinks tone="dark" className="justify-center" />
         </div>
       </div>
 
-      <div className="mt-6 border-t border-[#1c1a19]/10 pt-5 sm:hidden">
+      <div className="mt-6 flex flex-col items-center border-t border-[#1c1a19]/10 pt-5 text-center sm:hidden">
         <p className="mb-2.5 text-[10px] uppercase tracking-[0.2em] text-[#1c1a19]/4">
           {t("follow")}
         </p>
-        <SocialLinks tone="dark" />
+        <SocialLinks tone="dark" className="justify-center" />
       </div>
 
       {/* Mobile sticky bar */}

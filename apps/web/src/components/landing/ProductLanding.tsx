@@ -589,11 +589,11 @@ export function ProductLanding({
               productName={localize(product.name, locale)}
             />
 
-            <div className="mt-7">
+            <div className="mt-7 flex flex-col items-center text-center">
               <p className="mb-2.5 text-[10px] uppercase tracking-[0.2em] text-[#1c1a19]/4">
                 {t("follow")}
               </p>
-              <SocialLinks tone="dark" />
+              <SocialLinks tone="dark" className="justify-center" />
             </div>
           </div>
         </div>

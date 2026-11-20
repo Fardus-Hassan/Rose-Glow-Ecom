@@ -306,8 +306,8 @@ export function ProductGallery({
             className="h-full w-full object-contain"
             controls
             loop
-            muted
             playsInline
+            preferUnmuted
             autoPlay={inView && tabVisible}
             lazy={active !== 0}
             onLoadedMetadata={(event) => {
