@@ -82,6 +82,8 @@ export function Hero({
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
   const mobileVideoRef = useRef<HTMLVideoElement>(null);
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+  const [videoReady, setVideoReady] = useState(false);
+  const [imageReady, setImageReady] = useState(false);
 
   const useVideo = content.mode === "video";
   const headline =
@@ -98,11 +100,17 @@ export function Hero({
   }, []);
 
   useEffect(() => {
+    setVideoReady(false);
+    setImageReady(false);
+  }, [useVideo, content.mode, content.video, content.image]);
+
+  useEffect(() => {
     if (!useVideo || isDesktop === null || !content.video) return;
 
     const active = isDesktop ? desktopVideoRef.current : mobileVideoRef.current;
     const idle = isDesktop ? mobileVideoRef.current : desktopVideoRef.current;
     const asset = isDesktop ? content.video.desktop : content.video.mobile;
+    const src = mediaUrl(asset.src);
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -115,34 +123,48 @@ export function Hero({
 
     if (!active) return;
 
-    if (active.getAttribute("src") !== asset.src) {
-      active.setAttribute("src", asset.src);
+    setVideoReady(false);
+
+    if (active.getAttribute("src") !== src) {
+      active.setAttribute("src", src);
     }
     active.load();
 
     if (reduceMotion) {
       active.pause();
+      // Keep poster visible; mark ready so layout settles.
+      setVideoReady(true);
       return;
     }
 
     let cancelled = false;
 
+    const reveal = () => {
+      if (!cancelled) setVideoReady(true);
+    };
+
     const play = async () => {
       try {
-        if (!cancelled) await active.play();
+        if (cancelled) return;
+        await active.play();
+        reveal();
       } catch {
-        // Autoplay may be blocked; poster remains visible.
+        // Autoplay blocked — keep the poster underlay, don't flash.
+        reveal();
       }
     };
 
-    if (active.readyState >= 2) {
+    const onCanPlay = () => void play();
+
+    if (active.readyState >= 3) {
       void play();
     } else {
-      active.addEventListener("loadeddata", () => void play(), { once: true });
+      active.addEventListener("canplay", onCanPlay, { once: true });
     }
 
     return () => {
       cancelled = true;
+      active.removeEventListener("canplay", onCanPlay);
     };
   }, [useVideo, isDesktop, content.video]);
 
@@ -172,87 +194,100 @@ export function Hero({
           "[data-hero-copy]",
           { y: 24, opacity: 0, duration: 0.9, stagger: 0.12 },
           "-=0.45",
-        )
-        .from(
-          "[data-hero-media]",
-          { scale: 1.06, opacity: 0.65, duration: 1.4, ease: "power2.out" },
-          0,
         );
     }, root);
 
     return () => ctx.revert();
   }, []);
 
+  const posterDesktop = content.video?.desktop.poster || content.image.desktop;
+  const posterMobile = content.video?.mobile.poster || content.image.mobile;
+
   return (
     <section
       ref={rootRef}
       className="relative isolate flex min-h-[100svh] items-end overflow-hidden bg-[#0e0d0c] text-[#f4efe8] md:items-center"
     >
-      <div className="absolute inset-0 -z-20 overflow-hidden">
+      <div className="absolute inset-0 -z-20 overflow-hidden bg-[#0e0d0c]">
         {useVideo && content.video ? (
           <>
-            <video
-              ref={desktopVideoRef}
-              className="absolute inset-0 hidden h-full w-full object-cover object-center md:block"
-              muted
-              loop
-              playsInline
-              preload="none"
-              poster={mediaUrl(content.video.desktop.poster)}
-              aria-hidden
-            />
-            <video
-              ref={mobileVideoRef}
-              className="absolute inset-0 h-full w-full object-cover object-[center_20%] md:hidden"
-              muted
-              loop
-              playsInline
-              preload="none"
-              poster={mediaUrl(content.video.mobile.poster)}
-              aria-hidden
-            />
+            {/* Stable poster underlay — stays until video first frame is ready */}
             <SmartImage
-              data-hero-media
-              src={content.video.desktop.poster}
+              src={posterDesktop}
               alt=""
               fill
               priority
               variant="detail"
               sizesPreset="hero"
-              className="hidden object-cover object-[center_30%] opacity-0 motion-reduce:opacity-100 md:block"
+              className={cn(
+                "hidden bg-[#0e0d0c] object-cover object-[center_30%] transition-opacity duration-500 md:block",
+                videoReady ? "opacity-0" : "opacity-100",
+              )}
             />
             <SmartImage
-              data-hero-media
-              src={content.video.mobile.poster}
+              src={posterMobile}
               alt=""
               fill
               priority
               variant="card"
               sizesPreset="hero"
-              className="object-cover object-[center_25%] opacity-0 motion-reduce:opacity-100 md:hidden"
+              className={cn(
+                "bg-[#0e0d0c] object-cover object-[center_25%] transition-opacity duration-500 md:hidden",
+                videoReady ? "opacity-0" : "opacity-100",
+              )}
+            />
+            <video
+              ref={desktopVideoRef}
+              className={cn(
+                "absolute inset-0 hidden h-full w-full bg-[#0e0d0c] object-cover object-center transition-opacity duration-700 md:block",
+                videoReady ? "opacity-100" : "opacity-0",
+              )}
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-hidden
+            />
+            <video
+              ref={mobileVideoRef}
+              className={cn(
+                "absolute inset-0 h-full w-full bg-[#0e0d0c] object-cover object-[center_20%] transition-opacity duration-700 md:hidden",
+                videoReady ? "opacity-100" : "opacity-0",
+              )}
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-hidden
             />
           </>
         ) : (
           <>
             <SmartImage
-              data-hero-media
               src={content.image.desktop}
               alt=""
               fill
               priority
               variant="detail"
               sizesPreset="hero"
-              className="hidden object-cover object-[center_30%] md:block"
+              onLoad={() => setImageReady(true)}
+              className={cn(
+                "hidden bg-[#0e0d0c] object-cover object-[center_30%] transition-opacity duration-700 md:block",
+                imageReady ? "opacity-100" : "opacity-0",
+              )}
             />
             <SmartImage
-              data-hero-media
               src={content.image.mobile}
               alt=""
               fill
               priority
               variant="card"
               sizesPreset="hero"
-              className="object-cover object-[center_35%] md:hidden"
+              onLoad={() => setImageReady(true)}
+              className={cn(
+                "bg-[#0e0d0c] object-cover object-[center_35%] transition-opacity duration-700 md:hidden",
+                imageReady ? "opacity-100" : "opacity-0",
+              )}
             />
           </>
         )}
