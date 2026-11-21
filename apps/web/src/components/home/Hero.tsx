@@ -200,8 +200,9 @@ export function Hero({
     return () => ctx.revert();
   }, []);
 
-  const posterDesktop = content.video?.desktop.poster || content.image.desktop;
-  const posterMobile = content.video?.mobile.poster || content.image.mobile;
+  // Video mode: CMS image fields act as the loading preview until video is ready.
+  const previewDesktop = content.image.desktop;
+  const previewMobile = content.image.mobile;
 
   return (
     <section
@@ -211,9 +212,8 @@ export function Hero({
       <div className="absolute inset-0 -z-20 overflow-hidden bg-[#0e0d0c]">
         {useVideo && content.video ? (
           <>
-            {/* Stable poster underlay — stays until video first frame is ready */}
             <SmartImage
-              src={posterDesktop}
+              src={previewDesktop}
               alt=""
               fill
               priority
@@ -225,7 +225,7 @@ export function Hero({
               )}
             />
             <SmartImage
-              src={posterMobile}
+              src={previewMobile}
               alt=""
               fill
               priority

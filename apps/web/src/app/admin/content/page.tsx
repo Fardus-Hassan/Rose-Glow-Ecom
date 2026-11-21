@@ -139,8 +139,8 @@ export default function ContentPage() {
           ["ctaBn", "CTA BN"],
           ["overlayDesktop", "Overlay laptop (true/false)"],
           ["overlayMobile", "Overlay mobile (true/false)"],
-          ["imageDesktop", "Desktop image"],
-          ["imageMobile", "Mobile image"],
+          ["imageDesktop", "Desktop image (video load preview)"],
+          ["imageMobile", "Mobile image (video load preview)"],
         ]
       : selected?.key === "contact"
         ? [

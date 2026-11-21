@@ -169,8 +169,16 @@ export const sectionSchemas: SectionSchema[] = [
               help: "0 = very light, 50 = medium, 100 = deepest",
             }),
           ),
-          image("imageDesktop", "Desktop image"),
-          image("imageMobile", "Mobile image"),
+          image(
+            "imageDesktop",
+            "Desktop image",
+            "Also used as the preview while desktop video loads",
+          ),
+          image(
+            "imageMobile",
+            "Mobile image",
+            "Also used as the preview while mobile video loads",
+          ),
           video(
             "videoDesktop",
             "Desktop video",

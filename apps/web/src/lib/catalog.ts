@@ -538,14 +538,19 @@ export async function fetchHeroContent(): Promise<HeroContent> {
       video: {
         desktop: {
           src: String(hero.videoDesktop || staticHero.video.desktop.src),
+          // Image fields double as the loading preview while video buffers.
           poster: String(
-            hero.imageDesktop || staticHero.video.desktop.poster,
+            hero.imageDesktop ||
+              staticHero.image.desktop ||
+              staticHero.video.desktop.poster,
           ),
         },
         mobile: {
           src: String(hero.videoMobile || staticHero.video.mobile.src),
           poster: String(
-            hero.imageMobile || staticHero.video.mobile.poster,
+            hero.imageMobile ||
+              staticHero.image.mobile ||
+              staticHero.video.mobile.poster,
           ),
         },
       },
@@ -586,9 +591,22 @@ export async function fetchHeroContent(): Promise<HeroContent> {
       desktop: value.image?.desktop || staticHero.image.desktop,
       mobile: value.image?.mobile || staticHero.image.mobile,
     },
-    video: value.video ?? {
-      desktop: { ...staticHero.video.desktop },
-      mobile: { ...staticHero.video.mobile },
+    video: {
+      desktop: {
+        src:
+          value.video?.desktop?.src || staticHero.video.desktop.src,
+        poster:
+          value.image?.desktop ||
+          value.video?.desktop?.poster ||
+          staticHero.image.desktop,
+      },
+      mobile: {
+        src: value.video?.mobile?.src || staticHero.video.mobile.src,
+        poster:
+          value.image?.mobile ||
+          value.video?.mobile?.poster ||
+          staticHero.image.mobile,
+      },
     },
   };
 }
