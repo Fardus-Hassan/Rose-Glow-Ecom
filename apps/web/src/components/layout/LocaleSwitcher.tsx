@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/format";
@@ -7,15 +8,13 @@ import { cn } from "@/lib/format";
 function FlagBd({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 56 28"
-      preserveAspectRatio="xMidYMid slice"
+      viewBox="0 0 24 24"
       className={className}
       aria-hidden
       focusable="false"
     >
-      <rect width="56" height="28" fill="#006a4e" />
-      {/* Sit in the open (right) half when thumb is on the left */}
-      <circle cx="38" cy="14" r="8.5" fill="#f42a41" />
+      <circle cx="12" cy="12" r="12" fill="#006a4e" />
+      <circle cx="10.5" cy="12" r="5.2" fill="#f42a41" />
     </svg>
   );
 }
@@ -23,20 +22,24 @@ function FlagBd({ className }: { className?: string }) {
 function FlagGb({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 56 28"
-      preserveAspectRatio="xMidYMid slice"
+      viewBox="0 0 24 24"
       className={className}
       aria-hidden
       focusable="false"
     >
-      <rect width="56" height="28" fill="#012169" />
-      <path d="M0 0 L56 28 M56 0 L0 28" stroke="#fff" strokeWidth="5.5" />
-      <path d="M0 0 L56 28 M56 0 L0 28" stroke="#C8102E" strokeWidth="2.8" />
-      <path d="M28 0 V28 M0 14 H56" stroke="#fff" strokeWidth="9" />
-      <path d="M28 0 V28 M0 14 H56" stroke="#C8102E" strokeWidth="4.5" />
+      <circle cx="12" cy="12" r="12" fill="#012169" />
+      <path d="M0 0 L24 24 M24 0 L0 24" stroke="#fff" strokeWidth="3.2" />
+      <path d="M0 0 L24 24 M24 0 L0 24" stroke="#C8102E" strokeWidth="1.6" />
+      <path d="M12 0 V24 M0 12 H24" stroke="#fff" strokeWidth="5" />
+      <path d="M12 0 V24 M0 12 H24" stroke="#C8102E" strokeWidth="2.6" />
     </svg>
   );
 }
+
+const locales = [
+  { code: "bn" as const, label: "বাংলা", Flag: FlagBd },
+  { code: "en" as const, label: "English", Flag: FlagGb },
+];
 
 export function LocaleSwitcher({
   light = false,
@@ -48,57 +51,123 @@ export function LocaleSwitcher({
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
-  const isEn = locale === "en";
-  const nextLocale = isEn ? "bn" : "en";
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  const current = locales.find((item) => item.code === locale) ?? locales[0];
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointer = (event: MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("mousedown", onPointer);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("mousedown", onPointer);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={isEn}
-      aria-label={isEn ? "Switch to Bangla" : "Switch to English"}
-      onClick={() => router.replace(pathname, { locale: nextLocale })}
-      className={cn(
-        "relative inline-flex shrink-0 items-center overflow-hidden rounded-full",
-        "shadow-[inset_0_1px_2px_rgba(0,0,0,0.28),inset_0_-1px_1px_rgba(255,255,255,0.22)]",
-        size === "sm" ? "h-7 w-[3.25rem]" : "h-8 w-14",
-        light ? "ring-1 ring-white/30" : "ring-1 ring-[#1c1a19]/10",
-      )}
-    >
-      {/* Crossfade flags so the switch feels continuous */}
-      <span className="pointer-events-none absolute inset-0">
-        <span
-          className={cn(
-            "absolute inset-0 transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-            isEn ? "opacity-0" : "opacity-100",
-          )}
-        >
-          <FlagBd className="h-full w-full" />
-        </span>
-        <span
-          className={cn(
-            "absolute inset-0 transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-            isEn ? "opacity-100" : "opacity-0",
-          )}
-        >
-          <FlagGb className="h-full w-full" />
-        </span>
-        <span className="absolute inset-0 bg-black/[0.06]" />
-      </span>
-
-      <span
+    <div ref={rootRef} className="relative">
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label="Language"
+        onClick={() => setOpen((value) => !value)}
         className={cn(
-          "pointer-events-none absolute top-1/2 z-10 -translate-y-1/2 rounded-full bg-white",
-          "shadow-[0_2px_6px_rgba(0,0,0,0.28),0_0_0_1px_rgba(0,0,0,0.05)]",
-          "transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
-          size === "sm" ? "h-[1.35rem] w-[1.35rem]" : "h-6 w-6",
-          isEn
-            ? size === "sm"
-              ? "translate-x-[1.7rem]"
-              : "translate-x-[1.9rem]"
-            : "translate-x-[0.2rem]",
+          "inline-flex items-center gap-1.5 transition",
+          size === "sm" ? "gap-1.5" : "gap-2",
+          light
+            ? "text-[#f4efe8]/85 hover:text-[#f4efe8]"
+            : "text-[#1c1a19]/75 hover:text-[#1c1a19]",
         )}
-      />
-    </button>
+      >
+        <current.Flag
+          className={cn(
+            "shrink-0 overflow-hidden rounded-full ring-1",
+            size === "sm" ? "h-5 w-5" : "h-6 w-6",
+            light ? "ring-white/25" : "ring-[#1c1a19]/12",
+          )}
+        />
+        <span
+          className={cn(
+            "font-medium leading-none",
+            size === "sm" ? "text-[11px]" : "text-[13px]",
+          )}
+        >
+          {current.label}
+        </span>
+        <svg
+          viewBox="0 0 12 12"
+          className={cn(
+            "shrink-0 transition-transform duration-200",
+            size === "sm" ? "h-2.5 w-2.5" : "h-3 w-3",
+            open && "rotate-180",
+            light ? "text-[#f4efe8]/55" : "text-[#1c1a19]/4",
+          )}
+          aria-hidden
+          focusable="false"
+        >
+          <path
+            d="M2.5 4.5 L6 8 L9.5 4.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      {open ? (
+        <div
+          role="listbox"
+          aria-label="Language"
+          className={cn(
+            "absolute left-0 top-[calc(100%+0.4rem)] z-[70] min-w-[8.5rem] overflow-hidden border py-1 shadow-[0_12px_40px_rgba(0,0,0,0.14)]",
+            light
+              ? "border-white/10 bg-[#121110] text-[#f4efe8]"
+              : "border-[#1c1a19]/10 bg-[#f4efe8] text-[#1c1a19]",
+          )}
+        >
+          {locales.map(({ code, label, Flag }) => {
+            const active = locale === code;
+            return (
+              <button
+                key={code}
+                type="button"
+                role="option"
+                aria-selected={active}
+                onClick={() => {
+                  setOpen(false);
+                  if (code !== locale) {
+                    router.replace(pathname, { locale: code });
+                  }
+                }}
+                className={cn(
+                  "flex w-full items-center gap-2.5 px-3 py-2 text-left text-[12px] transition",
+                  active
+                    ? light
+                      ? "bg-white/10 text-[#f4efe8]"
+                      : "bg-[#1c1a19]/06 text-[#1c1a19]"
+                    : light
+                      ? "text-[#f4efe8]/7 hover:bg-white/8 hover:text-[#f4efe8]"
+                      : "text-[#1c1a19]/65 hover:bg-[#1c1a19]/05 hover:text-[#1c1a19]",
+                )}
+              >
+                <Flag className="h-5 w-5 shrink-0 rounded-full ring-1 ring-black/10" />
+                <span className="font-medium">{label}</span>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
   );
 }
