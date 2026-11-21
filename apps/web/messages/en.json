@@ -302,7 +302,7 @@
     "district": "District / city",
     "address": "Full address",
     "note": "Order note (optional)",
-    "placeOrder": "Place COD order",
+    "placeOrder": "Submit order",
     "orderNow": "Order now",
     "required": "Required",
     "phoneInvalid": "Enter a valid phone number",
