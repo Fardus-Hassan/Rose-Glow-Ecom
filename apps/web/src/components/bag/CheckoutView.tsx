@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
-import { chosenOffer, getCoverMedia, localize, type Product } from "@/data/products";
+import { chosenOffer, getCoverMedia, localize } from "@/data/products";
 import { bdMobile, formatBdt, cn } from "@/lib/format";
 import { CheckoutPageSkeleton } from "@/components/skeletons/StorefrontSkeletons";
 import { useBag } from "@/store/bag";
-import { useCatalog } from "@/store/catalog";
+import { useCartLines } from "@/hooks/useCartLines";
 import {
   computeClientShippingFee,
   createStoreOrder,
@@ -40,8 +40,8 @@ export function CheckoutView() {
   const t = useTranslations("Checkout");
   const locale = useLocale();
   const router = useRouter();
-  const { cart, clearCart } = useBag();
-  const { ready, getBySlug } = useCatalog();
+  const { clearCart } = useBag();
+  const { lines, pending } = useCartLines();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -76,21 +76,6 @@ export function CheckoutView() {
     };
   }, []);
 
-  const lines = useMemo(
-    () =>
-      cart
-        .map((line) => {
-          const product = getBySlug(line.slug);
-          if (!product) return null;
-          return { line, product };
-        })
-        .filter(Boolean) as Array<{
-        line: { slug: string; qty: number; optionId?: string };
-        product: Product;
-      }>,
-    [cart, getBySlug],
-  );
-
   const subtotal = lines.reduce(
     (sum, item) => sum + chosenOffer(item.product, item.line.optionId).price * item.line.qty,
     0,
@@ -106,7 +91,7 @@ export function CheckoutView() {
 
   const checkoutTracked = useRef(false);
   useEffect(() => {
-    if (!ready || lines.length === 0 || checkoutTracked.current) return;
+    if (pending || lines.length === 0 || checkoutTracked.current) return;
     checkoutTracked.current = true;
     trackInitiateCheckout({
       value: total,
@@ -117,7 +102,7 @@ export function CheckoutView() {
         item_price: product.price,
       })),
     });
-  }, [ready, lines, total]);
+  }, [pending, lines, total]);
 
   const validate = () => {
     const next: Partial<FormState> = {};
@@ -182,7 +167,7 @@ export function CheckoutView() {
     }
   };
 
-  if (!ready) return <CheckoutPageSkeleton />;
+  if (pending) return <CheckoutPageSkeleton />;
 
   if (submitted) {
     return (

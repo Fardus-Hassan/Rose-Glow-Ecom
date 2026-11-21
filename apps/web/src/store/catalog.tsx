@@ -103,7 +103,9 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     const load = async () => {
       try {
         const [productsRes, categoriesRes, settingsRes] = await Promise.all([
-          fetch(`${base}/products?page=1&pageSize=100`, { cache: "no-store" }),
+          fetch(`${base}/products?page=1&pageSize=100&sort=newest`, {
+            cache: "no-store",
+          }),
           fetch(`${base}/categories?active=1`, { cache: "no-store" }),
           fetch(`${base}/cms/sections/settings`, { cache: "no-store" }),
         ]);

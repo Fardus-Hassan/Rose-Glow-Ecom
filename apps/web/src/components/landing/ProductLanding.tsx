@@ -13,7 +13,14 @@ import {
 } from "@/data/products";
 import type { Review } from "@/data/reviews";
 import { bdMobile, formatBdt, cn } from "@/lib/format";
-import { IconGem, IconShield, IconStar, IconTruck } from "@/components/icons";
+import {
+  IconGem,
+  IconPhone,
+  IconShield,
+  IconStar,
+  IconTruck,
+  IconWhatsApp,
+} from "@/components/icons";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { VariantChoices } from "@/components/product/VariantChoices";
 import { ProductContactActions } from "@/components/product/ProductContactActions";
@@ -578,7 +585,7 @@ export function ProductLanding({
                   if (!lines[productSlug]) setQty(productSlug, 1);
                   scrollToOrder();
                 }}
-                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition-colors hover:bg-black"
+                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#d64545] px-6 text-[11px] uppercase tracking-[0.2em] text-white transition-colors hover:bg-[#c03838]"
               >
                 {t("orderNow")} →
               </button>
@@ -959,7 +966,7 @@ export function ProductLanding({
               <button
                 type="submit"
                 disabled={submitting}
-                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition-colors hover:bg-black disabled:opacity-50"
+                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#d64545] px-6 text-[11px] uppercase tracking-[0.2em] text-white transition-colors hover:bg-[#c03838] disabled:opacity-50"
               >
                 {submitting ? "…" : t("placeOrder")}
               </button>
@@ -971,19 +978,52 @@ export function ProductLanding({
       {/* Mobile sticky — hidden while COD form is on screen so Place COD isn't doubled */}
       {!orderInView ? (
         <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 border-t border-[#1c1a19]/10 bg-[#f0ebe4]/95 p-3 backdrop-blur-md lg:hidden">
-          <div className="container-rg flex items-center gap-3">
+          <div className="container-rg flex items-center gap-2 sm:gap-3">
             <div className="min-w-0 flex-1">
-              <p className="text-sm text-[#1c1a19]">
+              <p className="truncate text-sm text-[#1c1a19]">
                 {t("bagCount", { count: itemCount })}
               </p>
               <p className="text-xs text-[#1c1a19]/55">
                 {formatBdt(total, locale)}
               </p>
             </div>
+
+            {contact.showCallOnProducts &&
+            contact.phoneDisplay?.trim() &&
+            contact.phoneTel !== "tel:" ? (
+              <a
+                href={contact.phoneTel}
+                aria-label={tp("callButton")}
+                className="pointer-events-auto inline-flex h-12 w-12 shrink-0 items-center justify-center border border-[#1c1a19]/15 bg-[#f4efe8] text-[#1c1a19] transition hover:border-[#1c1a19] hover:bg-[#1c1a19] hover:text-[#f4efe8]"
+              >
+                <IconPhone className="h-4 w-4" />
+              </a>
+            ) : null}
+
+            {contact.showWhatsappOnProducts &&
+            contact.whatsappHref &&
+            contact.whatsappHref !== "https://wa.me/" ? (
+              <a
+                href={`${contact.whatsappHref}${
+                  contact.whatsappHref.includes("?") ? "&" : "?"
+                }text=${encodeURIComponent(
+                  locale === "bn"
+                    ? `হ্যালো Rose Glow, আমি “${localize(product.name, locale)}” অর্ডার করতে চাই।`
+                    : `Hi Rose Glow, I’d like to order “${localize(product.name, locale)}”.`,
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={tp("whatsappButton")}
+                className="pointer-events-auto inline-flex h-12 w-12 shrink-0 items-center justify-center bg-[#1f6b4a] text-[#f4efe8] transition hover:bg-[#185a3e]"
+              >
+                <IconWhatsApp className="h-4 w-4" />
+              </a>
+            ) : null}
+
             <button
               type="button"
               onClick={scrollToOrder}
-              className="rg-beat pointer-events-auto inline-flex h-12 shrink-0 items-center justify-center bg-[#1c1a19] px-5 text-[11px] uppercase tracking-[0.18em] text-[#f4efe8]"
+              className="rg-beat pointer-events-auto inline-flex h-12 shrink-0 items-center justify-center bg-[#d64545] px-4 text-[11px] uppercase tracking-[0.16em] text-white transition-colors hover:bg-[#c03838] sm:px-5 sm:tracking-[0.18em]"
             >
               {t("orderNow")}
             </button>

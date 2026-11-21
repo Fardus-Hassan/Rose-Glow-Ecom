@@ -3,30 +3,19 @@
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { chosenOffer, getCoverMedia, localize, type Product } from "@/data/products";
+import { chosenOffer, getCoverMedia, localize } from "@/data/products";
 import { formatBdt } from "@/lib/format";
 import { CartPageSkeleton } from "@/components/skeletons/StorefrontSkeletons";
 import { useBag } from "@/store/bag";
-import { useCatalog } from "@/store/catalog";
+import { useCartLines } from "@/hooks/useCartLines";
 
 export function CartView() {
   const t = useTranslations("Cart");
   const locale = useLocale();
-  const { cart, setCartQty, removeFromCart } = useBag();
-  const { ready, getBySlug } = useCatalog();
+  const { setCartQty, removeFromCart } = useBag();
+  const { lines, pending } = useCartLines();
 
-  if (!ready) return <CartPageSkeleton />;
-
-  const lines = cart
-    .map((line) => {
-      const product = getBySlug(line.slug);
-      if (!product) return null;
-      return { line, product };
-    })
-    .filter(Boolean) as Array<{
-    line: { slug: string; qty: number; optionId?: string };
-    product: Product;
-  }>;
+  if (pending) return <CartPageSkeleton />;
 
   const subtotal = lines.reduce(
     (sum, item) => sum + chosenOffer(item.product, item.line.optionId).price * item.line.qty,

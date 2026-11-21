@@ -307,7 +307,7 @@ export function Header() {
             aria-label={t("cart")}
           >
             <IconBag className="h-[18px] w-[18px] transition duration-300 group-hover:scale-[1.06]" />
-            {bagReady ? (
+            {bagReady && cartCount > 0 ? (
               <span
                 className={cn(
                   "absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-medium leading-none ring-2",
