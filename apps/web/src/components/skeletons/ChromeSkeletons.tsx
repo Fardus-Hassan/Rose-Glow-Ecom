@@ -6,7 +6,7 @@ export function HeaderSkeleton() {
       role="status"
       aria-busy="true"
       aria-label="Loading header"
-      className="sticky top-0 z-50 border-b border-[#1c1a19]/10 bg-[#f0ebe4]/95 backdrop-blur-md"
+      className="sticky top-0 z-50 border-b border-[#1c1a19]/10 bg-[#f0ebe4]"
     >
       <div className="container-rg flex h-16 items-center justify-between gap-4 md:h-[4.75rem]">
         <Skeleton className="h-9 w-9 md:hidden" />

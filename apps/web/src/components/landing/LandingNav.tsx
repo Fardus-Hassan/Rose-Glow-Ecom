@@ -15,7 +15,7 @@ export function LandingNav() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#1c1a19]/10 bg-[#f0ebe4]/95 text-[#1c1a19] backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-[#1c1a19]/10 bg-[#f0ebe4] text-[#1c1a19]">
       <div className="container-rg grid h-[4.25rem] grid-cols-[auto_1fr_auto] items-center gap-2 md:h-[4.75rem] md:grid-cols-[1fr_auto_1fr] md:gap-3">
         <div className="flex justify-start">
           <LocaleSwitcher size="sm" />

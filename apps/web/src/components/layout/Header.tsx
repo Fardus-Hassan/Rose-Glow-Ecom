@@ -124,7 +124,7 @@ export function Header() {
           ? "border-b border-white/10 bg-[#121110] text-[#f4efe8]"
           : headerDark
             ? "border-b border-transparent bg-transparent text-[#f4efe8]"
-            : "border-b border-[#1c1a19]/10 bg-[#f0ebe4]/95 text-[#1c1a19] backdrop-blur-xl",
+            : "border-b border-[#1c1a19]/10 bg-[#f0ebe4] text-[#1c1a19]",
       )}
     >
       <div className="container-rg relative grid h-[4.25rem] grid-cols-[1fr_auto_1fr] items-center md:h-[5rem]">
