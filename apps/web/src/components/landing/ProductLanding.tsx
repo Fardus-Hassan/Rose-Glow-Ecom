@@ -585,7 +585,7 @@ export function ProductLanding({
                   if (!lines[productSlug]) setQty(productSlug, 1);
                   scrollToOrder();
                 }}
-                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#d64545] px-6 text-[11px] uppercase tracking-[0.2em] text-white transition-colors hover:bg-[#c03838]"
+                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[color:var(--rg-pink)] px-6 text-[11px] uppercase tracking-[0.2em] text-white transition-colors hover:bg-[color:var(--rg-pink-deep)]"
               >
                 {t("orderNow")} →
               </button>
@@ -966,7 +966,7 @@ export function ProductLanding({
               <button
                 type="submit"
                 disabled={submitting}
-                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#d64545] px-6 text-[11px] uppercase tracking-[0.2em] text-white transition-colors hover:bg-[#c03838] disabled:opacity-50"
+                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[color:var(--rg-pink)] px-6 text-[11px] uppercase tracking-[0.2em] text-white transition-colors hover:bg-[color:var(--rg-pink-deep)] disabled:opacity-50"
               >
                 {submitting ? "…" : t("placeOrder")}
               </button>
@@ -1023,7 +1023,7 @@ export function ProductLanding({
             <button
               type="button"
               onClick={scrollToOrder}
-              className="rg-beat pointer-events-auto inline-flex h-12 shrink-0 items-center justify-center bg-[#d64545] px-4 text-[11px] uppercase tracking-[0.16em] text-white transition-colors hover:bg-[#c03838] sm:px-5 sm:tracking-[0.18em]"
+              className="rg-beat pointer-events-auto inline-flex h-12 shrink-0 items-center justify-center bg-[color:var(--rg-pink)] px-4 text-[11px] uppercase tracking-[0.16em] text-white transition-colors hover:bg-[color:var(--rg-pink-deep)] sm:px-5 sm:tracking-[0.18em]"
             >
               {t("orderNow")}
             </button>
