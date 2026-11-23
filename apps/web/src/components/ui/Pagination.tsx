@@ -62,15 +62,6 @@ export function Pagination({
       <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
         <button
           type="button"
-          onClick={() => onChange(1)}
-          disabled={page <= 1}
-          className={navBtn}
-          aria-label={t("first")}
-        >
-          «
-        </button>
-        <button
-          type="button"
           onClick={() => onChange(Math.max(1, page - 1))}
           disabled={page <= 1}
           className={navBtn}
@@ -114,15 +105,6 @@ export function Pagination({
           aria-label={t("next")}
         >
           ›
-        </button>
-        <button
-          type="button"
-          onClick={() => onChange(totalPages)}
-          disabled={page >= totalPages}
-          className={navBtn}
-          aria-label={t("last")}
-        >
-          »
         </button>
       </div>
     </nav>
