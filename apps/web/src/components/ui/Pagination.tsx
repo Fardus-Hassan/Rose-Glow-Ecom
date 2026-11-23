@@ -45,7 +45,7 @@ export function Pagination({
   const items = getPageItems(page, totalPages);
 
   const navBtn =
-    "flex h-10 w-10 items-center justify-center border border-[#f3eee8]/15 text-sm text-[#f3eee8] transition hover:border-[#f3eee8] disabled:cursor-not-allowed disabled:opacity-30";
+    "flex h-10 w-10 items-center justify-center border border-[#d4af37] text-sm text-[#f3eee8] transition hover:bg-[#d4af37]/10 disabled:cursor-not-allowed disabled:opacity-30";
 
   return (
     <nav
@@ -97,8 +97,8 @@ export function Pagination({
               className={cn(
                 "flex h-10 min-w-10 items-center justify-center px-2 text-[11px] transition",
                 item === page
-                  ? "bg-[#f3eee8] text-[#0c0a0b]"
-                  : "border border-[#f3eee8]/12 text-[#f3eee8]/55 hover:border-[#d4a574] hover:text-[#f3eee8]",
+                  ? "border border-[#d4af37] bg-[#d4af37] text-[#0c0a0b]"
+                  : "border border-[#d4af37] text-[#f3eee8] hover:bg-[#d4af37]/10",
               )}
             >
               {item}
