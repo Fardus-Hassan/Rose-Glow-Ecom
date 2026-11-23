@@ -81,13 +81,45 @@ export function ProductGallery({
     );
   }, []);
 
+  const activeKind = media[active]?.type;
+  const activeSrc = media[active]?.src;
   useEffect(() => {
-    rootRef.current?.querySelectorAll("video").forEach((video) => {
-      const slide = video.closest("[data-slide]");
-      const index = Number(slide?.getAttribute("data-slide"));
-      if (!inView || !tabVisible || index !== active) video.pause();
+    const root = rootRef.current;
+    if (!root) return;
+    const cleanups: Array<() => void> = [];
+
+    root.querySelectorAll("video").forEach((video) => {
+      const index = Number(video.closest("[data-slide]")?.getAttribute("data-slide"));
+      const shouldPlay =
+        inView && tabVisible && index === active && activeKind === "video";
+      if (!shouldPlay) {
+        video.pause();
+        return;
+      }
+
+      const start = () => {
+        void video.play().catch(() => {
+          video.muted = true;
+          void video.play().catch(() => undefined);
+        });
+      };
+
+      if (video.getAttribute("src") && video.readyState >= 2) {
+        start();
+        return;
+      }
+
+      const onReady = () => start();
+      video.addEventListener("loadeddata", onReady);
+      video.addEventListener("canplay", onReady);
+      cleanups.push(() => {
+        video.removeEventListener("loadeddata", onReady);
+        video.removeEventListener("canplay", onReady);
+      });
     });
-  }, [inView, tabVisible, active]);
+
+    return () => cleanups.forEach((fn) => fn());
+  }, [inView, tabVisible, active, activeKind, activeSrc]);
 
   useEffect(() => {
     const delay = firstSlide.current || reduceMotion ? 0 : 520;
@@ -264,7 +296,29 @@ export function ProductGallery({
           maxWidth: `min(100%, calc(min(72vh, 720px) * ${ratio}))`,
           marginInline: "auto",
         }}
-        onClick={openMobileZoom}
+        onMouseDown={(event) => {
+          const video = (event.target as HTMLElement).closest?.("video");
+          if (video instanceof HTMLVideoElement) {
+            video.dataset.wasPaused = video.paused ? "1" : "0";
+          }
+        }}
+        onClick={(event) => {
+          if (current.type !== "video") {
+            openMobileZoom();
+            return;
+          }
+          const video = stageRef.current?.querySelector(
+            `[data-slide="${active}"] video`,
+          );
+          if (!(video instanceof HTMLVideoElement)) return;
+          if (video.dataset.wasPaused !== "1" || !video.paused) return;
+          event.preventDefault();
+          video.muted = false;
+          void video.play().catch(() => {
+            video.muted = true;
+            void video.play().catch(() => undefined);
+          });
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();

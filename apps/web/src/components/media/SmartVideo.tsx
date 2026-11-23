@@ -40,7 +40,10 @@ export function SmartVideo({
   const startMuted = preferUnmuted ? false : Boolean(muted);
 
   useEffect(() => {
-    if (!lazy) return;
+    if (!lazy) {
+      setActive(true);
+      return;
+    }
     const node = ref.current;
     if (!node) return;
 
@@ -101,7 +104,7 @@ export function SmartVideo({
       muted={startMuted}
       loop={loop}
       playsInline={playsInline}
-      preload={active ? "metadata" : "none"}
+      preload={active ? (autoPlay ? "auto" : "metadata") : "none"}
       {...(active ? { src: resolvedSrc } : {})}
       {...rest}
     />
