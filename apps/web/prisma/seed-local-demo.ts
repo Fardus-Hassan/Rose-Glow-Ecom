@@ -6,6 +6,7 @@
  */
 import {
   MediaType,
+  Prisma,
   PrismaClient,
   Role,
 } from "@prisma/client";
@@ -797,8 +798,8 @@ async function seedSections() {
   for (const row of payloads) {
     await prisma.section.upsert({
       where: { key: row.key },
-      create: { key: row.key, data: row.data },
-      update: { data: row.data },
+      create: { key: row.key, data: row.data as Prisma.InputJsonValue },
+      update: { data: row.data as Prisma.InputJsonValue },
     });
   }
   console.log(`CMS sections: ${payloads.length}`);
