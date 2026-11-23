@@ -278,7 +278,8 @@ export const sectionSchemas: SectionSchema[] = [
   {
     key: "settings",
     label: "General",
-    description: "Brand, contact details and social profiles.",
+    description:
+      "Brand, contact, socials, and ads tracking (GTM, Meta, GA4, TikTok).",
     icon: Settings,
     group: "Site settings",
     panels: [
@@ -337,10 +338,33 @@ export const sectionSchemas: SectionSchema[] = [
         ],
       },
       {
-        title: "Meta Pixel (Facebook Ads)",
+        title: "Ads & tracking (for marketers)",
+        description:
+          "Paste IDs below and enable each tool. Storefront already fires PageView, ViewContent, AddToCart, InitiateCheckout, and Purchase — no code needed. Prefer GTM for Google stack; use Meta / TikTok fields for those platforms.",
+        fields: [],
+      },
+      {
+        title: "Google Tag Manager",
+        path: "gtm",
+        description:
+          "Recommended hub. After enabling, marketer can add GA4 / Google Ads / other tags inside GTM. Site pushes ecommerce events to dataLayer automatically.",
+        fields: [
+          toggle(
+            "gtmEnabled",
+            "Enable Google Tag Manager",
+            "Turn on after you paste a valid Container ID (GTM-XXXXXXX).",
+          ),
+          text("containerId", "Container ID", {
+            help: "Tag Manager → Admin → Container Settings → Container ID",
+            placeholder: "GTM-XXXXXXX",
+          }),
+        ],
+      },
+      {
+        title: "Meta Pixel (Facebook / Instagram Ads)",
         path: "meta",
         description:
-          "Paste your Pixel ID from Meta Events Manager. Events (PageView, ViewContent, AddToCart, Checkout, Purchase) fire automatically on the storefront.",
+          "Required for Meta Ads. Browser events fire automatically; optional CAPI improves Purchase matching.",
         fields: [
           toggle(
             "pixelEnabled",
@@ -358,6 +382,61 @@ export const sectionSchemas: SectionSchema[] = [
           text("capiAccessToken", "Conversions API token (optional)", {
             help: "Events Manager → Settings → Generate access token. Kept server-side for Purchase events.",
             placeholder: "EAAB…",
+          }),
+        ],
+      },
+      {
+        title: "Google Analytics 4",
+        path: "ga4",
+        description:
+          "Optional direct GA4. Skip this if you already load GA4 through GTM (avoid double counting).",
+        fields: [
+          toggle(
+            "ga4Enabled",
+            "Enable GA4 (direct)",
+            "Only enable if GA4 is NOT already installed via GTM.",
+          ),
+          text("measurementId", "Measurement ID", {
+            help: "Admin → Data streams → Web → Measurement ID",
+            placeholder: "G-XXXXXXXXXX",
+          }),
+        ],
+      },
+      {
+        title: "Google Ads",
+        path: "googleAds",
+        description:
+          "Optional direct conversion tag. Prefer configuring conversions in GTM / Google Ads if you use GTM.",
+        fields: [
+          toggle(
+            "adsEnabled",
+            "Enable Google Ads tag (direct)",
+            "Only enable if not already handled in GTM.",
+          ),
+          text("conversionId", "Conversion ID", {
+            help: "From Google Ads → Goals → Conversions → Tag setup (AW-…)",
+            placeholder: "AW-XXXXXXXXXX",
+          }),
+          text("conversionLabel", "Purchase conversion label (optional)", {
+            help: "Conversion action label for Purchase. Leave blank to only load the base tag.",
+            placeholder: "AbC-dEfGhIjKlMnOp",
+          }),
+        ],
+      },
+      {
+        title: "TikTok Pixel",
+        path: "tiktok",
+        description:
+          "For TikTok Ads. Events: PageView, ViewContent, AddToCart, InitiateCheckout, CompletePayment.",
+        fields: [
+          toggle(
+            "tiktokEnabled",
+            "Enable TikTok Pixel",
+            "Turn on after you paste a valid Pixel ID.",
+          ),
+          text("pixelId", "Pixel ID", {
+            help: "TikTok Ads → Assets → Events → Web Events → Pixel ID",
+            placeholder: "CXXXXXXXXXXXXXXXXX",
           }),
         ],
       },

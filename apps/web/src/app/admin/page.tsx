@@ -7,6 +7,7 @@ import {
   Home,
   Images,
   Inbox,
+  Megaphone,
   Menu,
   Package,
   Palette,
@@ -43,6 +44,12 @@ const quickActions = [
     label: "Logo & brand",
     description: "Store name, contact, socials",
     icon: Palette,
+  },
+  {
+    href: "/admin/sections/settings",
+    label: "Ads & tracking",
+    description: "GTM, Meta, GA4, TikTok, Google Ads IDs",
+    icon: Megaphone,
   },
   {
     href: "/admin/sections/home",

@@ -108,6 +108,23 @@ export const sectionDefaults: Record<SectionKey, Record<string, unknown>> = {
       testEventCode: "",
       capiAccessToken: "",
     },
+    gtm: {
+      gtmEnabled: false,
+      containerId: "",
+    },
+    ga4: {
+      ga4Enabled: false,
+      measurementId: "",
+    },
+    googleAds: {
+      adsEnabled: false,
+      conversionId: "",
+      conversionLabel: "",
+    },
+    tiktok: {
+      tiktokEnabled: false,
+      pixelId: "",
+    },
   },
   navigation: {
     links: [
