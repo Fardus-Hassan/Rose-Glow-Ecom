@@ -30,16 +30,13 @@ export function WishlistView() {
   if (items.length === 0) {
     return (
       <div className="py-16 text-center md:py-24">
-        <p className="font-display text-3xl text-[#1c1a19] md:text-4xl">
+        <p className="rg-section-title text-3xl md:text-4xl">
           {t("emptyTitle")}
         </p>
-        <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[#1c1a19]/55">
+        <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[#f3eee8]/55">
           {t("emptySub")}
         </p>
-        <Link
-          href="/products"
-          className="mt-8 inline-flex min-h-12 items-center justify-center bg-[#1c1a19] px-8 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition hover:bg-black"
-        >
+        <Link href="/products" className="rg-cta-solid mt-8 min-h-12 px-8">
           {t("browse")}
         </Link>
       </div>
@@ -59,14 +56,14 @@ export function WishlistView() {
                 addToCart(product.slug, 1);
                 toggleWishlist(product.slug);
               }}
-              className="inline-flex min-h-10 items-center justify-center bg-[#1c1a19] px-3 text-[10px] uppercase tracking-[0.16em] text-[#f4efe8] transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-40"
+              className="rg-cta-solid min-h-10 px-3 text-[10px] tracking-[0.16em] disabled:cursor-not-allowed disabled:opacity-40"
             >
               {t("moveToCart")}
             </button>
             <button
               type="button"
               onClick={() => toggleWishlist(product.slug)}
-              className="text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/45 transition hover:text-[#1c1a19]"
+              className="text-[10px] uppercase tracking-[0.18em] text-[#f3eee8]/45 transition hover:text-[#f3eee8]"
             >
               {t("remove")}
             </button>

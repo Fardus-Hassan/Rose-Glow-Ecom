@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { useCatalog } from "@/store/catalog";
 import { mediaUrl } from "@/lib/media";
+import { Parallax } from "@/components/motion/Parallax";
 
 export function FooterClient() {
   const t = useTranslations("Footer");
@@ -27,139 +28,154 @@ export function FooterClient() {
   const displayName = storeName || "Rose Glow";
 
   return (
-    <footer className="bg-[#0e0d0c] text-[#f4efe8]">
-      <div className="container-rg grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1fr_1.3fr] md:gap-10 md:py-20">
-        <div>
-          <div className="mb-5 flex items-center gap-3">
-            <span className="relative h-11 w-11 overflow-hidden rounded-full ring-1 ring-[#c9a08a]/40">
-              <Image
-                src={mediaUrl(logo || "/brand/logo.png")}
-                alt={displayName}
-                fill
-                sizes="44px"
-                className="object-cover"
-              />
-            </span>
-            <span className="font-display text-2xl">{displayName}</span>
-          </div>
-          <p className="max-w-xs text-sm leading-7 text-[#f4efe8]/55">
+    <footer className="relative overflow-hidden border-t border-[color:var(--rg-line)] bg-[color:var(--rg-paper)] text-[color:var(--rg-ink)]">
+      <div
+        className="rg-editorial-grid pointer-events-none absolute inset-0 opacity-40"
+        aria-hidden
+      />
+
+      <Parallax
+        speed={50}
+        className="pointer-events-none absolute inset-x-0 top-8 text-center"
+      >
+        <p className="rg-giant-type opacity-[0.05]">{displayName}</p>
+      </Parallax>
+
+      <div className="container-rg relative pt-16 md:pt-20">
+        <div className="mb-12 flex flex-col items-center text-center">
+          <span className="relative mb-4 h-12 w-12 overflow-hidden rounded-full ring-1 ring-[color:var(--rg-line)]">
+            <Image
+              src={mediaUrl(logo || "/brand/logo.png")}
+              alt={displayName}
+              fill
+              sizes="48px"
+              className="object-cover"
+            />
+          </span>
+          <p className="font-display text-3xl tracking-[0.08em] md:text-4xl">
+            {displayName}
+          </p>
+          <p className="mt-3 max-w-sm text-sm leading-7 text-[color:var(--rg-muted)]">
             {!ready ? (
-              <span className="inline-block h-3 w-48 animate-pulse rounded-sm bg-white/10" />
+              <span className="inline-block h-3 w-48 animate-pulse rounded-sm bg-[color:var(--rg-soft)]" />
             ) : (
               tagline
             )}
           </p>
-          <div className="mt-6">
-            <p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
+        </div>
+
+        <div className="grid gap-10 border-t border-[color:var(--rg-line)] py-12 md:grid-cols-4 md:gap-8">
+          <div>
+            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--rg-charcoal)]">
               {t("follow")}
             </p>
             <SocialLinks tone="light" links={social} />
           </div>
-        </div>
 
-        <div className="grid grid-cols-2 gap-8 md:contents">
-          <div>
-            <p className="mb-4 text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
-              {t("quickLinks")}
-            </p>
-            <div className="flex flex-col gap-3 text-sm text-[#f4efe8]/70">
-              <Link href="/" className="hover:text-[#f4efe8]">
-                {nav("home")}
-              </Link>
-              <Link href="/products" className="hover:text-[#f4efe8]">
-                {nav("products")}
-              </Link>
-              <Link href="/about" className="hover:text-[#f4efe8]">
-                {nav("about")}
-              </Link>
-              <Link href="/contact" className="hover:text-[#f4efe8]">
-                {nav("contact")}
-              </Link>
-              <Link href="/cart" className="hover:text-[#f4efe8]">
-                {nav("cart")}
-              </Link>
+          {/* Mobile: Navigate left + Categories right; md+: separate grid cells */}
+          <div className="grid grid-cols-2 gap-8 md:contents">
+            <div>
+              <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--rg-charcoal)]">
+                {t("quickLinks")}
+              </p>
+              <div className="flex flex-col gap-2.5 font-display text-base text-[color:var(--rg-charcoal)]/75">
+                <Link href="/" className="hover:text-[color:var(--rg-charcoal)]">
+                  {nav("home")}
+                </Link>
+                <Link href="/products" className="hover:text-[color:var(--rg-charcoal)]">
+                  {nav("products")}
+                </Link>
+                <Link href="/about" className="hover:text-[color:var(--rg-charcoal)]">
+                  {nav("about")}
+                </Link>
+                <Link href="/contact" className="hover:text-[color:var(--rg-charcoal)]">
+                  {nav("contact")}
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--rg-charcoal)]">
+                {t("categories")}
+              </p>
+              <div className="flex flex-col gap-2.5 font-display text-base text-[color:var(--rg-charcoal)]/75">
+                {!ready
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <span
+                        key={i}
+                        className="inline-block h-3 w-20 animate-pulse rounded-sm bg-[color:var(--rg-soft)]"
+                      />
+                    ))
+                  : categories.slice(0, 4).map((c) => (
+                      <Link
+                        key={c}
+                        href={`/products?category=${c}`}
+                        className="hover:text-[color:var(--rg-charcoal)]"
+                      >
+                        {tc(c)}
+                      </Link>
+                    ))}
+              </div>
             </div>
           </div>
 
           <div>
-            <p className="mb-4 text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
-              {t("categories")}
+            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--rg-charcoal)]">
+              {t("newsletter")}
             </p>
-            <div className="flex flex-col gap-3 text-sm text-[#f4efe8]/70">
-              {!ready
-                ? Array.from({ length: 4 }).map((_, i) => (
-                    <span
-                      key={i}
-                      className="inline-block h-3 w-20 animate-pulse rounded-sm bg-white/10"
-                    />
-                  ))
-                : categories.slice(0, 4).map((c) => (
-                    <Link
-                      key={c}
-                      href={`/products?category=${c}`}
-                      className="hover:text-[#f4efe8]"
-                    >
-                      {tc(c)}
-                    </Link>
-                  ))}
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <p className="mb-4 text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
-            {t("newsletter")}
-          </p>
-          <p className="mb-4 text-sm leading-6 text-[#f4efe8]/55">
-            {home("newsletterSub")}
-          </p>
-          {joined ? (
-            <p className="text-sm text-[#c9a08a]">{home("newsletterSuccess")}</p>
-          ) : (
-            <form
-              className="flex flex-row gap-2"
-              onSubmit={async (event) => {
-                event.preventDefault();
-                if (!email.trim()) return;
-                setJoining(true);
-                try {
-                  const res = await fetch("/api/subscribers", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email }),
-                  });
-                  if (!res.ok) throw new Error("Failed");
-                  setJoined(true);
-                  setEmail("");
-                } catch {
-                  /* keep form visible */
-                } finally {
-                  setJoining(false);
-                }
-              }}
-            >
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={home("newsletterPlaceholder")}
-                className="min-h-11 flex-1 border border-white/15 bg-transparent px-4 text-sm text-[#f4efe8] outline-none placeholder:text-[#f4efe8]/35 focus:border-[#c9a08a]"
-                required
-              />
-              <button
-                type="submit"
-                disabled={joining}
-                className="min-h-11 border border-[#c9a08a]/60 bg-[#c9a08a]/15 px-5 text-[11px] uppercase tracking-[0.18em] text-[#f4efe8] transition hover:bg-[#c9a08a]/25 disabled:opacity-50"
+            <p className="mb-4 text-sm leading-6 text-[color:var(--rg-muted)]">
+              {home("newsletterSub")}
+            </p>
+            {joined ? (
+              <p className="text-sm text-[color:var(--rg-accent)]">
+                {home("newsletterSuccess")}
+              </p>
+            ) : (
+              <form
+                className="flex flex-row gap-2"
+                onSubmit={async (event) => {
+                  event.preventDefault();
+                  if (!email.trim()) return;
+                  setJoining(true);
+                  try {
+                    const res = await fetch("/api/subscribers", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email }),
+                    });
+                    if (!res.ok) throw new Error("Failed");
+                    setJoined(true);
+                    setEmail("");
+                  } catch {
+                    /* keep form */
+                  } finally {
+                    setJoining(false);
+                  }
+                }}
               >
-                {home("newsletterCta")}
-              </button>
-            </form>
-          )}
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={home("newsletterPlaceholder")}
+                  className="min-h-11 flex-1 border border-[color:var(--rg-line)] bg-white px-4 text-sm outline-none placeholder:text-[color:var(--rg-muted)] focus:border-[color:var(--rg-charcoal)]"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={joining}
+                  className="rg-cta-solid min-h-11 px-4 disabled:opacity-50"
+                >
+                  {home("newsletterCta")}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="container-rg py-5 text-[11px] tracking-[0.12em] text-[#f4efe8]/35">
+      <div className="border-t border-[color:var(--rg-line)]">
+        <div className="container-rg py-5 text-center text-[11px] tracking-[0.12em] text-[color:var(--rg-muted)]">
           {t("rights", { year })}
         </div>
       </div>

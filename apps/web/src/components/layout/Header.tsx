@@ -10,6 +10,7 @@ import { getCoverMedia, localize } from "@/data/products";
 import { NAV_FEATURED_PRODUCT_SLUG } from "@/data/nav";
 import { SmoothCollapse } from "@/components/ui/SmoothCollapse";
 import { formatBdt, cn } from "@/lib/format";
+import { CartDrawer } from "@/components/bag/CartDrawer";
 import { useBag } from "@/store/bag";
 import { useCatalog } from "@/store/catalog";
 import { mediaUrl } from "@/lib/media";
@@ -29,6 +30,7 @@ export function Header() {
   const { ready, categories, getBySlug } = useCatalog();
   const [open, setOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const [mobileShopOpen, setMobileShopOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [bagReady, setBagReady] = useState(false);
@@ -41,6 +43,7 @@ export function Header() {
   useEffect(() => {
     setOpen(false);
     setShopOpen(false);
+    setCartOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -48,15 +51,29 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
+    const onScroll = () => {
+      const lenisY = (
+        window as Window & { __rgLenis?: { animatedScroll?: number } }
+      ).__rgLenis?.animatedScroll;
+      const y =
+        typeof lenisY === "number" ? lenisY : window.scrollY || window.pageYOffset;
+      setScrolled(y > 16);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const lenis = getLenis() as
+      | (RgLenis & { on?: (e: string, cb: () => void) => void; off?: (e: string, cb: () => void) => void })
+      | undefined;
+    lenis?.on?.("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      lenis?.off?.("scroll", onScroll);
+    };
   }, []);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
-    if (open || shopOpen) {
+    if (open || shopOpen || cartOpen) {
       document.body.style.overflow = "hidden";
       getLenis()?.stop();
     } else {
@@ -67,19 +84,20 @@ export function Header() {
       document.body.style.overflow = "";
       getLenis()?.start();
     };
-  }, [open, shopOpen]);
+  }, [open, shopOpen, cartOpen]);
 
   useEffect(() => {
-    if (!open && !shopOpen) return;
+    if (!open && !shopOpen && !cartOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
         setShopOpen(false);
+        setCartOpen(false);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, shopOpen]);
+  }, [open, shopOpen, cartOpen]);
 
   useEffect(() => {
     if (!shopOpen) return;
@@ -100,31 +118,27 @@ export function Header() {
     closeTimer.current = setTimeout(() => setShopOpen(false), 140);
   };
 
-  const headerDark = open || shopOpen || (isHome && !scrolled);
+  /* Velvet chrome — ivory type on deep stage; drawer stays noir. */
   const shopActive =
     pathname.startsWith("/products") || pathname.startsWith("/product");
   const contactActive = pathname.startsWith("/contact");
   const aboutActive = pathname.startsWith("/about");
 
-  const linkMuted = headerDark
-    ? "text-[#f4efe8]/55 hover:text-[#f4efe8]"
-    : "text-[#1c1a19]/55 hover:text-[#1c1a19]";
-  const linkActive = headerDark ? "text-[#f4efe8]" : "text-[#1c1a19]";
-  const iconBtn = headerDark
-    ? "text-[#f4efe8]/80 hover:text-[#f4efe8]"
-    : "text-[#1c1a19]/70 hover:text-[#1c1a19]";
+  const linkMuted = "text-[#f3eee8]/55 hover:text-[#f3eee8]";
+  const linkActive = "text-[#f3eee8]";
+  const iconBtn = "text-[#f3eee8]/80 hover:text-[#f3eee8]";
 
   return (
     <header
       ref={shopRef}
       suppressHydrationWarning
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter,color] duration-500",
+        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter,color,box-shadow] duration-500",
         open || shopOpen
-          ? "border-b border-white/10 bg-[#121110] text-[#f4efe8]"
-          : headerDark
-            ? "border-b border-transparent bg-transparent text-[#f4efe8]"
-            : "border-b border-[#1c1a19]/10 bg-[#f0ebe4] text-[#1c1a19]",
+          ? "border-b border-white/10 bg-[#0c0a0b] text-[#f3eee8]"
+          : scrolled || !isHome
+            ? "border-b border-[color:var(--rg-line)] bg-[color:var(--rg-paper)]/92 text-[color:var(--rg-ink)] shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
+            : "border-b border-transparent bg-transparent text-[color:var(--rg-ink)]",
       )}
     >
       <div className="container-rg relative grid h-[4.25rem] grid-cols-[1fr_auto_1fr] items-center md:h-[5rem]">
@@ -174,7 +188,7 @@ export function Header() {
               {t("home")}
               <span
                 className={cn(
-                  "absolute -bottom-1 left-0 h-px bg-[#c9a08a] transition-all duration-300",
+                  "absolute -bottom-1 left-0 h-px bg-[color:var(--rg-accent)] transition-all duration-300",
                   isHome && !shopOpen ? "w-full" : "w-0 group-hover:w-full",
                 )}
               />
@@ -207,7 +221,7 @@ export function Header() {
                 </span>
                 <span
                   className={cn(
-                    "absolute -bottom-1 left-0 h-px bg-[#c9a08a] transition-all duration-300",
+                    "absolute -bottom-1 left-0 h-px bg-[color:var(--rg-accent)] transition-all duration-300",
                     shopActive || shopOpen ? "w-full" : "w-0 group-hover:w-full",
                   )}
                 />
@@ -225,7 +239,7 @@ export function Header() {
               {t("about")}
               <span
                 className={cn(
-                  "absolute -bottom-1 left-0 h-px bg-[#c9a08a] transition-all duration-300",
+                  "absolute -bottom-1 left-0 h-px bg-[color:var(--rg-accent)] transition-all duration-300",
                   aboutActive ? "w-full" : "w-0 group-hover:w-full",
                 )}
               />
@@ -242,7 +256,7 @@ export function Header() {
               {t("contact")}
               <span
                 className={cn(
-                  "absolute -bottom-1 left-0 h-px bg-[#c9a08a] transition-all duration-300",
+                  "absolute -bottom-1 left-0 h-px bg-[color:var(--rg-accent)] transition-all duration-300",
                   contactActive ? "w-full" : "w-0 group-hover:w-full",
                 )}
               />
@@ -256,7 +270,7 @@ export function Header() {
           className="absolute left-1/2 top-1/2 z-[55] flex -translate-x-1/2 -translate-y-1/2 items-center gap-2.5"
           onClick={() => setOpen(false)}
         >
-          <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full ring-1 ring-[#c9a08a]/35 md:h-9 md:w-9">
+          <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full ring-1 ring-[#d4a574]/35 md:h-9 md:w-9">
             <Image
               src={mediaUrl("/brand/logo.png")}
               alt=""
@@ -284,7 +298,7 @@ export function Header() {
 
         <div className="relative z-[60] flex items-center justify-end gap-0.5">
           <div className="mr-2 hidden lg:mr-3 lg:block">
-            <LocaleSwitcher light={headerDark} />
+            <LocaleSwitcher light />
           </div>
 
           <Link
@@ -298,28 +312,28 @@ export function Header() {
             <IconSearch className="h-[18px] w-[18px] transition duration-300 group-hover:scale-[1.06]" />
           </Link>
 
-          <Link
-            href="/cart"
+          <button
+            type="button"
             className={cn(
               "group relative flex h-11 w-11 items-center justify-center transition",
               iconBtn,
             )}
             aria-label={t("cart")}
+            aria-expanded={cartOpen}
+            onClick={() => setCartOpen(true)}
           >
             <IconBag className="h-[18px] w-[18px] transition duration-300 group-hover:scale-[1.06]" />
             {bagReady && cartCount > 0 ? (
               <span
                 className={cn(
                   "absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-medium leading-none ring-2",
-                  headerDark
-                    ? "bg-[#c9a08a] text-[#0e0d0c] ring-[#121110]"
-                    : "bg-[#c9a08a] text-[#0e0d0c] ring-[#f0ebe4]",
+                  "bg-[#d4a574] text-[#0c0a0b] ring-[#0c0a0b]",
                 )}
               >
                 {cartCount > 9 ? "9+" : cartCount}
               </span>
             ) : null}
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -334,10 +348,10 @@ export function Header() {
         onMouseEnter={openShop}
         onMouseLeave={scheduleCloseShop}
       >
-        <div className="border-b border-white/10 bg-[#121110] text-[#f4efe8] shadow-[0_28px_80px_rgba(0,0,0,0.45)]">
+        <div className="border-b border-white/10 bg-[#121110] text-[#f3eee8] shadow-[0_28px_80px_rgba(0,0,0,0.45)]">
           <div className="container-rg grid grid-cols-[1fr_minmax(14rem,0.72fr)] gap-0">
             <div className="border-r border-white/10 py-8 pr-10">
-              <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#d4a574]">
                 {t("categories")}
               </p>
               <ul className="mt-5 grid grid-cols-2 gap-x-10 gap-y-1">
@@ -345,11 +359,11 @@ export function Header() {
                   <li key={c}>
                     <Link
                       href={`/products?category=${c}`}
-                      className="group flex items-center justify-between py-3 text-[14px] text-[#f4efe8]/8 transition hover:text-[#f4efe8]"
+                      className="group flex items-center justify-between py-3 text-[14px] text-[#f3eee8]/8 transition hover:text-[#f3eee8]"
                       onClick={() => setShopOpen(false)}
                     >
                       <span>{tc(c)}</span>
-                      <span className="translate-x-0 text-[#c9a08a] opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100">
+                      <span className="translate-x-0 text-[#d4a574] opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100">
                         →
                       </span>
                     </Link>
@@ -358,7 +372,7 @@ export function Header() {
               </ul>
               <Link
                 href="/products"
-                className="mt-7 inline-flex text-[10px] uppercase tracking-[0.2em] text-[#c9a08a] transition hover:text-[#f4efe8]"
+                className="mt-7 inline-flex text-[10px] uppercase tracking-[0.2em] text-[#d4a574] transition hover:text-[#f3eee8]"
                 onClick={() => setShopOpen(false)}
               >
                 {t("shopAll")} →
@@ -381,13 +395,13 @@ export function Header() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0e0d0c]/85 via-[#0e0d0c]/20 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-6">
-                    <p className="text-[9px] uppercase tracking-[0.22em] text-[#c9a08a]">
+                    <p className="text-[9px] uppercase tracking-[0.22em] text-[#d4a574]">
                       {t("featured")}
                     </p>
-                    <p className="mt-2 font-display text-2xl leading-tight text-[#f4efe8]">
+                    <p className="mt-2 font-display text-2xl leading-tight text-[#f3eee8]">
                       {localize(featured.name, locale)}
                     </p>
-                    <p className="mt-1.5 text-sm text-[#f4efe8]/65">
+                    <p className="mt-1.5 text-sm text-[#f3eee8]/65">
                       {formatBdt(featured.price, locale)}
                     </p>
                   </div>
@@ -420,7 +434,7 @@ export function Header() {
 
         <div
           className={cn(
-            "absolute inset-x-0 top-0 flex h-[100dvh] max-h-[100dvh] flex-col border-b border-white/10 bg-[#121110] pt-[4.25rem] text-[#f4efe8] shadow-[0_30px_80px_rgba(0,0,0,0.55)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:pt-[5rem]",
+            "absolute inset-x-0 top-0 flex h-[100dvh] max-h-[100dvh] flex-col border-b border-white/10 bg-[#121110] pt-[4.25rem] text-[#f3eee8] shadow-[0_30px_80px_rgba(0,0,0,0.55)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:pt-[5rem]",
             open ? "translate-y-0" : "-translate-y-[105%]",
           )}
         >
@@ -430,7 +444,7 @@ export function Header() {
             onWheel={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()}
           >
-            <div className="mb-6 h-px w-10 bg-gradient-to-r from-[#c9a08a] to-transparent" />
+            <div className="mb-6 h-px w-10 bg-gradient-to-r from-[#d4a574] to-transparent" />
 
             <nav aria-label="Mobile">
               <Link
@@ -454,7 +468,7 @@ export function Header() {
                   </Link>
                   <button
                     type="button"
-                    className="shrink-0 p-1 text-sm text-[#c9a08a]"
+                    className="shrink-0 p-1 text-sm text-[#d4a574]"
                     aria-expanded={mobileShopOpen}
                     aria-label={t("categories")}
                     onClick={() => setMobileShopOpen((v) => !v)}
@@ -474,13 +488,13 @@ export function Header() {
                   <div className="pb-5">
                     <Link
                       href="/products"
-                      className="mb-4 inline-flex text-[10px] uppercase tracking-[0.2em] text-[#c9a08a]"
+                      className="mb-4 inline-flex text-[10px] uppercase tracking-[0.2em] text-[#d4a574]"
                       onClick={() => setOpen(false)}
                     >
                       {t("shopAll")} →
                     </Link>
 
-                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]/8">
+                    <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-[#d4a574]/8">
                       {t("categories")}
                     </p>
                     <ul>
@@ -488,11 +502,11 @@ export function Header() {
                         <li key={c}>
                           <Link
                             href={`/products?category=${c}`}
-                            className="group flex items-center justify-between py-3 text-[16px] text-[#f4efe8]/85 transition hover:text-[#f4efe8]"
+                            className="group flex items-center justify-between py-3 text-[16px] text-[#f3eee8]/85 transition hover:text-[#f3eee8]"
                             onClick={() => setOpen(false)}
                           >
                             <span>{tc(c)}</span>
-                            <span className="text-[#c9a08a] transition group-hover:translate-x-0.5">
+                            <span className="text-[#d4a574] transition group-hover:translate-x-0.5">
                               →
                             </span>
                           </Link>
@@ -517,13 +531,13 @@ export function Header() {
                             />
                           </div>
                           <div className="flex flex-col justify-center px-4 py-3">
-                            <p className="text-[9px] uppercase tracking-[0.2em] text-[#c9a08a]">
+                            <p className="text-[9px] uppercase tracking-[0.2em] text-[#d4a574]">
                               {t("featured")}
                             </p>
-                            <p className="mt-1 font-display text-lg leading-snug text-[#f4efe8]">
+                            <p className="mt-1 font-display text-lg leading-snug text-[#f3eee8]">
                               {localize(featured.name, locale)}
                             </p>
-                            <p className="mt-1 text-xs text-[#f4efe8]/55">
+                            <p className="mt-1 text-xs text-[#f3eee8]/55">
                               {formatBdt(featured.price, locale)}
                             </p>
                           </div>
@@ -558,11 +572,11 @@ export function Header() {
             <div className="mt-8 grid grid-cols-2 gap-3">
               <Link
                 href="/wishlist"
-                className="flex items-center justify-between gap-3 border border-white/10 px-4 py-3 text-[11px] uppercase tracking-[0.18em] text-[#f4efe8]/75 transition hover:border-[#c9a08a]/40 hover:text-[#f4efe8]"
+                className="flex items-center justify-between gap-3 border border-white/10 px-4 py-3 text-[11px] uppercase tracking-[0.18em] text-[#f3eee8]/75 transition hover:border-[#d4a574]/40 hover:text-[#f3eee8]"
                 onClick={() => setOpen(false)}
               >
                 <span>{t("wishlist")}</span>
-                <span className="tabular-nums text-[#c9a08a]">
+                <span className="tabular-nums text-[#d4a574]">
                   {bagReady
                     ? wishlistCount > 9
                       ? "9+"
@@ -572,11 +586,11 @@ export function Header() {
               </Link>
               <Link
                 href="/cart"
-                className="flex items-center justify-between gap-3 border border-white/10 px-4 py-3 text-[11px] uppercase tracking-[0.18em] text-[#f4efe8]/75 transition hover:border-[#c9a08a]/40 hover:text-[#f4efe8]"
+                className="flex items-center justify-between gap-3 border border-white/10 px-4 py-3 text-[11px] uppercase tracking-[0.18em] text-[#f3eee8]/75 transition hover:border-[#d4a574]/40 hover:text-[#f3eee8]"
                 onClick={() => setOpen(false)}
               >
                 <span>{t("cart")}</span>
-                <span className="tabular-nums text-[#c9a08a]">
+                <span className="tabular-nums text-[#d4a574]">
                   {bagReady ? (cartCount > 9 ? "9+" : cartCount) : 0}
                 </span>
               </Link>
@@ -584,18 +598,20 @@ export function Header() {
 
             <div className="mt-10 flex items-end justify-between gap-4 border-t border-white/10 pt-7">
               <div>
-                <p className="mb-2.5 text-[10px] uppercase tracking-[0.22em] text-[#f4efe8]/45">
+                <p className="mb-2.5 text-[10px] uppercase tracking-[0.22em] text-[#f3eee8]/45">
                   Language
                 </p>
                 <LocaleSwitcher light />
               </div>
-              <p className="max-w-[9rem] text-right text-[10px] uppercase leading-5 tracking-[0.16em] text-[#f4efe8]/40">
+              <p className="max-w-[9rem] text-right text-[10px] uppercase leading-5 tracking-[0.16em] text-[#f3eee8]/40">
                 {t("atelierNote")}
               </p>
             </div>
           </div>
         </div>
       </div>
+
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </header>
   );
 }

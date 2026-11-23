@@ -385,34 +385,35 @@ export function ProductLanding({
   };
 
   const fieldClass =
-    "min-h-11 w-full border border-[#1c1a19]/15 bg-transparent px-4 text-sm text-[#1c1a19] outline-none transition placeholder:text-[#1c1a19]/35 focus:border-[#c9a08a]";
+    "min-h-11 w-full border border-[color:var(--rg-line)] bg-transparent px-4 text-sm text-[color:var(--rg-pearl)] outline-none transition placeholder:text-[color:var(--rg-muted)] focus:border-[color:var(--rg-accent)]";
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-[color:var(--rg-paper)]">
+      <div className="rg-stage relative min-h-screen">
+        <div className="rg-editorial-grid pointer-events-none absolute inset-0 opacity-60" aria-hidden />
         <LandingNav />
         <div className="container-rg flex min-h-[70vh] flex-col items-center justify-center py-20 text-center">
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[color:var(--rg-accent)]">
             {t("successEyebrow")}
           </p>
-          <h1 className="mt-4 font-display text-4xl text-[#1c1a19] md:text-5xl">
+          <h1 className="mt-4 font-display text-4xl text-[color:var(--rg-pearl)] md:text-5xl">
             {t("successTitle")}
           </h1>
-          <p className="mt-5 max-w-md text-sm leading-7 text-[#1c1a19]/55">
+          <p className="mt-5 max-w-md text-sm leading-7 text-[color:var(--rg-muted)]">
             {t("successSub")}
           </p>
-          <p className="mt-3 text-sm text-[#1c1a19]/45">
+          <p className="mt-3 text-sm text-[color:var(--rg-muted)]">
             {orderNumber ? `${orderNumber} · ` : ""}
             {t("bagCount", { count: itemCount })} · {formatBdt(total, locale)}
           </p>
           <a
             href={contact.phoneTel}
-            className="mt-8 inline-flex min-h-12 items-center justify-center bg-[#1c1a19] px-7 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8]"
+            className="rg-cta-solid mt-8 min-h-12 px-7"
           >
             {t("callUs")} · {contact.phoneDisplay}
           </a>
           <div className="mt-8">
-            <SocialLinks tone="dark" className="justify-center" />
+            <SocialLinks tone="light" className="justify-center" />
           </div>
         </div>
       </div>
@@ -420,7 +421,8 @@ export function ProductLanding({
   }
 
   return (
-    <div className="min-h-screen bg-[color:var(--rg-paper)]">
+    <div className="rg-stage relative min-h-screen">
+      <div className="rg-editorial-grid pointer-events-none absolute inset-0 opacity-60" aria-hidden />
       <MetaViewContent
         contentId={product.sku || product.slug}
         contentName={localize(product.name, locale)}
@@ -430,15 +432,15 @@ export function ProductLanding({
 
       {/* Floating bag strip when multi */}
       {itemCount > 0 ? (
-        <div className="sticky top-[4.25rem] z-40 border-b border-[#1c1a19]/10 bg-[#e7e0d6]/90 backdrop-blur-md md:top-[4.75rem]">
+        <div className="sticky top-[4.25rem] z-40 border-b border-[color:var(--rg-line)] bg-[color:var(--rg-paper)]/92 backdrop-blur-md md:top-[4.75rem]">
           <div className="container-rg flex items-center justify-between gap-3 py-2.5">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-[#1c1a19]/65">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--rg-muted)]">
               {t("bagCount", { count: itemCount })} · {formatBdt(total, locale)}
             </p>
             <button
               type="button"
               onClick={scrollToOrder}
-              className="text-[10px] uppercase tracking-[0.18em] text-[#1c1a19] underline-offset-4 hover:underline"
+              className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--rg-pearl)] underline-offset-4 hover:underline"
             >
               {t("viewOrder")} →
             </button>
@@ -457,7 +459,7 @@ export function ProductLanding({
           </div>
 
           <div>
-            <p className="text-[10px] uppercase tracking-[0.24em] text-[#c9a08a]">
+            <p className="text-[10px] uppercase tracking-[0.24em] text-[color:var(--rg-accent)]">
               {localize(
                 {
                   en: landing.eyebrowEn || tc(product.category),
@@ -466,7 +468,7 @@ export function ProductLanding({
                 locale,
               )}
             </p>
-            <h1 className="mt-3 font-display text-[clamp(1.75rem,6vw,2.85rem)] leading-[1.1] tracking-[-0.02em] text-[#1c1a19]">
+            <h1 className="mt-3 font-display text-[clamp(1.75rem,6vw,2.85rem)] leading-[1.1] tracking-[-0.02em] text-[color:var(--rg-pearl)]">
               {localize(
                 {
                   en: landing.headlineEn || product.name.en,
@@ -475,18 +477,19 @@ export function ProductLanding({
                 locale,
               )}
             </h1>
+            <div className="rg-home-gold-rule mt-4 w-12" />
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
-              <span className="text-2xl text-[#1c1a19]">
+              <span className="font-display text-[clamp(1.55rem,2.8vw,2rem)] text-[color:var(--rg-accent)]">
                 {formatBdt(offer.price, locale)}
               </span>
               {compare ? (
-                <span className="text-sm text-[#1c1a19]/40 line-through">
+                <span className="text-sm text-[color:var(--rg-muted)] line-through">
                   {formatBdt(compare, locale)}
                 </span>
               ) : null}
               {discount > 0 ? (
-                <span className="border border-[#c9a08a]/55 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#a67c68]">
+                <span className="border border-[#d4af37] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#d4af37]">
                   {t("off", { percent: discount })}
                 </span>
               ) : null}
@@ -504,7 +507,7 @@ export function ProductLanding({
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
               {product.rating > 0 ? (
                 <>
-                  <div className="flex items-center gap-1 text-[#c9a08a]">
+                  <div className="flex items-center gap-1 text-[color:var(--rg-accent)]">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <IconStar
                         key={i}
@@ -512,7 +515,7 @@ export function ProductLanding({
                       />
                     ))}
                   </div>
-                  <span className="text-xs text-[#1c1a19]/50">
+                  <span className="text-xs text-[color:var(--rg-muted)]">
                     {product.reviewCount > 0
                       ? t("rating", {
                           rating: product.rating.toFixed(1),
@@ -525,9 +528,9 @@ export function ProductLanding({
               {product.soldCount > 0 ? (
                 <>
                   {product.rating > 0 ? (
-                    <span className="text-[#1c1a19]/25">·</span>
+                    <span className="text-[color:var(--rg-muted)]">·</span>
                   ) : null}
-                  <span className="text-xs text-[#1c1a19]/50">
+                  <span className="text-xs text-[color:var(--rg-muted)]">
                     {t("purchased", { count: product.soldCount })}
                   </span>
                 </>
@@ -553,10 +556,10 @@ export function ProductLanding({
                 },
                 locale,
               )}
-              className="mt-5 text-[15px] leading-7 text-[#1c1a19]/58"
+              className="mt-5 text-[15px] leading-7 text-[color:var(--rg-muted)]"
             />
 
-            <div className="mt-6 grid grid-cols-3 gap-1.5 bg-[#f6efe8] px-2 py-4 ring-1 ring-[#c9a08a]/55 sm:gap-2 sm:px-3">
+            <div className="mt-6 grid grid-cols-3 gap-1.5 border border-[#d4af37]/45 bg-[color:var(--rg-paper-deep)]/70 px-2 py-4 sm:gap-2 sm:px-3">
               {(
                 [
                   [IconShield, t("trust1")],
@@ -568,10 +571,10 @@ export function ProductLanding({
                   key={label}
                   className="flex flex-col items-center gap-1.5 text-center sm:gap-2"
                 >
-                  <span className="flex h-8 w-8 items-center justify-center bg-[#c9a08a]/20 text-[#8d5e48] ring-1 ring-[#c9a08a]/55">
+                  <span className="flex h-8 w-8 items-center justify-center border border-[#d4af37]/55 bg-[color:var(--rg-accent)]/15 text-[color:var(--rg-accent)]">
                     <Icon className="h-3.5 w-3.5" />
                   </span>
-                  <p className="max-w-[6.5rem] text-[9px] font-medium leading-snug text-[#1c1a19]/85 sm:text-[10px]">
+                  <p className="max-w-[6.5rem] text-[9px] font-medium leading-snug text-[color:var(--rg-muted)] sm:text-[10px]">
                     {label}
                   </p>
                 </div>
@@ -585,7 +588,7 @@ export function ProductLanding({
                   if (!lines[productSlug]) setQty(productSlug, 1);
                   scrollToOrder();
                 }}
-                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#c75d7e] px-6 text-[11px] uppercase tracking-[0.2em] text-white transition-colors hover:bg-[#b24e6e]"
+                className="rg-cta-solid rg-beat min-h-12 w-full"
               >
                 {t("orderNow")} →
               </button>
@@ -597,20 +600,20 @@ export function ProductLanding({
             />
 
             <div className="mt-7 flex flex-col items-center text-center">
-              <p className="mb-2.5 text-[10px] uppercase tracking-[0.2em] text-[#1c1a19]/4">
+              <p className="mb-2.5 text-[10px] uppercase tracking-[0.2em] text-[color:var(--rg-muted)]">
                 {t("follow")}
               </p>
-              <SocialLinks tone="dark" className="justify-center" />
+              <SocialLinks tone="light" className="justify-center" />
             </div>
           </div>
         </div>
 
         {/* Details */}
-        <section className="mt-14 border-t border-[#1c1a19]/10 pt-10 md:mt-20 md:pt-14">
-          <h2 className="font-display text-3xl text-[#1c1a19] md:text-4xl">
+        <section className="mt-14 border-t border-[color:var(--rg-line)] pt-10 md:mt-20 md:pt-14">
+          <h2 className="font-display text-3xl text-[color:var(--rg-pearl)] md:text-4xl">
             {tp("descriptionTitle")}
           </h2>
-          <div className="mt-4 h-px w-12 bg-gradient-to-r from-[#c9a08a] to-transparent" />
+          <div className="mt-4 h-px w-12 bg-gradient-to-r from-[color:var(--rg-accent)] to-transparent" />
           <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-16">
             <div>
               <RichText
@@ -621,22 +624,22 @@ export function ProductLanding({
                   },
                   locale,
                 )}
-                className="text-sm leading-7 text-[#1c1a19]/58 md:text-[15px] md:leading-8"
+                className="text-sm leading-7 text-[color:var(--rg-muted)] md:text-[15px] md:leading-8"
               />
-              <ul className="mt-6 space-y-3 text-sm text-[#1c1a19]/65">
+              <ul className="mt-6 space-y-3 text-sm text-[color:var(--rg-muted)]">
                 {landing.points
                   .map((point) => localize(point, locale).trim())
                   .filter(Boolean)
                   .map((point) => (
                     <li key={point} className="flex gap-3">
-                      <span className="mt-2 h-1 w-1 shrink-0 bg-[#c9a08a]" />
+                      <span className="mt-2 h-1 w-1 shrink-0 bg-[color:var(--rg-accent)]" />
                       {point}
                     </li>
                   ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-[10px] uppercase tracking-[0.22em] text-[#c9a08a]">
+              <h3 className="text-[10px] uppercase tracking-[0.22em] text-[color:var(--rg-accent)]">
                 {tp("specifications")}
               </h3>
               <dl className="mt-4">
@@ -652,19 +655,19 @@ export function ProductLanding({
                 ).map(([label, value]) => (
                   <div
                     key={label}
-                    className="grid grid-cols-[1fr_1.2fr] gap-4 border-b border-[#1c1a19]/08 py-3.5"
+                    className="grid grid-cols-[1fr_1.2fr] gap-4 border-b border-[color:var(--rg-line)] py-3.5"
                   >
-                    <dt className="text-[11px] uppercase tracking-[0.14em] text-[#1c1a19]/40">
+                    <dt className="text-[11px] uppercase tracking-[0.14em] text-[color:var(--rg-muted)]">
                       {label}
                     </dt>
-                    <dd className="text-sm text-[#1c1a19]">{value}</dd>
+                    <dd className="text-sm text-[color:var(--rg-pearl)]">{value}</dd>
                   </div>
                 ))}
               </dl>
-              <h3 className="mt-8 text-[10px] uppercase tracking-[0.22em] text-[#c9a08a]">
+              <h3 className="mt-8 text-[10px] uppercase tracking-[0.22em] text-[color:var(--rg-accent)]">
                 {tp("shipping")}
               </h3>
-              <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[#1c1a19]/58">
+              <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[color:var(--rg-muted)]">
                 {(
                   locale === "bn"
                     ? shipping?.shippingReturnBn ||
@@ -691,8 +694,8 @@ export function ProductLanding({
       {/* Related */}
       {!ready ? (
         <section className="container-rg mt-14 md:mt-20">
-          <div className="h-3 w-24 animate-pulse rounded-sm bg-[#1c1a19]/10" />
-          <div className="mt-3 h-9 w-56 animate-pulse rounded-sm bg-[#1c1a19]/10" />
+          <div className="h-3 w-24 animate-pulse rounded-sm bg-[color:var(--rg-pearl)]/10" />
+          <div className="mt-3 h-9 w-56 animate-pulse rounded-sm bg-[color:var(--rg-pearl)]/10" />
           <div className="mt-8 flex gap-4 overflow-hidden">
             {Array.from({ length: 3 }).map((_, i) => (
               <ProductCardSkeleton
@@ -704,14 +707,14 @@ export function ProductLanding({
         </section>
       ) : related.length > 0 ? (
         <section className="container-rg mt-14 md:mt-20">
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[color:var(--rg-accent)]">
             {t("relatedEyebrow")}
           </p>
-          <h2 className="mt-3 font-display text-3xl text-[#1c1a19] md:text-4xl">
+          <h2 className="mt-3 font-display text-3xl text-[color:var(--rg-pearl)] md:text-4xl">
             {t("relatedTitle")}
           </h2>
-          <div className="mt-4 h-px w-12 bg-gradient-to-r from-[#c9a08a] to-transparent" />
-          <p className="mt-3 max-w-xl text-sm text-[#1c1a19]/55">
+          <div className="mt-4 h-px w-12 bg-gradient-to-r from-[color:var(--rg-accent)] to-transparent" />
+          <p className="mt-3 max-w-xl text-sm text-[color:var(--rg-muted)]">
             {t("relatedSub")}
           </p>
 
@@ -733,7 +736,7 @@ export function ProductLanding({
                       <button
                         type="button"
                         onClick={() => setPreview(item)}
-                        className="inline-flex min-h-10 flex-1 items-center justify-center border border-[#1c1a19]/2 px-2 text-[10px] uppercase tracking-[0.14em] text-[#1c1a19] transition hover:border-[#1c1a19] sm:px-3 sm:tracking-[0.16em]"
+                        className="inline-flex min-h-10 flex-1 items-center justify-center border border-[color:var(--rg-line)] px-2 text-[10px] uppercase tracking-[0.14em] text-[color:var(--rg-pearl)] transition hover:border-[color:var(--rg-accent)] sm:px-3 sm:tracking-[0.16em]"
                       >
                         {t("viewDetails")}
                       </button>
@@ -743,8 +746,8 @@ export function ProductLanding({
                         className={cn(
                           "inline-flex min-h-10 flex-1 items-center justify-center px-2 text-[10px] uppercase tracking-[0.14em] transition sm:px-3 sm:tracking-[0.16em]",
                           inBag
-                            ? "border border-[#1c1a19]/25 text-[#1c1a19] hover:border-[#1c1a19]"
-                            : "bg-[#1c1a19] text-[#f4efe8] hover:bg-black",
+                            ? "border border-[color:var(--rg-line)] text-[color:var(--rg-pearl)] hover:border-[color:var(--rg-accent)]"
+                            : "bg-[color:var(--rg-accent)] text-[color:var(--rg-cta-ink)] hover:bg-[color:var(--rg-cta-hover)]",
                         )}
                       >
                         {inBag ? t("remove") : t("addToo")}
@@ -759,31 +762,31 @@ export function ProductLanding({
       ) : null}
 
       <div className="container-rg pb-4 md:pb-8">
-        <div className="mt-12 flex flex-col items-center border-t border-[#1c1a19]/10 pt-10 text-center md:mt-16">
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
+        <div className="mt-12 flex flex-col items-center border-t border-[color:var(--rg-line)] pt-10 text-center md:mt-16">
+          <p className="text-[10px] uppercase tracking-[0.28em] text-[color:var(--rg-accent)]">
             {t("follow")}
           </p>
           <div className="mt-4">
-            <SocialLinks tone="dark" className="justify-center" />
+            <SocialLinks tone="light" className="justify-center" />
           </div>
         </div>
 
         {/* Order form */}
         <section
           id="order"
-          className="mt-12 scroll-mt-44 border border-[#1c1a19]/10 bg-[#e7e0d6]/40 p-4 sm:p-5 md:mt-16 md:scroll-mt-40 md:p-8 lg:p-10"
+          className="mt-12 scroll-mt-44 border border-[color:var(--rg-line)] bg-[color:var(--rg-paper-deep)]/70 p-4 sm:p-5 md:mt-16 md:scroll-mt-40 md:p-8 lg:p-10"
         >
           <div className="mx-auto max-w-2xl">
-            <p className="text-[10px] uppercase tracking-[0.24em] text-[#c9a08a]">
+            <p className="text-[10px] uppercase tracking-[0.24em] text-[color:var(--rg-accent)]">
               {t("orderEyebrow")}
             </p>
-            <h2 className="mt-2 font-display text-3xl text-[#1c1a19] md:text-4xl">
+            <h2 className="mt-2 font-display text-3xl text-[color:var(--rg-pearl)] md:text-4xl">
               {t("orderTitle")}
             </h2>
-            <p className="mt-2 text-sm text-[#1c1a19]/55">{t("codOnly")}</p>
+            <p className="mt-2 text-sm text-[color:var(--rg-muted)]">{t("codOnly")}</p>
 
             {/* Selected lines */}
-            <ul className="mt-6 divide-y divide-[#1c1a19]/10 border-t border-[#1c1a19]/10">
+            <ul className="mt-6 divide-y divide-[color:var(--rg-line)] border-t border-[color:var(--rg-line)]">
               {orderItems.map(({ product: item, qty }) => {
                 const lineOffer = offerFor(item);
                 const cover = lineOffer.image
@@ -795,7 +798,7 @@ export function ProductLanding({
                     className="flex flex-row items-center gap-3 py-4 sm:gap-4"
                   >
                     <div className="flex min-w-0 flex-1 gap-3">
-                      <div className="relative h-16 w-14 shrink-0 overflow-hidden bg-[#e2dacf]">
+                      <div className="relative h-16 w-14 shrink-0 overflow-hidden bg-[color:var(--rg-paper-deep)]">
                         {cover ? (
                           <Image
                             src={cover.src}
@@ -807,22 +810,22 @@ export function ProductLanding({
                         ) : null}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm leading-snug text-[#1c1a19]">
+                        <p className="text-sm leading-snug text-[color:var(--rg-pearl)]">
                           {localize(lineOffer.label, locale)}
                         </p>
-                        <p className="mt-0.5 text-xs text-[#1c1a19]/45">
+                        <p className="mt-0.5 text-xs text-[color:var(--rg-muted)]">
                           {formatBdt(lineOffer.price, locale)}
                         </p>
-                        <p className="mt-2 text-sm text-[#1c1a19] sm:hidden">
+                        <p className="mt-2 text-sm text-[color:var(--rg-pearl)] sm:hidden">
                           {formatBdt(lineOffer.price * qty, locale)}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end sm:gap-2">
-                      <div className="inline-flex items-center border border-[#1c1a19]/15">
+                      <div className="inline-flex items-center border border-[color:var(--rg-line)]">
                         <button
                           type="button"
-                          className="flex h-9 w-9 items-center justify-center text-[#1c1a19]/70 sm:h-8 sm:w-8"
+                          className="flex h-9 w-9 items-center justify-center text-[color:var(--rg-muted)] sm:h-8 sm:w-8"
                           onClick={() => setQty(item.slug, qty - 1)}
                           aria-label={t("decrease")}
                         >
@@ -831,7 +834,7 @@ export function ProductLanding({
                         <span className="min-w-7 text-center text-sm">{qty}</span>
                         <button
                           type="button"
-                          className="flex h-9 w-9 items-center justify-center text-[#1c1a19]/70 sm:h-8 sm:w-8"
+                          className="flex h-9 w-9 items-center justify-center text-[color:var(--rg-muted)] sm:h-8 sm:w-8"
                           onClick={() => setQty(item.slug, qty + 1)}
                           aria-label={t("increase")}
                         >
@@ -842,11 +845,11 @@ export function ProductLanding({
                         <button
                           type="button"
                           onClick={() => removeProduct(item.slug)}
-                          className="text-[10px] uppercase tracking-[0.14em] text-[#1c1a19]/45 transition hover:text-[#1c1a19]"
+                          className="text-[10px] uppercase tracking-[0.14em] text-[color:var(--rg-muted)] transition hover:text-[color:var(--rg-pearl)]"
                         >
                           {t("remove")}
                         </button>
-                        <p className="hidden text-sm text-[#1c1a19] sm:block">
+                        <p className="hidden text-sm text-[color:var(--rg-pearl)] sm:block">
                           {formatBdt(lineOffer.price * qty, locale)}
                         </p>
                       </div>
@@ -857,11 +860,11 @@ export function ProductLanding({
             </ul>
 
             <div className="mt-4 space-y-2 pt-2 text-sm">
-              <div className="flex items-center justify-between text-[#1c1a19]/55">
+              <div className="flex items-center justify-between text-[color:var(--rg-muted)]">
                 <span>{t("subtotal")}</span>
                 <span>{formatBdt(subtotal, locale)}</span>
               </div>
-              <div className="flex items-center justify-between text-[#1c1a19]/55">
+              <div className="flex items-center justify-between text-[color:var(--rg-muted)]">
                 <span>{t("shippingLabel")}</span>
                 <span>
                   {shippingFee > 0
@@ -874,15 +877,15 @@ export function ProductLanding({
               {shipping &&
               shipping.freeShippingOver > 0 &&
               subtotal < shipping.freeShippingOver ? (
-                <p className="text-xs text-[#1c1a19]/45">
+                <p className="text-xs text-[color:var(--rg-muted)]">
                   {t("freeShippingOver", {
                     amount: formatBdt(shipping.freeShippingOver, locale),
                   })}
                 </p>
               ) : null}
-              <div className="flex items-center justify-between border-t border-[#1c1a19]/10 pt-2">
-                <span className="text-[#1c1a19]/55">{t("total")}</span>
-                <span className="text-[#1c1a19]">{formatBdt(total, locale)}</span>
+              <div className="flex items-center justify-between border-t border-[color:var(--rg-line)] pt-2">
+                <span className="text-[color:var(--rg-muted)]">{t("total")}</span>
+                <span className="text-[color:var(--rg-pearl)]">{formatBdt(total, locale)}</span>
               </div>
             </div>
 
@@ -901,7 +904,7 @@ export function ProductLanding({
                 ] as const
               ).map(([key, label, type]) => (
                 <label key={key} className="block">
-                  <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-[#1c1a19]/45">
+                  <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-[color:var(--rg-muted)]">
                     {label}
                   </span>
                   <input
@@ -910,10 +913,10 @@ export function ProductLanding({
                     onChange={(e) =>
                       setForm((prev) => ({ ...prev, [key]: e.target.value }))
                     }
-                    className={cn(fieldClass, errors[key] && "border-red-700/50")}
+                    className={cn(fieldClass, errors[key] && "border-red-400/60")}
                   />
                   {errors[key] ? (
-                    <span className="mt-1 block text-xs text-red-700/70">
+                    <span className="mt-1 block text-xs text-red-300">
                       {errors[key]}
                     </span>
                   ) : null}
@@ -921,7 +924,7 @@ export function ProductLanding({
               ))}
 
               <label className="block">
-                <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-[#1c1a19]/45">
+                <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-[color:var(--rg-muted)]">
                   {t("address")}
                 </span>
                 <textarea
@@ -933,18 +936,18 @@ export function ProductLanding({
                   className={cn(
                     fieldClass,
                     "min-h-[5.5rem] resize-y py-3",
-                    errors.address && "border-red-700/50",
+                    errors.address && "border-red-400/60",
                   )}
                 />
                 {errors.address ? (
-                  <span className="mt-1 block text-xs text-red-700/70">
+                  <span className="mt-1 block text-xs text-red-300">
                     {errors.address}
                   </span>
                 ) : null}
               </label>
 
               <label className="block">
-                <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-[#1c1a19]/45">
+                <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-[color:var(--rg-muted)]">
                   {t("note")}
                 </span>
                 <textarea
@@ -958,7 +961,7 @@ export function ProductLanding({
               </label>
 
               {submitError ? (
-                <p className="border border-red-800/20 bg-red-50 px-3 py-2 text-sm text-red-900">
+                <p className="border border-red-400/30 bg-red-950/40 px-3 py-2 text-sm text-red-200">
                   {submitError}
                 </p>
               ) : null}
@@ -966,7 +969,7 @@ export function ProductLanding({
               <button
                 type="submit"
                 disabled={submitting}
-                className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#c75d7e] px-6 text-[11px] uppercase tracking-[0.2em] text-white transition-colors hover:bg-[#b24e6e] disabled:opacity-50"
+                className="rg-cta-solid rg-beat min-h-12 w-full disabled:opacity-50"
               >
                 {submitting ? "…" : t("placeOrder")}
               </button>
@@ -977,13 +980,13 @@ export function ProductLanding({
 
       {/* Mobile sticky — hidden while COD form is on screen so Place COD isn't doubled */}
       {!orderInView ? (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 border-t border-[#1c1a19]/10 bg-[#f0ebe4]/95 p-3 backdrop-blur-md lg:hidden">
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--rg-line)] bg-[color:var(--rg-paper)]/95 p-3 backdrop-blur-md lg:hidden">
           <div className="container-rg flex items-center gap-2 sm:gap-3">
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm text-[#1c1a19]">
+              <p className="truncate text-sm text-[color:var(--rg-pearl)]">
                 {t("bagCount", { count: itemCount })}
               </p>
-              <p className="text-xs text-[#1c1a19]/55">
+              <p className="text-xs text-[color:var(--rg-muted)]">
                 {formatBdt(total, locale)}
               </p>
             </div>
@@ -994,7 +997,7 @@ export function ProductLanding({
               <a
                 href={contact.phoneTel}
                 aria-label={tp("callButton")}
-                className="pointer-events-auto inline-flex h-12 w-12 shrink-0 items-center justify-center border border-[#1c1a19]/15 bg-[#f4efe8] text-[#1c1a19] transition hover:border-[#1c1a19] hover:bg-[#1c1a19] hover:text-[#f4efe8]"
+                className="pointer-events-auto inline-flex h-12 w-12 shrink-0 items-center justify-center border border-[color:var(--rg-line)] bg-[color:var(--rg-paper-deep)] text-[color:var(--rg-pearl)] transition hover:border-[color:var(--rg-accent)] hover:bg-[color:var(--rg-accent)] hover:text-[color:var(--rg-cta-ink)]"
               >
                 <IconPhone className="h-4 w-4" />
               </a>
@@ -1014,7 +1017,7 @@ export function ProductLanding({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={tp("whatsappButton")}
-                className="pointer-events-auto inline-flex h-12 w-12 shrink-0 items-center justify-center bg-[#1f6b4a] text-[#f4efe8] transition hover:bg-[#185a3e]"
+                className="pointer-events-auto inline-flex h-12 w-12 shrink-0 items-center justify-center bg-[#1f6b4a] text-white transition hover:bg-[#185a3e]"
               >
                 <IconWhatsApp className="h-4 w-4" />
               </a>
@@ -1023,7 +1026,7 @@ export function ProductLanding({
             <button
               type="button"
               onClick={scrollToOrder}
-              className="rg-beat pointer-events-auto inline-flex h-12 shrink-0 items-center justify-center bg-[#c75d7e] px-4 text-[11px] uppercase tracking-[0.16em] text-white transition-colors hover:bg-[#b24e6e] sm:px-5 sm:tracking-[0.18em]"
+              className="rg-cta-solid rg-beat pointer-events-auto h-12 shrink-0 px-4 text-[10px] tracking-[0.08em] sm:px-5"
             >
               {t("orderNow")}
             </button>

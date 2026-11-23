@@ -178,12 +178,9 @@ export function ProductGallery({
       ? mediaVariant(current.src, "full", current.variants)
       : "";
 
-  return (
-    <div
-      ref={rootRef}
-      className="flex flex-col gap-3 md:grid md:grid-cols-[68px_minmax(0,1fr)] md:gap-3 lg:grid-cols-[72px_minmax(0,1fr)] lg:gap-4"
-    >
-      <div className="order-2 -mx-5 flex gap-2 overflow-x-auto px-5 [-ms-overflow-style:none] [scrollbar-width:none] sm:-mx-6 sm:px-6 md:order-1 md:mx-0 md:flex-col md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
+  const thumbs =
+    media.length > 1 ? (
+      <div className="order-2 -mx-1 flex gap-2 overflow-x-auto px-1 [-ms-overflow-style:none] [scrollbar-width:none] md:order-1 md:mx-0 md:flex-col md:overflow-y-auto md:overflow-x-visible md:px-0 md:max-h-[min(72vh,720px)] [&::-webkit-scrollbar]:hidden">
         {media.map((item, index) => {
           const thumb =
             item.type === "image" ? item.src : item.poster || item.src;
@@ -194,10 +191,10 @@ export function ProductGallery({
               onClick={() => selectMedia(index)}
               onMouseEnter={() => preloadFull(item)}
               className={cn(
-                "relative flex aspect-[4/5] w-14 shrink-0 items-center justify-center overflow-hidden bg-[#e2dacf] transition md:w-full",
+                "relative flex aspect-[4/5] w-14 shrink-0 items-center justify-center overflow-hidden bg-[color:var(--rg-mat)] transition md:w-full",
                 active === index
-                  ? "ring-1 ring-[#c9a08a]"
-                  : "opacity-65 ring-1 ring-[#1c1a19]/10 hover:opacity-100",
+                  ? "ring-1 ring-[color:var(--rg-accent)]"
+                  : "opacity-55 ring-1 ring-[color:var(--rg-line)] hover:opacity-100",
               )}
               aria-label={item.type === "video" ? t("video") : t("image")}
               aria-current={active === index ? "true" : undefined}
@@ -213,14 +210,26 @@ export function ProductGallery({
                 className="object-contain"
               />
               {item.type === "video" ? (
-                <span className="absolute inset-0 flex items-center justify-center bg-[#0e0d0c]/40">
-                  <span className="ml-0.5 h-0 w-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-[#f4efe8]" />
+                <span className="absolute inset-0 flex items-center justify-center bg-[color:var(--rg-paper)]/45">
+                  <span className="ml-0.5 h-0 w-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-[color:var(--rg-pearl)]" />
                 </span>
               ) : null}
             </button>
           );
         })}
       </div>
+    ) : null;
+
+  return (
+    <div
+      ref={rootRef}
+      className={cn(
+        "flex flex-col gap-3",
+        media.length > 1 &&
+          "md:grid md:grid-cols-[68px_minmax(0,1fr)] md:gap-3 lg:grid-cols-[72px_minmax(0,1fr)] lg:gap-4",
+      )}
+    >
+      {thumbs}
 
       <div
         ref={stageRef}
@@ -228,14 +237,14 @@ export function ProductGallery({
         tabIndex={current.type === "image" ? 0 : undefined}
         aria-label={current.type === "image" ? t("tapToZoom") : undefined}
         className={cn(
-          "relative order-1 flex w-full max-w-full items-center justify-center overflow-hidden bg-[#1a1816] md:order-2 md:bg-[#e2dacf]",
+          "relative order-1 flex w-full max-w-full items-center justify-center overflow-hidden bg-[color:var(--rg-mat)] md:order-2",
           current.type === "image" && "cursor-zoom-in",
         )}
         style={{
           aspectRatio: ratio,
-          maxHeight: "min(78vh, 820px)",
+          maxHeight: "min(72vh, 720px)",
           width: "100%",
-          maxWidth: `min(100%, calc(min(78vh, 820px) * ${ratio}))`,
+          maxWidth: `min(100%, calc(min(72vh, 720px) * ${ratio}))`,
           marginInline: "auto",
         }}
         onClick={openMobileZoom}
@@ -257,7 +266,6 @@ export function ProductGallery({
       >
         {current.type === "image" ? (
           <>
-            {/* Display layer — optimized for LCP */}
             <div
               className={cn(
                 "absolute inset-0 transition-opacity duration-150",
@@ -273,14 +281,13 @@ export function ProductGallery({
                 blurDataURL={current.blurDataUrl}
                 sizesPreset="gallery"
                 priority={active === 0}
-                className="object-contain"
+                className="object-contain object-center"
                 onLoadingComplete={(img) => {
                   applyNaturalRatio(img.naturalWidth, img.naturalHeight);
                 }}
               />
             </div>
 
-            {/* Zoom layer — original full file, no Next resize (sharp at 2×) */}
             <div
               ref={zoomRef}
               aria-hidden={!zooming}
@@ -294,7 +301,7 @@ export function ProductGallery({
                 src={zoomSrc}
                 alt=""
                 decoding="async"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain object-center"
               />
             </div>
           </>
@@ -303,7 +310,7 @@ export function ProductGallery({
             key={current.src}
             src={current.src}
             poster={current.poster}
-            className="h-full w-full object-contain"
+            className="h-full w-full object-contain object-center"
             controls
             loop
             playsInline
@@ -318,13 +325,13 @@ export function ProductGallery({
         )}
 
         {discount > 0 && current.type === "image" ? (
-          <span className="pointer-events-none absolute left-3 top-3 z-10 bg-[#0e0d0c]/80 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#f4efe8] backdrop-blur-sm">
+          <span className="pointer-events-none absolute left-0 top-5 z-10 bg-[color:var(--rg-accent)] px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--rg-cta-ink)]">
             −{discount}%
           </span>
         ) : null}
 
         {current.type === "video" ? (
-          <span className="pointer-events-none absolute left-3 top-3 z-10 bg-[#0e0d0c]/80 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#f4efe8] backdrop-blur-sm">
+          <span className="pointer-events-none absolute left-0 top-5 z-10 bg-[color:var(--rg-paper)]/90 px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] text-[color:var(--rg-accent)]">
             {t("video")}
           </span>
         ) : null}
@@ -337,7 +344,7 @@ export function ProductGallery({
                 e.stopPropagation();
                 go(-1);
               }}
-              className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center border border-white/20 bg-[#0e0d0c]/45 text-[#f4efe8] backdrop-blur-sm transition hover:bg-[#0e0d0c]/70"
+              className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center border border-white/20 bg-[#0e0d0c]/45 text-[#f3eee8] backdrop-blur-sm transition hover:bg-[#0e0d0c]/70"
               aria-label={t("prevMedia")}
             >
               ←
@@ -348,7 +355,7 @@ export function ProductGallery({
                 e.stopPropagation();
                 go(1);
               }}
-              className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center border border-white/20 bg-[#0e0d0c]/45 text-[#f4efe8] backdrop-blur-sm transition hover:bg-[#0e0d0c]/70"
+              className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center border border-white/20 bg-[#0e0d0c]/45 text-[#f3eee8] backdrop-blur-sm transition hover:bg-[#0e0d0c]/70"
               aria-label={t("nextMedia")}
             >
               →
@@ -360,13 +367,13 @@ export function ProductGallery({
           <>
             <span
               className={cn(
-                "pointer-events-none absolute bottom-3 right-3 z-10 hidden text-[10px] uppercase tracking-[0.18em] text-[#f4efe8]/80 md:inline",
+                "pointer-events-none absolute bottom-3 right-3 z-10 hidden text-[10px] uppercase tracking-[0.18em] text-[#f3eee8]/80 md:inline",
                 zooming ? "opacity-100" : "opacity-0",
               )}
             >
               {t("zoomHint")}
             </span>
-            <span className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-sm bg-[#0e0d0c]/55 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#f4efe8]/90 md:hidden">
+            <span className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-sm bg-[#0e0d0c]/55 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#f3eee8]/90 md:hidden">
               {t("tapToZoom")}
             </span>
           </>

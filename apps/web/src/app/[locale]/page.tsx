@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/home/Hero";
 import { PromiseBar } from "@/components/home/PromiseBar";
 import { Spotlight } from "@/components/home/Spotlight";
+import { StoryBand } from "@/components/home/StoryBand";
 import { FeaturedSection } from "@/components/home/FeaturedSection";
 import { CollectionsStrip } from "@/components/home/CollectionsStrip";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
@@ -45,14 +46,15 @@ export default async function HomePage({
   ]);
 
   return (
-    <>
+    <div className="rg-home">
       <Hero locale={locale} content={hero} />
       <PromiseBar />
       <Spotlight products={products} />
       <FeaturedSection products={products} />
+      <StoryBand />
       <CollectionsStrip />
       <ReviewsSection reviews={reviews} />
       <AtelierBand />
-    </>
+    </div>
   );
 }

@@ -42,8 +42,8 @@ export function HomePageSkeleton() {
   return (
     <div role="status" aria-busy="true" aria-label="Loading page">
       {/* Hero */}
-      <div className="relative min-h-[100svh] bg-[#e2dacf]">
-        <Skeleton className="absolute inset-0 rounded-none bg-[#1c1a19]/10" />
+      <div className="relative min-h-[100svh] bg-[#1a1518]">
+        <Skeleton className="absolute inset-0 rounded-none bg-[#f3eee8]/10" />
         <div className="absolute inset-x-0 bottom-0 container-rg space-y-4 pb-16 md:pb-24">
           <Skeleton className="h-3 w-28 bg-white/20" />
           <Skeleton className="h-10 w-64 max-w-full bg-white/25 md:h-14 md:w-96" />
@@ -96,7 +96,7 @@ export function HomePageSkeleton() {
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="min-h-[240px] w-[85%] shrink-0 border border-[#1c1a19]/10 p-5 sm:w-[48%] md:min-h-[260px]"
+              className="min-h-[240px] w-[85%] shrink-0 border border-[#f3eee8]/10 p-5 sm:w-[48%] md:min-h-[260px]"
             >
               <SkeletonText lines={4} />
               <Skeleton className="mt-6 h-3 w-28" />
@@ -118,7 +118,7 @@ export function ProductsPageSkeleton() {
       role="status"
       aria-busy="true"
       aria-label="Loading shop"
-      className="bg-[#f0ebe4] pb-20 md:pb-28"
+      className="bg-[#0c0a0b] pb-20 md:pb-28"
     >
       <div className="relative isolate overflow-hidden border-b border-white/10 bg-[#0e0d0c]">
         <Skeleton className="absolute inset-0 rounded-none bg-white/5" />
@@ -149,7 +149,7 @@ export function ProductPageSkeleton() {
       role="status"
       aria-busy="true"
       aria-label="Loading product"
-      className="bg-[#f0ebe4] pb-28 md:pb-24"
+      className="bg-[#0c0a0b] pb-28 md:pb-24"
     >
       <div className="container-rg pt-24 md:pt-28">
         <div className="mb-8 flex gap-2">
@@ -209,9 +209,9 @@ export function LandingPageSkeleton() {
       role="status"
       aria-busy="true"
       aria-label="Loading landing"
-      className="min-h-screen bg-[#f0ebe4]"
+      className="min-h-screen bg-[#0c0a0b]"
     >
-      <div className="flex h-16 items-center justify-between border-b border-[#1c1a19]/10 px-4 md:h-20">
+      <div className="flex h-16 items-center justify-between border-b border-[#f3eee8]/10 px-4 md:h-20">
         <Skeleton className="h-8 w-8 rounded-full" />
         <Skeleton className="h-5 w-28" />
         <Skeleton className="h-10 w-24" />
@@ -247,7 +247,7 @@ export function LandingPageSkeleton() {
           </div>
         </div>
 
-        <div className="mt-12 border border-[#1c1a19]/10 bg-[#e7e0d6]/40 p-4 md:mt-16 md:p-8">
+        <div className="mt-12 border border-[#f3eee8]/10 bg-[#1a1518]/40 p-4 md:mt-16 md:p-8">
           <Skeleton className="h-3 w-28" />
           <Skeleton className="mt-3 h-8 w-56" />
           <div className="mt-6 space-y-3">
@@ -289,7 +289,7 @@ export function CartPageSkeleton() {
       <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex gap-4 border-b border-[#1c1a19]/10 pb-6">
+            <div key={i} className="flex gap-4 border-b border-[#f3eee8]/10 pb-6">
               <Skeleton className="h-28 w-24 shrink-0 md:h-36 md:w-28" />
               <div className="flex-1 space-y-3">
                 <Skeleton className="h-4 w-[66%]" />
@@ -299,7 +299,7 @@ export function CartPageSkeleton() {
             </div>
           ))}
         </div>
-        <div className="space-y-4 border border-[#1c1a19]/10 p-5">
+        <div className="space-y-4 border border-[#f3eee8]/10 p-5">
           <Skeleton className="h-5 w-32" />
           <Skeleton className="h-3 w-full" />
           <Skeleton className="h-3 w-full" />
@@ -330,7 +330,7 @@ export function CheckoutPageSkeleton() {
           ))}
           <Skeleton className="mt-4 h-12 w-full" />
         </div>
-        <div className="space-y-4 border border-[#1c1a19]/10 p-5">
+        <div className="space-y-4 border border-[#f3eee8]/10 p-5">
           {Array.from({ length: 2 }).map((_, i) => (
             <div key={i} className="flex gap-3">
               <Skeleton className="h-16 w-14 shrink-0" />
@@ -358,7 +358,7 @@ export function SearchPageSkeleton() {
       className="container-rg py-24 md:py-28"
     >
       <Skeleton className="h-9 w-40" />
-      <Skeleton className="mt-8 h-14 w-full border-b border-[#1c1a19]/10 bg-transparent md:h-16" />
+      <Skeleton className="mt-8 h-14 w-full border-b border-[#f3eee8]/10 bg-transparent md:h-16" />
       <div className="mt-10">
         <ProductGridSkeleton count={8} />
       </div>

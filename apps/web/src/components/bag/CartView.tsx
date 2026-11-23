@@ -25,16 +25,13 @@ export function CartView() {
   if (lines.length === 0) {
     return (
       <div className="py-16 text-center md:py-24">
-        <p className="font-display text-3xl text-[#1c1a19] md:text-4xl">
+        <p className="rg-section-title text-3xl md:text-4xl">
           {t("emptyTitle")}
         </p>
-        <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[#1c1a19]/55">
+        <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[#f3eee8]/55">
           {t("emptySub")}
         </p>
-        <Link
-          href="/products"
-          className="mt-8 inline-flex min-h-12 items-center justify-center bg-[#1c1a19] px-8 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition hover:bg-black"
-        >
+        <Link href="/products" className="rg-cta-solid mt-8 min-h-12 px-8">
           {t("continueShopping")}
         </Link>
       </div>
@@ -43,7 +40,7 @@ export function CartView() {
 
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)] lg:gap-14">
-      <ul className="divide-y divide-[#1c1a19]/10 border-y border-[#1c1a19]/10">
+      <ul className="divide-y divide-[#f3eee8]/10 border-y border-[#f3eee8]/10">
         {lines.map(({ line, product }) => {
           const offer = chosenOffer(product, line.optionId);
           const cover = offer.image
@@ -53,7 +50,7 @@ export function CartView() {
             <li key={`${line.slug}:${line.optionId || ""}`} className="flex gap-4 py-5 md:gap-6 md:py-6">
               <Link
                 href={`/product/${product.slug}`}
-                className="relative h-28 w-24 shrink-0 overflow-hidden bg-[#e2dacf] md:h-36 md:w-28"
+                className="relative h-28 w-24 shrink-0 overflow-hidden bg-[#1a1518] md:h-36 md:w-28"
               >
                 {cover ? (
                   <Image
@@ -71,28 +68,28 @@ export function CartView() {
                   <div>
                     <Link
                       href={`/product/${product.slug}`}
-                      className="font-display text-xl text-[#1c1a19] transition hover:text-[#a67c68] md:text-2xl"
+                      className="font-display text-xl text-[#f3eee8] transition hover:text-[#d4a574] md:text-2xl"
                     >
                       {localize(offer.label, locale)}
                     </Link>
-                    <p className="mt-1 text-sm text-[#1c1a19]/55">
+                    <p className="mt-1 text-sm text-[#f3eee8]/55">
                       {formatBdt(offer.price, locale)}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => removeFromCart(line.slug, line.optionId)}
-                    className="text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/40 transition hover:text-[#1c1a19]"
+                    className="text-[10px] uppercase tracking-[0.18em] text-[#f3eee8]/40 transition hover:text-[#f3eee8]"
                   >
                     {t("remove")}
                   </button>
                 </div>
 
                 <div className="mt-auto flex items-center justify-between pt-4">
-                  <div className="inline-flex items-center border border-[#1c1a19]/15">
+                  <div className="inline-flex items-center border border-[#f3eee8]/15">
                     <button
                       type="button"
-                      className="flex h-10 w-10 items-center justify-center text-[#1c1a19]/70 transition hover:bg-[#1c1a19]/05"
+                      className="flex h-10 w-10 items-center justify-center text-[#f3eee8]/70 transition hover:bg-[#f3eee8]/05"
                       onClick={() => setCartQty(line.slug, line.qty - 1, line.optionId)}
                       aria-label={t("decrease")}
                     >
@@ -101,14 +98,14 @@ export function CartView() {
                     <span className="min-w-8 text-center text-sm">{line.qty}</span>
                     <button
                       type="button"
-                      className="flex h-10 w-10 items-center justify-center text-[#1c1a19]/70 transition hover:bg-[#1c1a19]/05"
+                      className="flex h-10 w-10 items-center justify-center text-[#f3eee8]/70 transition hover:bg-[#f3eee8]/05"
                       onClick={() => setCartQty(line.slug, line.qty + 1, line.optionId)}
                       aria-label={t("increase")}
                     >
                       +
                     </button>
                   </div>
-                  <p className="text-sm text-[#1c1a19]">
+                  <p className="text-sm text-[#f3eee8]">
                     {formatBdt(offer.price * line.qty, locale)}
                   </p>
                 </div>
@@ -119,25 +116,25 @@ export function CartView() {
       </ul>
 
       <aside className="lg:sticky lg:top-28 lg:self-start">
-        <div className="border border-[#1c1a19]/10 bg-[#e7e0d6]/45 p-6 md:p-7">
-          <p className="text-[10px] uppercase tracking-[0.24em] text-[#c9a08a]">
+        <div className="border border-[#f3eee8]/10 bg-[#1a1518]/45 p-6 md:p-7">
+          <p className="text-[10px] uppercase tracking-[0.24em] text-[#d4a574]">
             {t("summary")}
           </p>
           <div className="mt-5 flex items-center justify-between text-sm">
-            <span className="text-[#1c1a19]/55">{t("subtotal")}</span>
-            <span className="text-[#1c1a19]">{formatBdt(subtotal, locale)}</span>
+            <span className="text-[#f3eee8]/55">{t("subtotal")}</span>
+            <span className="text-[#f3eee8]">{formatBdt(subtotal, locale)}</span>
           </div>
-          <p className="mt-3 text-xs leading-6 text-[#1c1a19]/45">{t("codNote")}</p>
+          <p className="mt-3 text-xs leading-6 text-[#f3eee8]/45">{t("codNote")}</p>
           <div className="mt-6 flex flex-row gap-2">
             <Link
               href="/checkout"
-              className="flex min-h-11 flex-1 items-center justify-center bg-[#1c1a19] px-3 text-[10px] uppercase tracking-[0.16em] text-[#f4efe8] transition hover:bg-black sm:min-h-12 sm:text-[11px] sm:tracking-[0.2em]"
+              className="rg-cta-solid min-h-11 flex-1 px-3 sm:min-h-12"
             >
               {t("checkout")}
             </Link>
             <Link
               href="/products"
-              className="flex min-h-11 flex-1 items-center justify-center border border-[#1c1a19]/2 px-3 text-[10px] uppercase tracking-[0.16em] text-[#1c1a19]/70 transition hover:border-[#1c1a19] hover:text-[#1c1a19] sm:min-h-12 sm:text-[11px] sm:tracking-[0.18em]"
+              className="rg-cta min-h-11 flex-1 px-3 sm:min-h-12"
             >
               {t("continueShopping")}
             </Link>

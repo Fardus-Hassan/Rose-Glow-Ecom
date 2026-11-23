@@ -4,47 +4,67 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { Product } from "@/data/products";
 import { Reveal } from "@/components/motion/Reveal";
-import { Slider } from "@/components/ui/Slider";
+import { StaggerParallax } from "@/components/motion/StaggerParallax";
 import { ProductCard } from "@/components/products/ProductCard";
 
+/**
+ * Runway grid — staggered heights, restless parallax, gold header.
+ */
 export function FeaturedSection({ products }: { products: Product[] }) {
   const t = useTranslations("Home");
+  const list = products.slice(0, 8);
 
   return (
-    <section className="bg-[#f0ebe4] py-16 md:py-24">
-      <div className="container-rg">
+    <section className="relative overflow-hidden bg-[color:var(--rg-paper)] py-20 md:py-32">
+      <div
+        className="rg-editorial-grid pointer-events-none absolute inset-0 opacity-80"
+        aria-hidden
+      />
+
+      <div className="container-rg relative">
         <Reveal>
-          <div className="mb-6 flex flex-col gap-4 md:mb-8 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-xl">
-              <h2 className="font-display text-4xl text-[#1c1a19] md:text-5xl">
+          <div className="mb-14 flex flex-col gap-6 md:mb-20 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[color:var(--rg-accent)]">
+                {t("featuredCta")}
+              </p>
+              <h2 className="mt-4 font-display text-[clamp(2.4rem,6vw,4.75rem)] leading-[1.02] tracking-[-0.03em] text-[color:var(--rg-pearl)]">
                 {t("featuredTitle")}
               </h2>
-              <p className="mt-3 text-sm leading-7 text-[#1c1a19]/55">
+              <div className="rg-home-gold-rule mt-5 w-16" />
+              <p className="mt-5 max-w-md text-[15px] leading-7 text-[color:var(--rg-muted)] md:text-base">
                 {t("featuredSub")}
               </p>
             </div>
             <Link
               href="/products"
-              className="text-[11px] uppercase tracking-[0.22em] text-[#1c1a19]/70 underline-offset-8 hover:text-[#1c1a19] hover:underline"
+              className="rg-cta shrink-0 self-start md:self-auto"
             >
-              {t("featuredCta")} →
+              {t("featuredCta")}
             </Link>
           </div>
         </Reveal>
 
-        <Slider
-          labelPrev={t("sliderPrev")}
-          labelNext={t("sliderNext")}
-          slideClassName="basis-[70%] sm:basis-[45%] md:basis-[32%] lg:basis-[24%]"
+        <StaggerParallax
+          className="grid grid-cols-2 gap-x-3 gap-y-12 sm:gap-x-5 md:grid-cols-4 md:gap-x-7 md:gap-y-0"
+          yOffsets={[48, -56, 28, -40, 44, -24, 36, -48]}
         >
-          {products.map((product, index) => (
-            <ProductCard
+          {list.map((product, index) => (
+            <div
               key={product.slug}
-              product={product}
-              priority={index < 2}
-            />
+              data-stagger-item
+              className={
+                index % 2 === 0
+                  ? "md:mt-20"
+                  : index % 3 === 0
+                    ? "md:mt-8"
+                    : "md:mt-2"
+              }
+            >
+              <ProductCard product={product} priority={index < 2} />
+            </div>
           ))}
-        </Slider>
+        </StaggerParallax>
       </div>
     </section>
   );

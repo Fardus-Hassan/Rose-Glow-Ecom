@@ -45,17 +45,17 @@ export function Pagination({
   const items = getPageItems(page, totalPages);
 
   const navBtn =
-    "flex h-10 w-10 items-center justify-center border border-[#1c1a19]/15 text-sm text-[#1c1a19] transition hover:border-[#1c1a19] disabled:cursor-not-allowed disabled:opacity-30";
+    "flex h-10 w-10 items-center justify-center border border-[#f3eee8]/15 text-sm text-[#f3eee8] transition hover:border-[#f3eee8] disabled:cursor-not-allowed disabled:opacity-30";
 
   return (
     <nav
       aria-label={t("label")}
       className={cn(
-        "mt-12 flex flex-col items-center gap-4 border-t border-[#1c1a19]/10 pt-8 md:mt-16 md:pt-10",
+        "mt-12 flex flex-col items-center gap-4 border-t border-[#f3eee8]/10 pt-8 md:mt-16 md:pt-10",
         className,
       )}
     >
-      <p className="text-[10px] uppercase tracking-[0.22em] text-[#1c1a19]/4">
+      <p className="text-[10px] uppercase tracking-[0.22em] text-[#f3eee8]/4">
         {t("status", { page, total: totalPages })}
       </p>
 
@@ -83,7 +83,7 @@ export function Pagination({
           item === "…" ? (
             <span
               key={`ellipsis-${index}`}
-              className="flex h-10 min-w-8 items-center justify-center px-1 text-[#1c1a19]/35"
+              className="flex h-10 min-w-8 items-center justify-center px-1 text-[#f3eee8]/35"
               aria-hidden
             >
               …
@@ -97,8 +97,8 @@ export function Pagination({
               className={cn(
                 "flex h-10 min-w-10 items-center justify-center px-2 text-[11px] transition",
                 item === page
-                  ? "bg-[#1c1a19] text-[#f4efe8]"
-                  : "border border-[#1c1a19]/12 text-[#1c1a19]/55 hover:border-[#c9a08a] hover:text-[#1c1a19]",
+                  ? "bg-[#f3eee8] text-[#0c0a0b]"
+                  : "border border-[#f3eee8]/12 text-[#f3eee8]/55 hover:border-[#d4a574] hover:text-[#f3eee8]",
               )}
             >
               {item}

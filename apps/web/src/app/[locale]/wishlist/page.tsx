@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { WishlistView } from "@/components/bag/WishlistView";
+import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
 
 export default async function WishlistPage({
   params,
@@ -11,16 +12,16 @@ export default async function WishlistPage({
   const t = await getTranslations("Wishlist");
 
   return (
-    <div className="container-rg pb-16 pt-28 md:pb-24 md:pt-36">
-      <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
-        {t("eyebrow")}
-      </p>
-      <h1 className="mt-3 font-display text-4xl text-[#1c1a19] md:text-5xl">
-        {t("title")}
-      </h1>
-      <div className="mt-4 h-px w-12 bg-gradient-to-r from-[#c9a08a] to-transparent" />
-      <div className="mt-10 md:mt-12">
-        <WishlistView />
+    <div className="relative overflow-hidden bg-[color:var(--rg-paper)] pb-16 pt-28 md:pb-24 md:pt-36">
+      <div
+        className="rg-editorial-grid pointer-events-none absolute inset-0 opacity-40"
+        aria-hidden
+      />
+      <div className="container-rg relative">
+        <EditorialPageHeader eyebrow={t("eyebrow")} title={t("title")} />
+        <div className="mt-10 md:mt-12">
+          <WishlistView />
+        </div>
       </div>
     </div>
   );

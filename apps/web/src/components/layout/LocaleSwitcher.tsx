@@ -84,15 +84,15 @@ export function LocaleSwitcher({
           "inline-flex items-center gap-1.5 transition",
           size === "sm" ? "gap-1.5" : "gap-2",
           light
-            ? "text-[#f4efe8]/85 hover:text-[#f4efe8]"
-            : "text-[#1c1a19]/75 hover:text-[#1c1a19]",
+            ? "text-[#f3eee8]/85 hover:text-[#f3eee8]"
+            : "text-[#f3eee8]/75 hover:text-[#f3eee8]",
         )}
       >
         <current.Flag
           className={cn(
             "shrink-0 overflow-hidden rounded-full ring-1",
             size === "sm" ? "h-5 w-5" : "h-6 w-6",
-            light ? "ring-white/25" : "ring-[#1c1a19]/12",
+            light ? "ring-white/25" : "ring-white/20",
           )}
         />
         <span
@@ -109,7 +109,7 @@ export function LocaleSwitcher({
             "shrink-0 transition-transform duration-200",
             size === "sm" ? "h-2.5 w-2.5" : "h-3 w-3",
             open && "rotate-180",
-            light ? "text-[#f4efe8]/55" : "text-[#1c1a19]/4",
+            light ? "text-[#f3eee8]/55" : "text-[#f3eee8]/45",
           )}
           aria-hidden
           focusable="false"
@@ -132,8 +132,8 @@ export function LocaleSwitcher({
           className={cn(
             "absolute left-0 top-[calc(100%+0.4rem)] z-[70] min-w-[8.5rem] overflow-hidden border py-1 shadow-[0_12px_40px_rgba(0,0,0,0.14)]",
             light
-              ? "border-white/10 bg-[#121110] text-[#f4efe8]"
-              : "border-[#1c1a19]/10 bg-[#f4efe8] text-[#1c1a19]",
+              ? "border-white/10 bg-[#121110] text-[#f3eee8]"
+              : "border-white/10 bg-[#121110] text-[#f3eee8]",
           )}
         >
           {locales.map(({ code, label, Flag }) => {
@@ -154,11 +154,11 @@ export function LocaleSwitcher({
                   "flex w-full items-center gap-2.5 px-3 py-2 text-left text-[12px] transition",
                   active
                     ? light
-                      ? "bg-white/10 text-[#f4efe8]"
-                      : "bg-[#1c1a19]/06 text-[#1c1a19]"
+                      ? "bg-white/10 text-[#f3eee8]"
+                      : "bg-white/10 text-[#f3eee8]"
                     : light
-                      ? "text-[#f4efe8]/7 hover:bg-white/8 hover:text-[#f4efe8]"
-                      : "text-[#1c1a19]/65 hover:bg-[#1c1a19]/05 hover:text-[#1c1a19]",
+                      ? "text-[#f3eee8]/7 hover:bg-white/8 hover:text-[#f3eee8]"
+                      : "text-[#f3eee8]/7 hover:bg-white/8 hover:text-[#f3eee8]",
                 )}
               >
                 <Flag className="h-5 w-5 shrink-0 rounded-full ring-1 ring-black/10" />

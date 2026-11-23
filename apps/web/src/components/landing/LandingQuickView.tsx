@@ -137,23 +137,23 @@ export function LandingQuickView({
         role="dialog"
         aria-modal="true"
         data-lenis-prevent
-        className="relative z-10 flex max-h-[92dvh] w-full flex-col border border-[#1c1a19]/10 bg-[#f0ebe4] rg-scale-in sm:max-h-[90vh] sm:max-w-lg"
+        className="rg-stage relative z-10 flex max-h-[92dvh] w-full flex-col border border-[color:var(--rg-line)] rg-scale-in sm:max-h-[90vh] sm:max-w-lg"
         onWheel={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
       >
-        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-[#1c1a19]/08 px-5 py-4 sm:px-7">
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-[color:var(--rg-line)] px-5 py-4 sm:px-7">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[#c9a08a]">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[color:var(--rg-accent)]">
               {tc(product.category)}
             </p>
-            <h3 className="mt-1 font-display text-2xl text-[#1c1a19]">
+            <h3 className="mt-1 font-display text-2xl text-[color:var(--rg-pearl)]">
               {localize(product.name, locale)}
             </h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 pt-1 text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/45"
+            className="shrink-0 pt-1 text-[10px] uppercase tracking-[0.18em] text-[color:var(--rg-muted)]"
           >
             {t("closePreview")}
           </button>
@@ -164,7 +164,7 @@ export function LandingQuickView({
           className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-7 [-webkit-overflow-scrolling:touch]"
         >
           <div
-            className="relative bg-[#e2dacf]"
+            className="relative bg-[color:var(--rg-paper-deep)]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
             onFocusCapture={() => setPaused(true)}
@@ -215,7 +215,7 @@ export function LandingQuickView({
                     </video>
                   )}
                   {item.type === "video" ? (
-                    <span className="pointer-events-none absolute left-3 top-3 bg-[#0e0d0c]/80 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-[#f4efe8]">
+                    <span className="pointer-events-none absolute left-3 top-3 bg-[#0e0d0c]/80 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-[color:var(--rg-pearl)]">
                       {t("video")}
                     </span>
                   ) : null}
@@ -228,7 +228,7 @@ export function LandingQuickView({
                 <button
                   type="button"
                   onClick={() => go(-1)}
-                  className="absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#0e0d0c]/55 text-lg text-[#f4efe8]"
+                  className="absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#0e0d0c]/55 text-lg text-[color:var(--rg-pearl)]"
                   aria-label={t("sliderPrev")}
                 >
                   ←
@@ -236,12 +236,12 @@ export function LandingQuickView({
                 <button
                   type="button"
                   onClick={() => go(1)}
-                  className="absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#0e0d0c]/55 text-lg text-[#f4efe8]"
+                  className="absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-[#0e0d0c]/55 text-lg text-[color:var(--rg-pearl)]"
                   aria-label={t("sliderNext")}
                 >
                   →
                 </button>
-                <p className="pointer-events-none absolute bottom-3 right-3 bg-[#0e0d0c]/55 px-2 py-1 text-[10px] tracking-[0.12em] text-[#f4efe8]">
+                <p className="pointer-events-none absolute bottom-3 right-3 bg-[#0e0d0c]/55 px-2 py-1 text-[10px] tracking-[0.12em] text-[color:var(--rg-pearl)]">
                   {active + 1}/{media.length}
                 </p>
               </>
@@ -260,10 +260,10 @@ export function LandingQuickView({
                       type="button"
                       onClick={() => jumpTo(index)}
                       className={cn(
-                        "relative aspect-[4/5] w-14 shrink-0 overflow-hidden bg-[#e2dacf] transition",
+                        "relative aspect-[4/5] w-14 shrink-0 overflow-hidden bg-[color:var(--rg-paper-deep)] transition",
                         active === index
-                          ? "ring-1 ring-[#c9a08a]"
-                          : "opacity-65 ring-1 ring-[#1c1a19]/10",
+                          ? "ring-1 ring-[color:var(--rg-accent)]"
+                          : "opacity-65 ring-1 ring-[color:var(--rg-line)]",
                       )}
                     >
                       {thumb ? (
@@ -287,7 +287,7 @@ export function LandingQuickView({
                     onClick={() => jumpTo(index)}
                     className={cn(
                       "h-1.5 w-1.5 rounded-full transition",
-                      active === index ? "bg-[#1c1a19]" : "bg-[#1c1a19]/25",
+                      active === index ? "bg-[color:var(--rg-accent)]" : "bg-[color:var(--rg-pearl)]/25",
                     )}
                     aria-label={`Media ${index + 1}`}
                   />
@@ -296,10 +296,10 @@ export function LandingQuickView({
             </div>
           ) : null}
 
-          <p className="mt-5 text-lg text-[#1c1a19]">
+          <p className="mt-5 text-lg text-[color:var(--rg-pearl)]">
             {formatBdt(offer.price, locale)}
             {compare ? (
-              <span className="ml-2 text-sm text-[#1c1a19]/4 line-through">
+              <span className="ml-2 text-sm text-[color:var(--rg-muted)] line-through">
                 {formatBdt(compare, locale)}
               </span>
             ) : null}
@@ -309,12 +309,12 @@ export function LandingQuickView({
             selectedId={offer.optionId}
             onSelect={setOptionId}
           />
-          <p className="mt-3 text-sm leading-7 text-[#1c1a19]/58">
+          <p className="mt-3 text-sm leading-7 text-[color:var(--rg-muted)]">
             {stripHtml(localize(product.description, locale))}
           </p>
         </div>
 
-        <div className="flex shrink-0 flex-row gap-2 border-t border-[#1c1a19]/08 bg-[#f0ebe4] p-4 sm:p-5 sm:px-7">
+        <div className="flex shrink-0 flex-row gap-2 border-t border-[color:var(--rg-line)] bg-[color:var(--rg-paper)] p-4 sm:p-5 sm:px-7">
           <button
             type="button"
             disabled={!inBag && !offer.inStock}
@@ -326,15 +326,15 @@ export function LandingQuickView({
             className={cn(
               "inline-flex min-h-11 flex-1 items-center justify-center px-3 text-[10px] uppercase tracking-[0.16em] disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-12 sm:px-5 sm:text-[11px] sm:tracking-[0.18em]",
               inBag
-                ? "border border-[#1c1a19]/25 text-[#1c1a19]"
-                : "bg-[#1c1a19] text-[#f4efe8]",
+                ? "border border-[color:var(--rg-line)] text-[color:var(--rg-pearl)]"
+                : "bg-[color:var(--rg-accent)] text-[color:var(--rg-cta-ink)]",
             )}
           >
             {inBag ? t("remove") : t("addToo")}
           </button>
           <Link
             href={`/product/${product.slug}`}
-            className="inline-flex min-h-11 flex-1 items-center justify-center border border-[#1c1a19]/2 px-3 text-[10px] uppercase tracking-[0.16em] text-[#1c1a19] sm:min-h-12 sm:px-5 sm:text-[11px] sm:tracking-[0.18em]"
+            className="inline-flex min-h-11 flex-1 items-center justify-center border border-[color:var(--rg-line)] px-3 text-[10px] uppercase tracking-[0.16em] text-[color:var(--rg-pearl)] sm:min-h-12 sm:px-5 sm:text-[11px] sm:tracking-[0.18em]"
           >
             {t("fullDetails")}
           </Link>

@@ -1,10 +1,9 @@
-import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ProductsView } from "@/components/products/ProductsView";
+import { Reveal } from "@/components/motion/Reveal";
 import { fetchProductsPage } from "@/lib/catalog";
 import { SHOP_PAGE_SIZE } from "@/lib/shop";
 import { buildPageMetadata } from "@/lib/seo";
-import { mediaUrl } from "@/lib/media";
 
 export const dynamic = "force-dynamic";
 
@@ -41,36 +40,39 @@ export default async function ProductsPage({
   });
 
   return (
-    <div className="bg-[#f0ebe4] pb-20 md:pb-28">
-      <section className="relative isolate overflow-hidden border-b border-white/10 bg-[#0e0d0c] text-[#f4efe8]">
-        <div className="absolute inset-0 -z-20">
-          <Image
-            src={mediaUrl("/home/atelier-gold-spread.jpg")}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-[center_40%]"
-          />
-        </div>
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#0e0d0c]/90 via-[#0e0d0c]/72 to-[#0e0d0c]/45" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#0e0d0c]/80 via-transparent to-[#0e0d0c]/35" />
+    <div className="rg-stage relative pb-24 md:pb-32">
+      <div
+        className="rg-editorial-grid pointer-events-none absolute inset-0 opacity-80"
+        aria-hidden
+      />
 
-        <div className="container-rg relative pb-12 pt-28 md:pb-16 md:pt-32">
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
-            {t("eyebrow")}
-          </p>
-          <h1 className="mt-4 font-display text-[clamp(2.4rem,6vw,4.25rem)] leading-[1.05] tracking-[-0.02em]">
-            {t("title")}
-          </h1>
-          <div className="mt-5 h-px w-14 bg-gradient-to-r from-[#c9a08a] to-transparent" />
-          <p className="mt-5 max-w-xl text-[15px] leading-7 text-[#f4efe8]/70 md:text-base">
-            {t("subtitle")}
-          </p>
+      {/* Compact shop intro — tight band, products rise fast */}
+      <section className="relative border-b border-[color:var(--rg-line)] pt-24 md:pt-28">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_15%_0%,rgba(212,175,55,0.07),transparent_50%)]"
+          aria-hidden
+        />
+        <div className="container-rg relative pb-7 md:pb-8">
+          <Reveal>
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-10">
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[color:var(--rg-accent)]">
+                  {t("eyebrow")}
+                </p>
+                <h1 className="mt-2 font-display text-[clamp(2rem,4.5vw,3.25rem)] leading-[1.05] tracking-[-0.03em] text-[color:var(--rg-pearl)]">
+                  {t("title")}
+                </h1>
+                <div className="rg-home-gold-rule mt-3 w-12 md:w-16" />
+              </div>
+              <p className="max-w-sm text-sm leading-6 text-[color:var(--rg-muted)] md:pb-1 md:text-right md:text-[15px] md:leading-7">
+                {t("subtitle")}
+              </p>
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      <div className="container-rg pt-10 md:pt-14">
+      <div className="relative pt-8 md:pt-10">
         <ProductsView initial={initial} initialCategory={category} />
       </div>
     </div>

@@ -10,8 +10,10 @@ export const heroMedia = {
   mode: "image" as "image" | "video",
 
   image: {
-    desktop: mediaUrl("/home/atelier-gold-spread.jpg"),
-    mobile: mediaUrl("/home/hero-ornaments.jpg"),
+    desktop:
+      "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&w=1800&q=80",
+    mobile:
+      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=80",
   },
 
   video: {

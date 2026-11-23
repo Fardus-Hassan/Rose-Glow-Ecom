@@ -5,7 +5,11 @@ import { getCoverMedia, localize, type Product } from "@/data/products";
 import { formatBdt } from "@/lib/format";
 import { stripHtml } from "@/lib/rich-text";
 import { Reveal } from "@/components/motion/Reveal";
+import { Parallax } from "@/components/motion/Parallax";
 
+/**
+ * Cinematic spotlight — full-bleed product stage, gold type, one CTA.
+ */
 export async function Spotlight({ products }: { products: Product[] }) {
   const t = await getTranslations("Home");
   const locale = await getLocale();
@@ -14,43 +18,45 @@ export async function Spotlight({ products }: { products: Product[] }) {
   const cover = getCoverMedia(product);
 
   return (
-    <section className="bg-[#f0ebe4] py-16 md:py-24">
-      <div className="container-rg grid items-stretch gap-0 md:grid-cols-2">
-        <Reveal className="relative min-h-[420px] overflow-hidden md:min-h-[560px]">
+    <section className="relative isolate min-h-[88svh] overflow-hidden bg-[color:var(--rg-paper)] md:min-h-[92svh]">
+      <div className="absolute inset-0">
+        <Parallax speed={55} scale={1.1} className="absolute inset-[-10%]">
           {cover ? (
             <Image
               src={cover.src}
               alt={localize(product.name, locale)}
               fill
-              sizes="(max-width:768px) 100vw, 50vw"
-              className="object-cover"
+              sizes="100vw"
+              className="object-cover object-center"
+              priority={false}
             />
           ) : null}
-        </Reveal>
+        </Parallax>
+        <div className="absolute inset-0 bg-[color:var(--rg-paper)]/55" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--rg-paper)] via-[color:var(--rg-paper)]/40 to-transparent" />
+      </div>
 
-        <Reveal
-          delay={0.1}
-          className="flex flex-col justify-center border border-[#1c1a19]/10 border-t-0 bg-[#e7e0d6] px-6 py-10 md:border-l-0 md:border-t md:px-12 md:py-16"
-        >
-          <p className="text-[11px] uppercase tracking-[0.28em] text-[#c9a08a]">
+      <div className="container-rg relative flex min-h-[88svh] flex-col justify-end pb-16 pt-28 md:min-h-[92svh] md:pb-24 md:pt-32">
+        <Reveal>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[color:var(--rg-accent)]">
             {t("spotlightEyebrow")}
           </p>
-          <h2 className="mt-5 font-display text-4xl leading-tight text-[#1c1a19] md:text-5xl">
+          <h2 className="mt-4 max-w-3xl font-display text-[clamp(2.4rem,7vw,5.5rem)] leading-[1.02] tracking-[-0.03em] text-[color:var(--rg-pearl)]">
             {localize(product.name, locale)}
           </h2>
-          <p className="mt-5 max-w-md text-sm leading-7 text-[#1c1a19]/65">
+          <div className="rg-home-gold-rule mt-6 w-20" />
+          <p className="mt-6 max-w-lg text-[15px] leading-7 text-[color:var(--rg-muted)] md:text-base md:leading-8">
             {stripHtml(localize(product.description, locale))}
           </p>
-          <p className="mt-8 text-lg text-[#1c1a19]">
-            {formatBdt(product.price, locale)}
-          </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-wrap items-end gap-6 md:mt-10">
+            <p className="font-display text-3xl text-[color:var(--rg-accent)] md:text-4xl">
+              {formatBdt(product.price, locale)}
+            </p>
             <Link
               href={`/product/${product.slug}`}
-              className="inline-flex items-center gap-3 border border-[#1c1a19] px-7 py-3.5 text-[11px] uppercase tracking-[0.22em] text-[#1c1a19] transition hover:bg-[#1c1a19] hover:text-[#f4efe8]"
+              className="rg-cta-solid min-h-12 px-8"
             >
               {t("spotlightCta")}
-              <span>→</span>
             </Link>
           </div>
         </Reveal>

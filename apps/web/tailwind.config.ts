@@ -21,11 +21,12 @@ const config: Config = {
         ink: "#1c1a19",
         muted: "#7d7470",
         line: "var(--rg-line)",
-        paper: "#f0ebe4",
-        "paper-deep": "#e7e0d6",
-        night: "#121110",
+        paper: "#f7f1f3",
+        "paper-deep": "#efe4e8",
+        night: "#141211",
         "night-deep": "#0e0d0c",
-        cream: "#f4efe8",
+        cream: "#f7f1f3",
+        cta: "#c75d7e",
       },
       boxShadow: {
         atelier:

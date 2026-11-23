@@ -25,7 +25,7 @@ export function ContactForm() {
   const [errors, setErrors] = useState<Partial<FormState>>({});
 
   const fieldClass =
-    "min-h-12 w-full border border-[#1c1a19]/15 bg-transparent px-4 text-sm text-[#1c1a19] outline-none transition placeholder:text-[#1c1a19]/35 focus:border-[#c9a08a]";
+    "min-h-12 w-full border border-[#f3eee8]/15 bg-transparent px-4 text-sm text-[#f3eee8] outline-none transition placeholder:text-[#f3eee8]/35 focus:border-[#d4a574]";
 
   const validate = () => {
     const next: Partial<FormState> = {};
@@ -66,14 +66,14 @@ export function ContactForm() {
 
   if (sent) {
     return (
-      <div className="border border-[#1c1a19]/10 bg-[#e7e0d6]/45 p-8 md:p-10">
-        <p className="text-[10px] uppercase tracking-[0.22em] text-[#c9a08a]">
+      <div className="border border-[#f3eee8]/10 bg-[#1a1518]/45 p-8 md:p-10">
+        <p className="text-[10px] uppercase tracking-[0.22em] text-[#d4a574]">
           {t("successEyebrow")}
         </p>
-        <p className="mt-3 font-display text-3xl text-[#1c1a19] md:text-4xl">
+        <p className="rg-section-title mt-3 text-3xl md:text-4xl">
           {t("successTitle")}
         </p>
-        <p className="mt-3 text-sm leading-7 text-[#1c1a19]/55">
+        <p className="mt-3 text-sm leading-7 text-[#f3eee8]/55">
           {t("successSub")}
         </p>
         <button
@@ -83,7 +83,7 @@ export function ContactForm() {
             setForm(empty);
             setErrors({});
           }}
-          className="mt-8 text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/55 underline-offset-4 hover:text-[#1c1a19] hover:underline"
+          className="mt-8 text-[10px] uppercase tracking-[0.18em] text-[#f3eee8]/55 underline-offset-4 hover:text-[#f3eee8] hover:underline"
         >
           {t("sendAnother")}
         </button>
@@ -93,20 +93,20 @@ export function ContactForm() {
 
   return (
     <form
-      className="border border-[#1c1a19]/10 bg-[#e7e0d6]/35 p-5 sm:p-7 md:p-8"
+      className="border border-[#f3eee8]/10 bg-[#1a1518]/35 p-5 sm:p-7 md:p-8"
       onSubmit={onSubmit}
       noValidate
     >
-      <p className="text-[10px] uppercase tracking-[0.22em] text-[#c9a08a]">
+      <p className="text-[10px] uppercase tracking-[0.22em] text-[#d4a574]">
         {t("formEyebrow")}
       </p>
-      <h2 className="mt-2 font-display text-2xl text-[#1c1a19] md:text-3xl">
+      <h2 className="rg-section-title mt-2 text-2xl md:text-3xl">
         {t("formTitle")}
       </h2>
 
       <div className="mt-7 space-y-5">
         <label className="block">
-          <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/45">
+          <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#f3eee8]/45">
             {t("name")}
           </span>
           <input
@@ -127,7 +127,7 @@ export function ContactForm() {
 
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="block">
-            <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/45">
+            <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#f3eee8]/45">
               {t("phone")}
             </span>
             <input
@@ -147,7 +147,7 @@ export function ContactForm() {
           </label>
 
           <label className="block">
-            <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/45">
+            <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#f3eee8]/45">
               {t("emailOptional")}
             </span>
             <input
@@ -168,7 +168,7 @@ export function ContactForm() {
         </div>
 
         <label className="block">
-          <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/45">
+          <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#f3eee8]/45">
             {t("message")}
           </span>
           <textarea
@@ -190,10 +190,7 @@ export function ContactForm() {
           ) : null}
         </label>
 
-        <button
-          type="submit"
-          className="inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-8 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition hover:bg-black sm:w-auto"
-        >
+        <button type="submit" className="rg-cta-solid min-h-12 w-full px-8 sm:w-auto">
           {t("send")}
         </button>
       </div>

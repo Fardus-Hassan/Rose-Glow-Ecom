@@ -7,9 +7,11 @@ import {
 } from "next/font/google";
 import "./globals.css";
 
+/** Editorial luxury Latin display — BIJOUX-adjacent quiet luxury. */
 const display = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });

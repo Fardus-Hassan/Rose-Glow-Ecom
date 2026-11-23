@@ -141,8 +141,8 @@ export function Slider({
           className={cn(
             "flex h-10 w-10 items-center justify-center border transition",
             dark
-              ? "border-white/25 text-[#f4efe8] hover:border-[#c9a08a] disabled:opacity-30"
-              : "border-[#1c1a19]/20 text-[#1c1a19] hover:border-[#c9a08a] disabled:opacity-30",
+              ? "border-white/25 text-[#f3eee8] hover:border-[#d4a574] disabled:opacity-30"
+              : "border-[#f3eee8]/20 text-[#f3eee8] hover:border-[#d4a574] disabled:opacity-30",
           )}
         >
           ←
@@ -155,8 +155,8 @@ export function Slider({
           className={cn(
             "flex h-10 w-10 items-center justify-center border transition",
             dark
-              ? "border-white/25 text-[#f4efe8] hover:border-[#c9a08a] disabled:opacity-30"
-              : "border-[#1c1a19]/20 text-[#1c1a19] hover:border-[#c9a08a] disabled:opacity-30",
+              ? "border-white/25 text-[#f3eee8] hover:border-[#d4a574] disabled:opacity-30"
+              : "border-[#f3eee8]/20 text-[#f3eee8] hover:border-[#d4a574] disabled:opacity-30",
           )}
         >
           →

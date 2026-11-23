@@ -7,8 +7,9 @@ import { localize, type Product } from "@/data/products";
 import type { Review } from "@/data/reviews";
 import { IconStar } from "@/components/icons";
 import { Pagination } from "@/components/ui/Pagination";
+import { Reveal } from "@/components/motion/Reveal";
 
-const REVIEW_PAGE_SIZE = 5;
+const REVIEW_PAGE_SIZE = 2;
 
 export function ProductReviews({
   product,
@@ -56,116 +57,125 @@ export function ProductReviews({
   };
 
   return (
-    <section id="product-reviews" className="container-rg scroll-mt-36">
-      <div
-        className={
-          reviews.length
-            ? "grid gap-10 lg:grid-cols-[minmax(220px,0.35fr)_minmax(0,1fr)] lg:items-start lg:gap-14"
-            : ""
-        }
-      >
-        <div className="border-t border-[#1c1a19]/10 pt-6 lg:sticky lg:top-36 lg:border-t-0 lg:pt-2">
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
-            {t("reviewsEyebrow")}
-          </p>
-          <h2 className="mt-3 font-display text-3xl text-[#1c1a19] md:text-4xl">
-            {t("reviewsTitle")}
-          </h2>
-          <div className="mt-4 h-px w-12 bg-gradient-to-r from-[#c9a08a] to-transparent" />
-
-          {product.rating > 0 ? (
-            <>
-              <p className="mt-8 font-display text-5xl text-[#1c1a19] md:text-6xl">
-                {product.rating.toFixed(1)}
+    <section
+      id="product-reviews"
+      className="scroll-mt-28 border-y border-[color:var(--rg-line)] bg-[color:var(--rg-paper-deep)] py-12 md:py-16"
+    >
+      <div className="container-rg">
+        <div
+          className={
+            reviews.length
+              ? "grid gap-10 lg:grid-cols-[minmax(200px,0.32fr)_minmax(0,1fr)] lg:items-start lg:gap-14"
+              : ""
+          }
+        >
+          <Reveal>
+            <div className="lg:sticky lg:top-[7.25rem]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--rg-accent)]">
+                {t("reviewsEyebrow")}
               </p>
-              <div className="mt-3 flex items-center gap-1 text-[#c9a08a]">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <IconStar
-                    key={i}
-                    className={`h-4 w-4 ${i < filled ? "opacity-100" : "opacity-25"}`}
-                  />
-                ))}
-              </div>
-            </>
-          ) : null}
-          {product.reviewCount > 0 ? (
-            <p className="mt-3 text-sm text-[#1c1a19]/55">
-              {t("reviewsSummary", { count: product.reviewCount })}
-            </p>
-          ) : (
-            <p className="mt-3 text-sm text-[#1c1a19]/55">{t("reviewsEmpty")}</p>
-          )}
-          {product.soldCount > 0 ? (
-            <p className="mt-1 text-xs text-[#1c1a19]/45">
-              {t("purchased", { count: product.soldCount })}
-            </p>
-          ) : null}
-        </div>
+              <h2 className="mt-2.5 font-display text-[clamp(1.75rem,3vw,2.5rem)] tracking-[-0.02em] text-[color:var(--rg-pearl)]">
+                {t("reviewsTitle")}
+              </h2>
+              <div className="rg-home-gold-rule mt-4 w-12" />
 
-        {reviews.length > 0 ? (
-        <div>
-          <ul className="divide-y divide-[#1c1a19]/10 border-y border-[#1c1a19]/10">
-            {notes.map((review) => (
-              <li key={review.id} className="py-6 md:py-7">
-                <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <div className="flex items-center gap-0.5 text-[#c9a08a]">
-                    {Array.from({ length: review.rating }).map((_, i) => (
-                      <IconStar key={i} className="h-3 w-3" />
+              {product.rating > 0 ? (
+                <>
+                  <p className="mt-6 font-display text-5xl text-[color:var(--rg-pearl)] md:text-6xl">
+                    {product.rating.toFixed(1)}
+                  </p>
+                  <div className="mt-2.5 flex items-center gap-1 text-[color:var(--rg-accent)]">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <IconStar
+                        key={i}
+                        className={`h-3.5 w-3.5 ${i < filled ? "opacity-100" : "opacity-25"}`}
+                      />
                     ))}
                   </div>
-                  <p className="text-sm text-[#1c1a19]">
-                    {localize(review.name, locale)}
-                  </p>
-                  <span className="text-[#1c1a19]/25">·</span>
-                  <p className="text-[11px] uppercase tracking-[0.14em] text-[#1c1a19]/45">
-                    {localize(review.place, locale)}
-                  </p>
-                </div>
-                <p className="max-w-2xl text-sm leading-7 text-[#1c1a19]/65 md:text-[15px] md:leading-8">
-                  “{localize(review.quote, locale)}”
+                </>
+              ) : null}
+              {product.reviewCount > 0 ? (
+                <p className="mt-3 text-sm text-[color:var(--rg-muted)]">
+                  {t("reviewsSummary", { count: product.reviewCount })}
                 </p>
+              ) : (
+                <p className="mt-3 text-sm text-[color:var(--rg-muted)]">
+                  {t("reviewsEmpty")}
+                </p>
+              )}
+              {product.soldCount > 0 ? (
+                <p className="mt-1 text-xs text-[color:var(--rg-muted)]">
+                  {t("purchased", { count: product.soldCount })}
+                </p>
+              ) : null}
+            </div>
+          </Reveal>
 
-                {review.images && review.images.length > 0 ? (
-                  <ul className="mt-4 flex flex-wrap gap-2">
-                    {review.images.map((src) => (
-                      <li key={src}>
-                        <button
-                          type="button"
-                          onClick={() => setLightbox(src)}
-                          className="relative block h-20 w-16 overflow-hidden bg-[#e2dacf] sm:h-24 sm:w-20"
-                          aria-label={t("reviewPhoto")}
-                        >
-                          <Image
-                            src={src}
-                            alt=""
-                            fill
-                            sizes="80px"
-                            className="object-cover transition duration-300 hover:scale-[1.04]"
-                          />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </li>
-            ))}
-          </ul>
+          {reviews.length > 0 ? (
+            <div>
+              <ul className="divide-y divide-[color:var(--rg-line)] border-y border-[color:var(--rg-line)]">
+                {notes.map((review) => (
+                  <li key={review.id} className="py-5 md:py-6">
+                    <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <div className="flex items-center gap-0.5 text-[color:var(--rg-accent)]">
+                        {Array.from({ length: review.rating }).map((_, i) => (
+                          <IconStar key={i} className="h-3 w-3" />
+                        ))}
+                      </div>
+                      <p className="text-sm text-[color:var(--rg-pearl)]">
+                        {localize(review.name, locale)}
+                      </p>
+                      <span className="text-[color:var(--rg-muted)]">·</span>
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-[color:var(--rg-muted)]">
+                        {localize(review.place, locale)}
+                      </p>
+                    </div>
+                    <p className="max-w-2xl text-sm leading-7 text-[color:var(--rg-muted)] md:text-[15px]">
+                      “{localize(review.quote, locale)}”
+                    </p>
 
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            onChange={goToPage}
-            className="mt-8 border-t-0 pt-0 md:mt-10 md:pt-0"
-          />
+                    {review.images && review.images.length > 0 ? (
+                      <ul className="mt-3.5 flex flex-wrap gap-2">
+                        {review.images.map((src) => (
+                          <li key={src}>
+                            <button
+                              type="button"
+                              onClick={() => setLightbox(src)}
+                              className="relative block h-20 w-16 overflow-hidden bg-[color:var(--rg-mat)] sm:h-24 sm:w-20"
+                              aria-label={t("reviewPhoto")}
+                            >
+                              <Image
+                                src={src}
+                                alt=""
+                                fill
+                                sizes="80px"
+                                className="object-cover transition duration-300 hover:scale-[1.04]"
+                              />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onChange={goToPage}
+                className="mt-8 border-t-0 pt-0 md:mt-10 md:pt-0"
+              />
+            </div>
+          ) : null}
         </div>
-        ) : null}
       </div>
 
       {lightbox ? (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
           <button
             type="button"
-            className="absolute inset-0 bg-[#0e0d0c]/65 backdrop-blur-[2px] rg-fade-in"
+            className="absolute inset-0 bg-[color:var(--rg-paper)]/80 backdrop-blur-[2px] rg-fade-in"
             aria-label={t("closePhoto")}
             onClick={() => setLightbox(null)}
           />
@@ -173,11 +183,11 @@ export function ProductReviews({
             <button
               type="button"
               onClick={() => setLightbox(null)}
-              className="absolute -top-10 right-0 text-[10px] uppercase tracking-[0.18em] text-[#f4efe8]/85"
+              className="absolute -top-10 right-0 text-[10px] uppercase tracking-[0.18em] text-[color:var(--rg-pearl)]"
             >
               {t("closePhoto")}
             </button>
-            <div className="relative aspect-[4/5] overflow-hidden bg-[#1c1a19]">
+            <div className="relative aspect-[4/5] overflow-hidden bg-[color:var(--rg-mat)]">
               <Image
                 src={lightbox}
                 alt=""

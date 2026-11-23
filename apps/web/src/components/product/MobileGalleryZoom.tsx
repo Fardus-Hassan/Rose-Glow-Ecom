@@ -215,13 +215,13 @@ export function MobileGalleryZoom({
       aria-label={t("zoomTitle")}
     >
       <div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-[#f4efe8]/70">
+        <p className="text-[11px] uppercase tracking-[0.18em] text-[#f3eee8]/70">
           {imageIndex + 1} / {images.length}
         </p>
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex min-h-10 min-w-10 items-center justify-center text-[11px] uppercase tracking-[0.18em] text-[#f4efe8]"
+          className="inline-flex min-h-10 min-w-10 items-center justify-center text-[11px] uppercase tracking-[0.18em] text-[#f3eee8]"
           aria-label={t("closePhoto")}
         >
           {t("closePhoto")} ✕
@@ -255,14 +255,14 @@ export function MobileGalleryZoom({
           onClick={() => go(-1)}
           disabled={images.length < 2 || scale > 1.05}
           className={cn(
-            "inline-flex h-11 w-11 items-center justify-center border border-white/20 text-[#f4efe8]",
+            "inline-flex h-11 w-11 items-center justify-center border border-white/20 text-[#f3eee8]",
             (images.length < 2 || scale > 1.05) && "opacity-30",
           )}
           aria-label={t("prevMedia")}
         >
           ←
         </button>
-        <p className="text-center text-[10px] uppercase tracking-[0.16em] text-[#f4efe8]/55">
+        <p className="text-center text-[10px] uppercase tracking-[0.16em] text-[#f3eee8]/55">
           {t("zoomMobileHint")}
         </p>
         <button
@@ -270,7 +270,7 @@ export function MobileGalleryZoom({
           onClick={() => go(1)}
           disabled={images.length < 2 || scale > 1.05}
           className={cn(
-            "inline-flex h-11 w-11 items-center justify-center border border-white/20 text-[#f4efe8]",
+            "inline-flex h-11 w-11 items-center justify-center border border-white/20 text-[#f3eee8]",
             (images.length < 2 || scale > 1.05) && "opacity-30",
           )}
           aria-label={t("nextMedia")}

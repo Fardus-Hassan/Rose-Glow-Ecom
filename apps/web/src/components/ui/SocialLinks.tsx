@@ -69,11 +69,11 @@ export function SocialLinks({
                   : "h-10 w-10 items-center justify-center border",
                 tone === "light"
                   ? showLabels
-                    ? "text-[#f4efe8]/55 hover:text-[#f4efe8]"
-                    : "border-white/15 text-[#f4efe8]/70 hover:border-[#c9a08a]/50 hover:text-[#f4efe8]"
+                    ? "text-[#f3eee8]/55 hover:text-[#f3eee8]"
+                    : "border-white/15 text-[#f3eee8]/70 hover:border-[color:var(--rg-accent)]/55 hover:text-[#f3eee8]"
                   : showLabels
-                    ? "text-[#1c1a19]/45 hover:text-[#1c1a19]"
-                    : "border-[#1c1a19]/12 text-[#1c1a19]/55 hover:border-[#c9a08a]/55 hover:text-[#1c1a19]",
+                    ? "text-[#f3eee8]/55 hover:text-[#f3eee8]"
+                    : "border-[color:var(--rg-line)] text-[#f3eee8]/65 hover:border-[color:var(--rg-accent)]/55 hover:text-[#f3eee8]",
               )}
             >
               <Icon className="h-[18px] w-[18px]" />

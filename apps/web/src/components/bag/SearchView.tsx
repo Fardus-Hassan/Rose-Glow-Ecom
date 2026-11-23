@@ -73,12 +73,12 @@ export function SearchView({ initialQuery = "" }: { initialQuery?: string }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("placeholder")}
-          className="min-h-14 w-full border-b border-[#1c1a19]/15 bg-transparent pr-24 text-lg text-[#1c1a19] outline-none placeholder:text-[#1c1a19]/35 focus:border-[#c9a08a] md:min-h-16 md:text-xl"
+          className="min-h-14 w-full border-b border-[#f3eee8]/15 bg-transparent pr-24 text-lg text-[#f3eee8] outline-none placeholder:text-[#f3eee8]/35 focus:border-[#d4a574] md:min-h-16 md:text-xl"
           autoFocus
         />
         <button
           type="submit"
-          className="absolute right-0 top-1/2 -translate-y-1/2 text-[11px] uppercase tracking-[0.2em] text-[#1c1a19]/55 transition hover:text-[#1c1a19]"
+          className="absolute right-0 top-1/2 -translate-y-1/2 text-[11px] uppercase tracking-[0.2em] text-[#f3eee8]/55 transition hover:text-[#f3eee8]"
         >
           {t("submit")}
         </button>
@@ -86,14 +86,14 @@ export function SearchView({ initialQuery = "" }: { initialQuery?: string }) {
 
       <div className="mt-10 md:mt-12">
         {!deferred ? (
-          <p className="text-sm text-[#1c1a19]/45">{t("hint")}</p>
+          <p className="text-sm text-[#f3eee8]/45">{t("hint")}</p>
         ) : loading && !result ? (
           <ProductGridSkeleton count={8} />
         ) : !result || result.total === 0 ? (
-          <p className="text-sm text-[#1c1a19]/55">{t("empty")}</p>
+          <p className="text-sm text-[#f3eee8]/55">{t("empty")}</p>
         ) : (
           <>
-            <p className="mb-6 text-[11px] uppercase tracking-[0.2em] text-[#1c1a19]/45">
+            <p className="mb-6 text-[11px] uppercase tracking-[0.2em] text-[#f3eee8]/45">
               {t("results", { count: result.total })}
             </p>
             <StaggerGrid

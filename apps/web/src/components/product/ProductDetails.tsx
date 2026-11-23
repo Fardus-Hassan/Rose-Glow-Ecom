@@ -3,18 +3,17 @@
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { localize, type Product } from "@/data/products";
-import { FadePanel } from "@/components/ui/FadePanel";
+import { Reveal } from "@/components/motion/Reveal";
 import { RichText } from "@/components/ui/RichText";
-import { cn } from "@/lib/format";
 import { fetchShippingSettings } from "@/lib/catalog";
 
-type Tab = "description" | "specifications" | "shipping";
-
+/**
+ * One editorial details band — description + specs + shipping, no tab chrome.
+ */
 export function ProductDetails({ product }: { product: Product }) {
   const t = useTranslations("Product");
   const tc = useTranslations("Categories");
   const locale = useLocale();
-  const [tab, setTab] = useState<Tab>("description");
   const [shippingCopy, setShippingCopy] = useState(t("shippingCopy"));
 
   useEffect(() => {
@@ -43,111 +42,57 @@ export function ProductDetails({ product }: { product: Product }) {
   ] as const;
 
   return (
-    <section className="container-rg">
-      <div className="-mx-5 overflow-x-auto border-b border-[#1c1a19]/10 px-5 [-ms-overflow-style:none] [scrollbar-width:none] sm:-mx-6 sm:px-6 md:mx-0 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
-        <div className="flex min-w-max gap-6 md:min-w-0 md:gap-8">
-          {(
-            [
-              ["description", t("description")],
-              ["specifications", t("specifications")],
-              ["shipping", t("shipping")],
-            ] as const
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setTab(key)}
-              className={cn(
-                "relative shrink-0 pb-3 text-[11px] uppercase tracking-[0.18em] transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                tab === key
-                  ? "text-[#1c1a19]"
-                  : "text-[#1c1a19]/40 hover:text-[#1c1a19]",
-              )}
-            >
-              {label}
-              <span
-                className={cn(
-                  "absolute inset-x-0 -bottom-px h-px bg-[#c9a08a] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                  tab === key ? "scale-x-100" : "scale-x-0",
-                )}
+    <section className="border-y border-[color:var(--rg-line)] bg-[color:var(--rg-paper-deep)] py-12 md:py-16">
+      <div className="container-rg">
+        <Reveal>
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-16 xl:gap-20">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--rg-accent)]">
+                {t("description")}
+              </p>
+              <h2 className="mt-2.5 font-display text-[clamp(1.75rem,3.2vw,2.5rem)] leading-[1.08] tracking-[-0.02em] text-[color:var(--rg-pearl)]">
+                {t("descriptionTitle")}
+              </h2>
+              <div className="rg-home-gold-rule mt-4 w-12" />
+              <RichText
+                html={localize(product.description, locale)}
+                className="mt-6 text-[15px] leading-7 text-[color:var(--rg-muted)] md:leading-8"
               />
-            </button>
-          ))}
-          <span className="w-2 shrink-0 md:hidden" aria-hidden />
-        </div>
-      </div>
+            </div>
 
-      <div className="py-8 md:py-10">
-        <FadePanel activeKey={tab}>
-          {tab === "description" ? (
-            <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+            <div className="flex flex-col gap-8 lg:pt-1">
               <div>
-                <h3 className="font-display text-2xl text-[#1c1a19] md:text-3xl">
-                  {t("descriptionTitle")}
-                </h3>
-                <RichText
-                  html={localize(product.description, locale)}
-                  className="mt-4 text-sm leading-7 text-[#1c1a19]/58 md:text-[15px] md:leading-8"
-                />
-                <ul className="mt-6 space-y-3 text-sm text-[#1c1a19]/65">
-                  <li className="flex gap-3">
-                    <span className="mt-2 h-1 w-1 shrink-0 bg-[#c9a08a]" />
-                    {localize(product.material, locale)}
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="mt-2 h-1 w-1 shrink-0 bg-[#c9a08a]" />
-                    {product.colors.map((c) => localize(c, locale)).join(" · ")}
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="mt-2 h-1 w-1 shrink-0 bg-[#c9a08a]" />
-                    {t("trustShipping")} · {t("trustReturn")}
-                  </li>
-                </ul>
-              </div>
-
-              <div className="border border-[#1c1a19]/10 bg-[#e7e0d6] p-5 md:p-7">
-                <h4 className="text-[10px] uppercase tracking-[0.22em] text-[#c9a08a]">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--rg-accent)]">
                   {t("specifications")}
-                </h4>
+                </p>
                 <dl className="mt-4">
                   {specs.map(([label, value]) => (
                     <div
                       key={label}
-                      className="grid grid-cols-[1fr_1.2fr] gap-4 border-b border-[#1c1a19]/08 py-3.5 last:border-b-0"
+                      className="grid grid-cols-[minmax(0,0.45fr)_minmax(0,1fr)] gap-4 border-b border-[color:var(--rg-line)] py-3.5 last:border-b-0"
                     >
-                      <dt className="text-[11px] uppercase tracking-[0.14em] text-[#1c1a19]/40">
+                      <dt className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--rg-muted)]">
                         {label}
                       </dt>
-                      <dd className="text-sm text-[#1c1a19]">{value}</dd>
+                      <dd className="text-sm text-[color:var(--rg-pearl)]">
+                        {value}
+                      </dd>
                     </div>
                   ))}
                 </dl>
               </div>
+
+              <div className="border-t border-[color:var(--rg-line)] pt-6">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--rg-accent)]">
+                  {t("shipping")}
+                </p>
+                <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[color:var(--rg-muted)]">
+                  {shippingCopy}
+                </p>
+              </div>
             </div>
-          ) : null}
-
-          {tab === "specifications" ? (
-            <dl className="mx-auto max-w-2xl">
-              {specs.map(([label, value]) => (
-                <div
-                  key={label}
-                  className="grid grid-cols-[1fr_1.4fr] gap-4 border-b border-[#1c1a19]/08 py-4"
-                >
-                  <dt className="text-[11px] uppercase tracking-[0.14em] text-[#1c1a19]/40">
-                    {label}
-                  </dt>
-                  <dd className="text-sm text-[#1c1a19]">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : null}
-
-          {tab === "shipping" ? (
-            <p className="max-w-2xl whitespace-pre-line text-sm leading-7 text-[#1c1a19]/58 md:text-[15px]">
-              {shippingCopy}
-            </p>
-          ) : null}
-        </FadePanel>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

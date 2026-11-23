@@ -35,17 +35,16 @@ export function Reveal({
     if (reduceMotion) return;
 
     const ctx = gsap.context(() => {
-      gsap.set(el, { opacity: 0, y, filter: "blur(8px)" });
+      gsap.set(el, { opacity: 0, y: Math.min(y, 36) });
       gsap.to(el, {
         opacity: 1,
         y: 0,
-        filter: "blur(0px)",
-        duration: 1.05,
+        duration: 0.85,
         delay,
         ease: "power3.out",
         scrollTrigger: {
           trigger: el,
-          start: "top 88%",
+          start: "top 90%",
           toggleActions: once
             ? "play none none none"
             : "play reverse play reverse",

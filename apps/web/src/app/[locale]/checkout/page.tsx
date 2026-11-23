@@ -20,8 +20,14 @@ export default async function CheckoutPage({
   setRequestLocale(locale);
 
   return (
-    <div className="container-rg pb-16 pt-28 md:pb-24 md:pt-36">
-      <CheckoutView />
+    <div className="relative overflow-hidden bg-[color:var(--rg-paper)] pb-16 pt-28 md:pb-24 md:pt-36">
+      <div
+        className="rg-editorial-grid pointer-events-none absolute inset-0 opacity-35"
+        aria-hidden
+      />
+      <div className="container-rg relative">
+        <CheckoutView />
+      </div>
     </div>
   );
 }

@@ -172,31 +172,28 @@ export function CheckoutView() {
   if (submitted) {
     return (
       <div className="mx-auto max-w-xl py-10 text-center md:py-16">
-        <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
+        <p className="text-[10px] uppercase tracking-[0.28em] text-[#d4a574]">
           {t("successEyebrow")}
         </p>
-        <h1 className="mt-4 font-display text-4xl text-[#1c1a19] md:text-5xl">
+        <h1 className="rg-section-title mt-4 text-4xl md:text-5xl">
           {t("successTitle")}
         </h1>
-        <p className="mt-5 text-sm leading-7 text-[#1c1a19]/55">
+        <p className="mt-5 text-sm leading-7 text-[#f3eee8]/55">
           {t("successSub")}
         </p>
         {orderNumber ? (
-          <p className="mt-3 text-sm text-[#1c1a19]/70">
+          <p className="mt-3 text-sm text-[#f3eee8]/70">
             {orderNumber}
           </p>
         ) : null}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/products"
-            className="inline-flex min-h-12 items-center justify-center bg-[#1c1a19] px-7 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8]"
-          >
+          <Link href="/products" className="rg-cta-solid min-h-12 px-7">
             {t("shopMore")}
           </Link>
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="inline-flex min-h-12 items-center justify-center border border-[#1c1a19]/2 px-7 text-[11px] uppercase tracking-[0.2em] text-[#1c1a19]"
+            className="rg-cta min-h-12 px-7"
           >
             {t("home")}
           </button>
@@ -208,19 +205,16 @@ export function CheckoutView() {
   if (lines.length === 0) {
     return (
       <div className="py-10 text-center md:py-16">
-        <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
+        <p className="text-[10px] uppercase tracking-[0.28em] text-[#d4a574]">
           {t("eyebrow")}
         </p>
-        <h1 className="mt-3 font-display text-4xl text-[#1c1a19] md:text-5xl">
+        <h1 className="rg-section-title mt-3 text-4xl md:text-5xl">
           {t("emptyTitle")}
         </h1>
-        <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[#1c1a19]/55">
+        <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-[#f3eee8]/55">
           {t("emptySub")}
         </p>
-        <Link
-          href="/products"
-          className="mt-8 inline-flex min-h-12 items-center justify-center bg-[#1c1a19] px-8 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8]"
-        >
+        <Link href="/products" className="rg-cta-solid mt-8 min-h-12 px-8">
           {t("shopMore")}
         </Link>
       </div>
@@ -228,25 +222,24 @@ export function CheckoutView() {
   }
 
   const fieldClass =
-    "min-h-12 w-full border border-[#1c1a19]/15 bg-transparent px-4 text-sm text-[#1c1a19] outline-none transition placeholder:text-[#1c1a19]/35 focus:border-[#c9a08a]";
+    "min-h-12 w-full border border-[#f3eee8]/15 bg-transparent px-4 text-sm text-[#f3eee8] outline-none transition placeholder:text-[#f3eee8]/35 focus:border-[#d4a574]";
 
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-[0.28em] text-[#c9a08a]">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--rg-muted)]">
         {t("eyebrow")}
       </p>
-      <h1 className="mt-3 font-display text-4xl text-[#1c1a19] md:text-5xl">
+      <h1 className="rg-section-title mt-3 text-4xl md:text-5xl">
         {t("title")}
       </h1>
-      <div className="mt-4 h-px w-12 bg-gradient-to-r from-[#c9a08a] to-transparent" />
 
       <div className="mt-10 grid gap-10 md:mt-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] lg:gap-14">
         <form onSubmit={onSubmit} className="space-y-5" noValidate>
           <div>
-            <p className="text-[10px] uppercase tracking-[0.24em] text-[#c9a08a]">
+            <p className="text-[10px] uppercase tracking-[0.24em] text-[#d4a574]">
               {t("delivery")}
             </p>
-            <p className="mt-2 text-sm text-[#1c1a19]/55">
+            <p className="mt-2 text-sm text-[#f3eee8]/55">
               {codNote || t("codOnly")}
             </p>
             {shipping && !shipping.codEnabled ? (
@@ -264,7 +257,7 @@ export function CheckoutView() {
             ] as const
           ).map(([key, label, type]) => (
             <label key={key} className="block">
-              <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/45">
+              <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#f3eee8]/45">
                 {label}
               </span>
               <input
@@ -291,7 +284,7 @@ export function CheckoutView() {
           ))}
 
           <label className="block">
-            <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/45">
+            <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#f3eee8]/45">
               {t("address")}
             </span>
             <textarea
@@ -315,7 +308,7 @@ export function CheckoutView() {
           </label>
 
           <label className="block">
-            <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#1c1a19]/45">
+            <span className="mb-2 block text-[10px] uppercase tracking-[0.18em] text-[#f3eee8]/45">
               {t("note")}
             </span>
             <textarea
@@ -337,15 +330,15 @@ export function CheckoutView() {
           <button
             type="submit"
             disabled={submitting || (shipping ? !shipping.codEnabled : false)}
-            className="rg-beat inline-flex min-h-12 w-full items-center justify-center bg-[#1c1a19] px-6 text-[11px] uppercase tracking-[0.2em] text-[#f4efe8] transition-colors hover:bg-black disabled:opacity-50 sm:w-auto"
+            className="rg-cta-solid min-h-12 w-full px-6 disabled:opacity-50 sm:w-auto"
           >
             {submitting ? "…" : t("placeOrder")}
           </button>
         </form>
 
         <aside className="lg:sticky lg:top-28 lg:self-start">
-          <div className="border border-[#1c1a19]/10 bg-[#e7e0d6]/45 p-6 md:p-7">
-            <p className="text-[10px] uppercase tracking-[0.24em] text-[#c9a08a]">
+          <div className="border border-[#f3eee8]/10 bg-[#1a1518]/45 p-6 md:p-7">
+            <p className="text-[10px] uppercase tracking-[0.24em] text-[#d4a574]">
               {t("order")}
             </p>
             <ul className="mt-5 space-y-4">
@@ -354,7 +347,7 @@ export function CheckoutView() {
                 const cover = offer.image ? { src: offer.image } : getCoverMedia(product);
                 return (
                   <li key={`${line.slug}:${line.optionId || ""}`} className="flex gap-3">
-                    <div className="relative h-16 w-14 shrink-0 overflow-hidden bg-[#e2dacf]">
+                    <div className="relative h-16 w-14 shrink-0 overflow-hidden bg-[#1a1518]">
                       {cover ? (
                         <Image
                           src={cover.src}
@@ -366,10 +359,10 @@ export function CheckoutView() {
                       ) : null}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm text-[#1c1a19]">
+                      <p className="truncate text-sm text-[#f3eee8]">
                         {localize(product.name, locale)}
                       </p>
-                      <p className="mt-1 text-xs text-[#1c1a19]/45">
+                      <p className="mt-1 text-xs text-[#f3eee8]/45">
                         ×{line.qty} ·{" "}
                         {formatBdt(offer.price * line.qty, locale)}
                       </p>
@@ -378,12 +371,12 @@ export function CheckoutView() {
                 );
               })}
             </ul>
-            <div className="mt-6 space-y-2 border-t border-[#1c1a19]/10 pt-4 text-sm">
-              <div className="flex items-center justify-between text-[#1c1a19]/55">
+            <div className="mt-6 space-y-2 border-t border-[#f3eee8]/10 pt-4 text-sm">
+              <div className="flex items-center justify-between text-[#f3eee8]/55">
                 <span>{t("subtotal")}</span>
                 <span>{formatBdt(subtotal, locale)}</span>
               </div>
-              <div className="flex items-center justify-between text-[#1c1a19]/55">
+              <div className="flex items-center justify-between text-[#f3eee8]/55">
                 <span>{t("shippingLabel")}</span>
                 <span>
                   {shippingFee > 0
@@ -396,15 +389,15 @@ export function CheckoutView() {
               {shipping &&
               shipping.freeShippingOver > 0 &&
               subtotal < shipping.freeShippingOver ? (
-                <p className="text-xs text-[#1c1a19]/45">
+                <p className="text-xs text-[#f3eee8]/45">
                   {t("freeShippingOver", {
                     amount: formatBdt(shipping.freeShippingOver, locale),
                   })}
                 </p>
               ) : null}
-              <div className="flex items-center justify-between border-t border-[#1c1a19]/10 pt-2">
-                <span className="text-[#1c1a19]/55">{t("total")}</span>
-                <span className="text-[#1c1a19]">
+              <div className="flex items-center justify-between border-t border-[#f3eee8]/10 pt-2">
+                <span className="text-[#f3eee8]/55">{t("total")}</span>
+                <span className="text-[#f3eee8]">
                   {formatBdt(total, locale)}
                 </span>
               </div>

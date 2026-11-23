@@ -174,7 +174,8 @@
     "summary": "Summary",
     "subtotal": "Subtotal",
     "codNote": "Cash on delivery available nationwide. Shipping confirmed after order.",
-    "checkout": "Checkout · COD"
+    "checkout": "Checkout · COD",
+    "viewCart": "View cart"
   },
   "Wishlist": {
     "eyebrow": "Saved pieces",

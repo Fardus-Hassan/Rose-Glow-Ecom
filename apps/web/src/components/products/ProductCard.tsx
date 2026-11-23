@@ -34,94 +34,78 @@ export function ProductCard({
 
   const body = (
     <>
-      <div className="relative aspect-[4/5] overflow-hidden bg-[#e2dacf]">
+      <div className="relative aspect-[3/4] overflow-hidden bg-[color:var(--rg-soft)]">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(243,238,232,0.12),transparent_70%)]"
+          aria-hidden
+        />
         {coverSrc ? (
-          <SmartImage
-            src={coverSrc}
-            alt={
-              cover?.alt
-                ? localize(cover.alt, locale)
-                : localize(product.name, locale)
-            }
-            fill
-            variant="card"
-            variants={cover?.variants}
-            blurDataURL={cover?.blurDataUrl}
-            sizesPreset="card"
-            priority={priority}
-            className="object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
-          />
+          <div className="absolute inset-0 overflow-hidden">
+            <SmartImage
+              src={coverSrc}
+              alt={
+                cover?.alt
+                  ? localize(cover.alt, locale)
+                  : localize(product.name, locale)
+              }
+              fill
+              variant="card"
+              variants={cover?.variants}
+              blurDataURL={cover?.blurDataUrl}
+              sizesPreset="card"
+              priority={priority}
+              className="object-cover object-center transition duration-700 ease-out group-hover:scale-[1.04]"
+            />
+          </div>
         ) : null}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[color:var(--rg-paper)]/70 to-transparent" />
 
         {discount > 0 ? (
-          <span className="absolute left-3 top-3 bg-[#0e0d0c]/78 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#f4efe8] backdrop-blur-sm">
+          <span className="absolute left-0 top-5 bg-[color:var(--rg-accent)] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-[color:var(--rg-cta-ink)]">
             −{discount}%
           </span>
         ) : null}
-
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-2 bg-gradient-to-t from-[#0e0d0c]/70 to-transparent p-3 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-          <span className="block text-center text-[10px] uppercase tracking-[0.2em] text-[#f4efe8]">
-            {t("viewProduct")} →
-          </span>
-        </div>
       </div>
 
-      <div className="flex flex-1 flex-col pt-3.5 text-left md:pt-4">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-[#1c1a19]/45">
+      <div className="flex flex-1 flex-col pt-5 text-left">
+        <p className="text-[10px] uppercase tracking-[0.22em] text-[color:var(--rg-accent)]">
           {tc(product.category)}
         </p>
-        <h3 className="mt-1 font-display text-lg leading-snug text-[#1c1a19] md:text-xl">
+        <h3 className="mt-2 font-display text-[clamp(1.15rem,2.2vw,1.45rem)] leading-[1.15] tracking-[-0.02em] text-[color:var(--rg-pearl)] transition group-hover:text-[color:var(--rg-accent)]">
           {localize(product.name, locale)}
         </h3>
-
-        {product.rating > 0 || product.soldCount > 0 ? (
-          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-            {product.rating > 0 ? (
-              <>
-                <div className="flex items-center gap-0.5 text-[#c9a08a]">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <IconStar
-                      key={i}
-                      className={`h-3 w-3 ${i < filledStars ? "opacity-100" : "opacity-25"}`}
-                    />
-                  ))}
-                </div>
-                <span className="text-[11px] text-[#1c1a19]/45">
-                  {product.rating.toFixed(1)}
-                </span>
-              </>
-            ) : null}
-            {product.soldCount > 0 ? (
-              <>
-                {product.rating > 0 ? (
-                  <span className="text-[11px] text-[#1c1a19]/35">·</span>
-                ) : null}
-                <span className="text-[11px] text-[#1c1a19]/45">
-                  {t("purchased", { count: product.soldCount })}
-                </span>
-              </>
-            ) : null}
-          </div>
-        ) : null}
-
-        <div className="mt-2 flex items-baseline gap-2.5">
-          <span className="text-sm text-[#1c1a19]/85">
+        <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span className="text-sm tabular-nums text-[color:var(--rg-accent)] md:text-[15px]">
             {(product.options?.length || 0) > 1
               ? t("priceFrom", { price: formatBdt(product.price, locale) })
               : formatBdt(product.price, locale)}
           </span>
           {product.compareAtPrice && !(product.options?.length || 0) ? (
-            <span className="text-xs text-[#1c1a19]/40 line-through">
+            <span className="text-xs tabular-nums text-[color:var(--rg-muted)] line-through">
               {formatBdt(product.compareAtPrice, locale)}
             </span>
           ) : null}
         </div>
+
+        {product.rating > 0 ? (
+          <div className="mt-3 flex items-center gap-1 text-[color:var(--rg-accent)]">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <IconStar
+                key={i}
+                className={`h-2.5 w-2.5 ${i < filledStars ? "opacity-100" : "opacity-25"}`}
+              />
+            ))}
+            <span className="ml-1 text-[10px] text-[color:var(--rg-muted)]">
+              {product.rating.toFixed(1)}
+            </span>
+          </div>
+        ) : null}
       </div>
     </>
   );
 
   return (
-    <article data-stagger-item className="group flex flex-col">
+    <article className="group flex flex-col">
       {onSelect ? (
         <button type="button" onClick={onSelect} className="block w-full text-left">
           {body}
