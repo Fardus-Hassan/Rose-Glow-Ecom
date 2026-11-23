@@ -26,7 +26,7 @@ export function EditorialPageHeader({
       </h1>
       <div className="rg-home-gold-rule mt-5 w-16 md:w-20" />
       {lead ? (
-        <p className="mt-5 max-w-xl text-[15px] leading-7 text-[color:var(--rg-muted)] md:text-base md:leading-8">
+        <p className="mt-5 max-w-xl text-[15px] leading-7 text-white md:text-base md:leading-8">
           {lead}
         </p>
       ) : null}

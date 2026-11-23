@@ -10,9 +10,11 @@ import { Reveal } from "@/components/motion/Reveal";
 import { MetaViewContent } from "@/components/analytics/MetaViewContent";
 import { Link } from "@/i18n/navigation";
 import {
+  fetchContactContent,
   fetchProductBySlug,
   fetchRelatedProducts,
   fetchReviews,
+  fetchSocialLinks,
 } from "@/lib/catalog";
 import { buildPageMetadata } from "@/lib/seo";
 import { stripHtml } from "@/lib/rich-text";
@@ -47,9 +49,11 @@ export default async function ProductPage({
   const product = await fetchProductBySlug(slug);
   if (!product) notFound();
 
-  const [related, reviews] = await Promise.all([
+  const [related, reviews, contact, social] = await Promise.all([
     fetchRelatedProducts(slug, 4),
     fetchReviews({ productSlug: slug, pageSize: 100 }),
+    fetchContactContent(),
+    fetchSocialLinks(),
   ]);
   const t = await getTranslations("Product");
   const tc = await getTranslations("Categories");
@@ -90,7 +94,7 @@ export default async function ProductPage({
           </Link>
         </nav>
 
-        <ProductShowcase product={product} />
+        <ProductShowcase product={product} contact={contact} social={social} />
       </div>
 
       <div className="relative mt-14 md:mt-20">

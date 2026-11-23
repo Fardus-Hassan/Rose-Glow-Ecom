@@ -52,10 +52,10 @@ export function FooterClient() {
               className="object-cover"
             />
           </span>
-          <p className="font-display text-3xl tracking-[0.08em] md:text-4xl">
+          <p className="font-brand text-3xl md:text-4xl">
             {displayName}
           </p>
-          <p className="mt-3 max-w-sm text-sm leading-7 text-[color:var(--rg-muted)]">
+          <p className="mt-3 max-w-sm text-sm leading-7 text-white">
             {!ready ? (
               <span className="inline-block h-3 w-48 animate-pulse rounded-sm bg-[color:var(--rg-soft)]" />
             ) : (

@@ -280,7 +280,7 @@ export function Header() {
               priority
             />
           </span>
-          <span className="font-display text-[1.15rem] leading-none tracking-[0.01em] md:text-xl">
+          <span className="font-brand text-[1.15rem] leading-none md:text-xl">
             Rose Glow
           </span>
         </Link>
@@ -291,7 +291,7 @@ export function Header() {
           aria-hidden
         >
           <span className="h-8 w-8 md:h-9 md:w-9" />
-          <span className="font-display text-[1.15rem] md:text-xl">
+          <span className="font-brand text-[1.15rem] md:text-xl">
             Rose Glow
           </span>
         </div>

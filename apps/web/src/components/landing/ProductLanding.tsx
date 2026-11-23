@@ -399,7 +399,7 @@ export function ProductLanding({
           <h1 className="mt-4 font-display text-4xl text-[color:var(--rg-pearl)] md:text-5xl">
             {t("successTitle")}
           </h1>
-          <p className="mt-5 max-w-md text-sm leading-7 text-[color:var(--rg-muted)]">
+          <p className="mt-5 max-w-md text-sm leading-7 text-white">
             {t("successSub")}
           </p>
           <p className="mt-3 text-sm text-[color:var(--rg-muted)]">
@@ -434,7 +434,7 @@ export function ProductLanding({
       {itemCount > 0 ? (
         <div className="sticky top-[4.25rem] z-40 border-b border-[color:var(--rg-line)] bg-[color:var(--rg-paper)]/92 backdrop-blur-md md:top-[4.75rem]">
           <div className="container-rg flex items-center justify-between gap-3 py-2.5">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--rg-muted)]">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-white">
               {t("bagCount", { count: itemCount })} · {formatBdt(total, locale)}
             </p>
             <button
@@ -449,8 +449,13 @@ export function ProductLanding({
       ) : null}
 
       <div className="container-rg pt-6 sm:pt-8 md:pt-12">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start lg:gap-12 xl:gap-16">
-          <div className="lg:sticky lg:top-36">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start lg:gap-x-12 lg:gap-y-14 xl:gap-x-16">
+          <div
+            className={cn(
+              "lg:sticky lg:z-10 lg:self-start",
+              itemCount > 0 ? "lg:top-[8.25rem]" : "lg:top-[5.75rem]",
+            )}
+          >
             <ProductGallery
               key={offer.optionId || "product"}
               media={gallery}
@@ -556,7 +561,7 @@ export function ProductLanding({
                 },
                 locale,
               )}
-              className="mt-5 text-[15px] leading-7 text-[color:var(--rg-muted)]"
+              className="mt-5 text-[15px] leading-7 text-white"
             />
 
             <div className="mt-6 grid grid-cols-3 gap-1.5 border border-[#d4af37]/45 bg-[color:var(--rg-paper-deep)]/70 px-2 py-4 sm:gap-2 sm:px-3">
@@ -608,7 +613,6 @@ export function ProductLanding({
           </div>
         </div>
 
-        {/* Details */}
         <section className="mt-14 border-t border-[color:var(--rg-line)] pt-10 md:mt-20 md:pt-14">
           <h2 className="font-display text-3xl text-[color:var(--rg-pearl)] md:text-4xl">
             {tp("descriptionTitle")}
@@ -624,9 +628,9 @@ export function ProductLanding({
                   },
                   locale,
                 )}
-                className="text-sm leading-7 text-[color:var(--rg-muted)] md:text-[15px] md:leading-8"
+                className="text-sm leading-7 text-white md:text-[15px] md:leading-8"
               />
-              <ul className="mt-6 space-y-3 text-sm text-[color:var(--rg-muted)]">
+              <ul className="mt-6 space-y-3 text-sm text-white">
                 {landing.points
                   .map((point) => localize(point, locale).trim())
                   .filter(Boolean)
@@ -667,7 +671,7 @@ export function ProductLanding({
               <h3 className="mt-8 text-[10px] uppercase tracking-[0.22em] text-[color:var(--rg-accent)]">
                 {tp("shipping")}
               </h3>
-              <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[color:var(--rg-muted)]">
+              <p className="mt-3 whitespace-pre-line text-sm leading-7 text-white">
                 {(
                   locale === "bn"
                     ? shipping?.shippingReturnBn ||
@@ -714,7 +718,7 @@ export function ProductLanding({
             {t("relatedTitle")}
           </h2>
           <div className="mt-4 h-px w-12 bg-gradient-to-r from-[color:var(--rg-accent)] to-transparent" />
-          <p className="mt-3 max-w-xl text-sm text-[color:var(--rg-muted)]">
+          <p className="mt-3 max-w-xl text-sm text-white">
             {t("relatedSub")}
           </p>
 
@@ -783,7 +787,7 @@ export function ProductLanding({
             <h2 className="mt-2 font-display text-3xl text-[color:var(--rg-pearl)] md:text-4xl">
               {t("orderTitle")}
             </h2>
-            <p className="mt-2 text-sm text-[color:var(--rg-muted)]">{t("codOnly")}</p>
+            <p className="mt-2 text-sm text-white">{t("codOnly")}</p>
 
             {/* Selected lines */}
             <ul className="mt-6 divide-y divide-[color:var(--rg-line)] border-t border-[color:var(--rg-line)]">
@@ -877,7 +881,7 @@ export function ProductLanding({
               {shipping &&
               shipping.freeShippingOver > 0 &&
               subtotal < shipping.freeShippingOver ? (
-                <p className="text-xs text-[color:var(--rg-muted)]">
+                <p className="text-xs text-white">
                   {t("freeShippingOver", {
                     amount: formatBdt(shipping.freeShippingOver, locale),
                   })}

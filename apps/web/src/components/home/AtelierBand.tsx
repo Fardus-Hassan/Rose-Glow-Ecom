@@ -39,7 +39,7 @@ export async function AtelierBand() {
             {t("atelierTitle")}
           </h2>
           <div className="rg-home-gold-rule mt-6 w-20" />
-          <p className="mt-6 max-w-lg text-[15px] leading-7 text-[color:var(--rg-muted)] md:text-base md:leading-8">
+          <p className="mt-6 max-w-lg text-[15px] leading-7 text-white md:text-base md:leading-8">
             {t("atelierSub")}
           </p>
           <div className="mt-10">

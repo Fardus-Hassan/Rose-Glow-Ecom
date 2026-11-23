@@ -75,7 +75,7 @@ export function StoryBand() {
       <div className="container-rg relative z-10 flex flex-col items-center text-center">
         <Reveal>
           <div className="rg-home-gold-rule mx-auto mb-8 w-16" />
-          <p className="mx-auto max-w-2xl font-display text-[clamp(1.35rem,3vw,2rem)] leading-relaxed text-[color:var(--rg-pearl)]/90">
+          <p className="mx-auto max-w-2xl font-display text-[clamp(1.35rem,3vw,2rem)] leading-relaxed text-white">
             {t("atelierSub")}
           </p>
         </Reveal>

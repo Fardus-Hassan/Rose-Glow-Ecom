@@ -28,7 +28,7 @@ export async function PromoBanner() {
               <h2 className="mt-3 font-display text-4xl text-[color:var(--rg-charcoal)] md:text-5xl">
                 {t("promoTitle")}
               </h2>
-              <p className="mt-3 max-w-sm text-sm leading-7 text-[color:var(--rg-muted)]">
+              <p className="mt-3 max-w-sm text-sm leading-7 text-white">
                 {t("promoSub")}
               </p>
               <p className="mt-5 inline-flex w-fit rounded-full bg-[color:var(--rg-paper)] px-4 py-2 text-xs font-semibold tracking-wider text-[color:var(--rg-charcoal)] ring-1 ring-[color:var(--rg-line)]">

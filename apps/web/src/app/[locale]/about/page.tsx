@@ -95,7 +95,7 @@ export default async function AboutPage({
               <h2 className="font-display text-2xl text-[color:var(--rg-charcoal)] md:text-3xl">
                 {pillarTitle}
               </h2>
-              <p className="mt-3 text-sm leading-7 text-[color:var(--rg-muted)]">
+              <p className="mt-3 text-sm leading-7 text-white">
                 {body}
               </p>
             </div>

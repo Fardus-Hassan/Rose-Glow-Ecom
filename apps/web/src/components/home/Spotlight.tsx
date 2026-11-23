@@ -45,7 +45,7 @@ export async function Spotlight({ products }: { products: Product[] }) {
             {localize(product.name, locale)}
           </h2>
           <div className="rg-home-gold-rule mt-6 w-20" />
-          <p className="mt-6 max-w-lg text-[15px] leading-7 text-[color:var(--rg-muted)] md:text-base md:leading-8">
+          <p className="mt-6 max-w-lg text-[15px] leading-7 text-white md:text-base md:leading-8">
             {stripHtml(localize(product.description, locale))}
           </p>
           <div className="mt-8 flex flex-wrap items-end gap-6 md:mt-10">

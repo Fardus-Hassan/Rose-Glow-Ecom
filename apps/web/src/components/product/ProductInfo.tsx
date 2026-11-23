@@ -16,6 +16,8 @@ import { SocialLinks } from "@/components/ui/SocialLinks";
 import { RichText } from "@/components/ui/RichText";
 import { ProductContactActions } from "@/components/product/ProductContactActions";
 import { VariantChoices } from "@/components/product/VariantChoices";
+import type { SocialLink } from "@/data/social";
+import type { ContactContent } from "@/lib/catalog";
 import { trackAddToCart } from "@/lib/meta-pixel";
 import { isRichTextEmpty } from "@/lib/rich-text";
 
@@ -23,10 +25,14 @@ export function ProductInfo({
   product,
   optionId: optionIdProp,
   onOptionId,
+  contact,
+  social,
 }: {
   product: Product;
   optionId?: string;
   onOptionId?: (id: string) => void;
+  contact?: ContactContent;
+  social?: SocialLink[];
 }) {
   const t = useTranslations("Product");
   const tc = useTranslations("Categories");
@@ -173,7 +179,7 @@ export function ProductInfo({
       {shortHtml ? (
         <RichText
           html={shortHtml}
-          className="mt-5 max-w-md text-sm leading-7 text-[color:var(--rg-muted)] md:text-[15px]"
+          className="mt-5 max-w-md text-sm leading-7 text-white md:text-[15px]"
         />
       ) : null}
 
@@ -234,21 +240,22 @@ export function ProductInfo({
         </div>
       </div>
 
-      <p className="mt-4 text-[10px] uppercase tracking-[0.18em] text-[color:var(--rg-muted)]">
+      <p className="mt-4 text-[11px] uppercase tracking-[0.14em] text-white">
         {t("trustMaterial")}
-        <span className="mx-2 text-[color:var(--rg-accent)]/50">·</span>
+        <span className="mx-2 text-[#d4af37]">·</span>
         {t("trustShipping")}
-        <span className="mx-2 text-[color:var(--rg-accent)]/50">·</span>
+        <span className="mx-2 text-[#d4af37]">·</span>
         {t("trustReturn")}
       </p>
 
       <ProductContactActions
         className="mt-5"
         productName={localize(product.name, locale)}
+        contact={contact}
       />
 
       <div className="mt-5 hidden items-center justify-between gap-4 sm:flex">
-        <div className="flex gap-5 text-[11px] uppercase tracking-[0.18em] text-[color:var(--rg-muted)]">
+        <div className="flex gap-5 text-[11px] uppercase tracking-[0.18em] text-white">
           <button
             type="button"
             onClick={() => toggleWishlist(product.slug)}
@@ -268,14 +275,14 @@ export function ProductInfo({
             {t("share")}
           </button>
         </div>
-        <SocialLinks tone="light" />
+        <SocialLinks tone="light" links={social} />
       </div>
 
       <div className="mt-5 flex flex-col border-t border-[color:var(--rg-line)] pt-4 sm:hidden">
-        <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-[color:var(--rg-muted)]">
+        <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-white">
           {t("follow")}
         </p>
-        <SocialLinks tone="light" />
+        <SocialLinks tone="light" links={social} />
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--rg-line)] bg-[color:var(--rg-paper)]/95 p-3 backdrop-blur-md md:hidden">

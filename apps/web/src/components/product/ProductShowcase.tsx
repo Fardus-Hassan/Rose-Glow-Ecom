@@ -7,6 +7,8 @@ import {
   galleryForOffer,
   type Product,
 } from "@/data/products";
+import type { SocialLink } from "@/data/social";
+import type { ContactContent } from "@/lib/catalog";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductInfo } from "@/components/product/ProductInfo";
 
@@ -14,7 +16,15 @@ import { ProductInfo } from "@/components/product/ProductInfo";
  * Desktop: balanced 50/50 — gallery capped so jewelry stays full-frame.
  * Mobile: stacked (unchanged feel).
  */
-export function ProductShowcase({ product }: { product: Product }) {
+export function ProductShowcase({
+  product,
+  contact,
+  social,
+}: {
+  product: Product;
+  contact?: ContactContent;
+  social?: SocialLink[];
+}) {
   const [optionId, setOptionId] = useState(defaultOptionId(product));
   const offer = chosenOffer(product, optionId);
   const media = useMemo(
@@ -29,7 +39,7 @@ export function ProductShowcase({ product }: { product: Product }) {
 
   return (
     <section className="relative grid w-full gap-8 md:gap-10 lg:grid-cols-2 lg:items-start lg:gap-10 xl:gap-14">
-      <div className="relative min-w-0">
+      <div className="relative min-w-0 lg:sticky lg:top-[6.5rem] lg:self-start">
         <div className="overflow-hidden">
           <ProductGallery
             key={offer.optionId || "product"}
@@ -39,11 +49,13 @@ export function ProductShowcase({ product }: { product: Product }) {
         </div>
       </div>
 
-      <div className="min-w-0 lg:sticky lg:top-[7.25rem] lg:max-h-[calc(100vh-7.75rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-1">
+      <div className="min-w-0">
         <ProductInfo
           product={product}
           optionId={optionId}
           onOptionId={setOptionId}
+          contact={contact}
+          social={social}
         />
       </div>
     </section>

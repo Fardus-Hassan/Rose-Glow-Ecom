@@ -58,7 +58,7 @@ export function ReviewsSection({ reviews }: { reviews: Review[] }) {
               {t("reviewsTitle")}
             </h2>
             <div className="rg-home-gold-rule mt-5 w-16" />
-            <p className="mt-5 text-[15px] leading-7 text-[color:var(--rg-muted)]">
+            <p className="mt-5 text-[15px] leading-7 text-white">
               {t("reviewsSub")}
             </p>
           </div>
@@ -83,7 +83,7 @@ export function ReviewsSection({ reviews }: { reviews: Review[] }) {
                   ))}
                 </div>
 
-                <p className="flex-1 font-display text-lg leading-8 text-[color:var(--rg-pearl)]/85 md:text-xl md:leading-9">
+                <p className="flex-1 font-display text-lg leading-8 text-white md:text-xl md:leading-9">
                   “{localize(review.quote, locale)}”
                 </p>
 

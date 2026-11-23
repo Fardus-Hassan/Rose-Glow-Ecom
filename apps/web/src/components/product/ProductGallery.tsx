@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import gsap from "gsap";
 import { localize, type ProductMedia } from "@/data/products";
 import { cn } from "@/lib/format";
 import { mediaVariant } from "@/lib/media";
@@ -35,6 +34,13 @@ export function ProductGallery({
   const zoomRef = useRef<HTMLDivElement>(null);
   const shouldPlayVideo = useRef(false);
   const preloaded = useRef<Set<string>>(new Set());
+  const swipeRef = useRef({ x: 0, y: 0, swiped: false });
+  const ratiosRef = useRef<Record<number, number>>({});
+  const activeRef = useRef(0);
+  const slidingRef = useRef(false);
+  const firstSlide = useRef(true);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  activeRef.current = active;
   const current = media[active];
   const autoplayOn =
     inView && tabVisible && !hoverPaused && !zooming;
@@ -70,23 +76,30 @@ export function ProductGallery({
   }, []);
 
   useEffect(() => {
-    if (inView && tabVisible) return;
+    setReduceMotion(
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    );
+  }, []);
+
+  useEffect(() => {
     rootRef.current?.querySelectorAll("video").forEach((video) => {
-      video.pause();
+      const slide = video.closest("[data-slide]");
+      const index = Number(slide?.getAttribute("data-slide"));
+      if (!inView || !tabVisible || index !== active) video.pause();
     });
   }, [inView, tabVisible, active]);
 
   useEffect(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    gsap.fromTo(
-      stage,
-      { opacity: 0.35 },
-      { opacity: 1, duration: 0.45, ease: "power2.out" },
-    );
-  }, [active]);
+    const delay = firstSlide.current || reduceMotion ? 0 : 520;
+    firstSlide.current = false;
+    slidingRef.current = delay > 0;
+    const id = window.setTimeout(() => {
+      slidingRef.current = false;
+      const known = ratiosRef.current[active];
+      if (known) setRatio(known);
+    }, delay);
+    return () => window.clearTimeout(id);
+  }, [active, reduceMotion]);
 
   useEffect(() => {
     setZooming(false);
@@ -100,16 +113,16 @@ export function ProductGallery({
     if (media.length < 2) return;
     if (!autoplayOn) return;
     if (current?.type === "video") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reduceMotion) return;
 
-    // Restart the 3s timer whenever the active slide changes
+    // Restart the timer whenever the active slide changes
     // (manual arrow/thumb click or previous auto-advance).
     const id = window.setTimeout(() => {
       setActive((prev) => (prev + 1) % media.length);
-    }, 3000);
+    }, 4200);
 
     return () => window.clearTimeout(id);
-  }, [active, media.length, autoplayOn, current?.type]);
+  }, [active, media.length, autoplayOn, current?.type, reduceMotion]);
 
   const selectMedia = (index: number) => {
     const next = media[index];
@@ -122,8 +135,11 @@ export function ProductGallery({
     selectMedia(next);
   };
 
-  const applyNaturalRatio = (width: number, height: number) => {
-    if (width > 0 && height > 0) setRatio(width / height);
+  const applyNaturalRatio = (index: number, width: number, height: number) => {
+    if (width <= 0 || height <= 0) return;
+    const next = width / height;
+    ratiosRef.current[index] = next;
+    if (index === activeRef.current && !slidingRef.current) setRatio(next);
   };
 
   const preloadFull = (item: ProductMedia | undefined) => {
@@ -166,6 +182,7 @@ export function ProductGallery({
       window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
       window.matchMedia("(min-width: 768px)").matches;
     if (fineDesktop) return;
+    if (swipeRef.current.swiped) return;
     preloadFull(current);
     setMobileZoomOpen(true);
     setHoverPaused(true);
@@ -255,8 +272,21 @@ export function ProductGallery({
           }
         }}
         onMouseEnter={() => {
-          setHoverPaused(true);
           preloadFull(current);
+        }}
+        onTouchStart={(event) => {
+          const touch = event.touches[0];
+          if (!touch) return;
+          swipeRef.current = { x: touch.clientX, y: touch.clientY, swiped: false };
+        }}
+        onTouchEnd={(event) => {
+          const touch = event.changedTouches[0];
+          if (!touch || media.length < 2) return;
+          const dx = touch.clientX - swipeRef.current.x;
+          const dy = touch.clientY - swipeRef.current.y;
+          if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
+          swipeRef.current.swiped = true;
+          go(dx < 0 ? 1 : -1);
         }}
         onMouseMove={onMove}
         onMouseLeave={() => {
@@ -264,65 +294,74 @@ export function ProductGallery({
           if (!mobileZoomOpen) setHoverPaused(false);
         }}
       >
-        {current.type === "image" ? (
-          <>
+        <div
+          className={cn(
+            "absolute inset-0 flex will-change-transform",
+            !reduceMotion &&
+              "transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          )}
+          style={{ transform: `translate3d(${-active * 100}%, 0, 0)` }}
+        >
+          {media.map((item, index) => (
             <div
-              className={cn(
-                "absolute inset-0 transition-opacity duration-150",
-                zooming ? "opacity-0" : "opacity-100",
-              )}
+              key={`${item.src}-${index}`}
+              data-slide={index}
+              className="relative h-full min-w-full shrink-0 basis-full"
             >
-              <SmartImage
-                src={current.src}
-                alt={current.alt ? localize(current.alt, locale) : t("image")}
-                fill
-                variant="detail"
-                variants={current.variants}
-                blurDataURL={current.blurDataUrl}
-                sizesPreset="gallery"
-                priority={active === 0}
-                className="object-contain object-center"
-                onLoadingComplete={(img) => {
-                  applyNaturalRatio(img.naturalWidth, img.naturalHeight);
-                }}
-              />
+              {item.type === "image" ? (
+                <SmartImage
+                  src={item.src}
+                  alt={item.alt ? localize(item.alt, locale) : t("image")}
+                  fill
+                  variant="detail"
+                  variants={item.variants}
+                  blurDataURL={item.blurDataUrl}
+                  sizesPreset="gallery"
+                  priority={index === 0}
+                  className="object-contain object-center"
+                  onLoadingComplete={(img) => {
+                    applyNaturalRatio(index, img.naturalWidth, img.naturalHeight);
+                  }}
+                />
+              ) : (
+                <SmartVideo
+                  src={item.src}
+                  poster={item.poster}
+                  className="h-full w-full object-contain object-center"
+                  controls
+                  loop
+                  playsInline
+                  preferUnmuted
+                  autoPlay={index === active && inView && tabVisible}
+                  lazy={index !== active}
+                  onLoadedMetadata={(event) => {
+                    const video = event.currentTarget;
+                    applyNaturalRatio(index, video.videoWidth, video.videoHeight);
+                  }}
+                />
+              )}
             </div>
+          ))}
+        </div>
 
-            <div
-              ref={zoomRef}
-              aria-hidden={!zooming}
-              className={cn(
-                "absolute inset-0 transition-[transform,opacity] duration-200 ease-out will-change-transform",
-                zooming ? "opacity-100" : "pointer-events-none opacity-0",
-              )}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={zoomSrc}
-                alt=""
-                decoding="async"
-                className="h-full w-full object-contain object-center"
-              />
-            </div>
-          </>
-        ) : (
-          <SmartVideo
-            key={current.src}
-            src={current.src}
-            poster={current.poster}
-            className="h-full w-full object-contain object-center"
-            controls
-            loop
-            playsInline
-            preferUnmuted
-            autoPlay={inView && tabVisible}
-            lazy={active !== 0}
-            onLoadedMetadata={(event) => {
-              const video = event.currentTarget;
-              applyNaturalRatio(video.videoWidth, video.videoHeight);
-            }}
-          />
-        )}
+        {current.type === "image" ? (
+          <div
+            ref={zoomRef}
+            aria-hidden={!zooming}
+            className={cn(
+              "absolute inset-0 z-[1] transition-[transform,opacity] duration-200 ease-out will-change-transform",
+              zooming ? "opacity-100" : "pointer-events-none opacity-0",
+            )}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={zoomSrc}
+              alt=""
+              decoding="async"
+              className="h-full w-full object-contain object-center"
+            />
+          </div>
+        ) : null}
 
         {discount > 0 && current.type === "image" ? (
           <span className="pointer-events-none absolute left-0 top-5 z-10 bg-[color:var(--rg-accent)] px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[color:var(--rg-cta-ink)]">

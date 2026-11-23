@@ -3,19 +3,26 @@
 import { useLocale, useTranslations } from "next-intl";
 import { IconPhone, IconWhatsApp } from "@/components/icons";
 import { cn } from "@/lib/format";
+import type { ContactContent } from "@/lib/catalog";
 import { useCatalog } from "@/store/catalog";
 
 type Props = {
   productName?: string;
   className?: string;
+  contact?: ContactContent;
 };
 
-export function ProductContactActions({ productName, className }: Props) {
+export function ProductContactActions({
+  productName,
+  className,
+  contact: contactProp,
+}: Props) {
   const t = useTranslations("Product");
   const locale = useLocale();
-  const { ready, contact } = useCatalog();
+  const { ready, contact: catalogContact } = useCatalog();
+  const contact = contactProp ?? catalogContact;
 
-  if (!ready) return null;
+  if (!contactProp && !ready) return null;
 
   const showCall =
     contact.showCallOnProducts &&
@@ -53,7 +60,7 @@ export function ProductContactActions({ productName, className }: Props) {
           <p className="text-[10px] uppercase tracking-[0.2em] text-[color:var(--rg-accent)]">
             {t("needHelpEyebrow")}
           </p>
-          <p className="mt-1 text-sm text-[color:var(--rg-muted)]">
+          <p className="mt-1 text-sm text-white">
             {t("needHelpTitle")}
           </p>
         </div>
@@ -68,7 +75,7 @@ export function ProductContactActions({ productName, className }: Props) {
         {showCall ? (
           <a
             href={contact.phoneTel}
-            className="rg-beat group inline-flex min-h-11 items-center justify-center gap-2 border border-[color:var(--rg-line)] bg-[color:var(--rg-paper)] px-3 text-[11px] uppercase tracking-[0.16em] text-[color:var(--rg-pearl)] transition-colors hover:border-[color:var(--rg-accent)] hover:text-[color:var(--rg-accent)]"
+            className="rg-beat group inline-flex min-h-11 items-center justify-center gap-2 border border-[#d4af37] bg-transparent px-3 text-[11px] uppercase tracking-[0.16em] text-white transition-colors hover:bg-[#d4af37] hover:text-[#0c0a0b]"
           >
             <IconPhone className="h-4 w-4 shrink-0 transition group-hover:scale-105" />
             <span className="truncate">{t("callButton")}</span>
@@ -88,7 +95,7 @@ export function ProductContactActions({ productName, className }: Props) {
         ) : null}
       </div>
 
-      <p className="mt-2.5 text-[11px] leading-relaxed text-[color:var(--rg-muted)]">
+      <p className="mt-2.5 text-[11px] leading-relaxed text-white">
         {t("needHelpHint")}
       </p>
     </div>

@@ -37,7 +37,7 @@ export function LandingNav() {
               priority
             />
           </span>
-          <span className="truncate font-display text-[1rem] tracking-[0.02em] sm:text-[1.1rem] md:text-xl">
+          <span className="font-brand truncate text-[1rem] sm:text-[1.1rem] md:text-xl">
             Rose Glow
           </span>
         </button>

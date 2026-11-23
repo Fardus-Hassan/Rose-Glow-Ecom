@@ -130,7 +130,7 @@ export function ProductReviews({
                         {localize(review.place, locale)}
                       </p>
                     </div>
-                    <p className="max-w-2xl text-sm leading-7 text-[color:var(--rg-muted)] md:text-[15px]">
+                    <p className="max-w-2xl text-sm leading-7 text-white md:text-[15px]">
                       “{localize(review.quote, locale)}”
                     </p>
 

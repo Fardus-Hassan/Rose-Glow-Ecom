@@ -36,7 +36,7 @@ export function CollectionsStrip() {
               {t("categoriesTitle")}
             </h2>
             <div className="rg-home-gold-rule mt-5 w-16" />
-            <p className="mt-5 text-[15px] leading-7 text-[color:var(--rg-muted)] md:text-base">
+            <p className="mt-5 text-[15px] leading-7 text-white md:text-base">
               {t("categoriesSub")}
             </p>
           </div>

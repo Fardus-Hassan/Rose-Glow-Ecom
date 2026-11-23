@@ -56,7 +56,7 @@ export function ProductDetails({ product }: { product: Product }) {
               <div className="rg-home-gold-rule mt-4 w-12" />
               <RichText
                 html={localize(product.description, locale)}
-                className="mt-6 text-[15px] leading-7 text-[color:var(--rg-muted)] md:leading-8"
+                className="mt-6 text-[15px] leading-7 text-white md:leading-8"
               />
             </div>
 
@@ -86,7 +86,7 @@ export function ProductDetails({ product }: { product: Product }) {
                 <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--rg-accent)]">
                   {t("shipping")}
                 </p>
-                <p className="mt-3 whitespace-pre-line text-sm leading-7 text-[color:var(--rg-muted)]">
+                <p className="mt-3 whitespace-pre-line text-sm leading-7 text-white">
                   {shippingCopy}
                 </p>
               </div>

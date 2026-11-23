@@ -309,7 +309,7 @@ export function LandingQuickView({
             selectedId={offer.optionId}
             onSelect={setOptionId}
           />
-          <p className="mt-3 text-sm leading-7 text-[color:var(--rg-muted)]">
+          <p className="mt-3 text-sm leading-7 text-white">
             {stripHtml(localize(product.description, locale))}
           </p>
         </div>

@@ -271,7 +271,7 @@ export function Hero({
         <div className="max-w-2xl md:max-w-3xl">
           <p
             data-hero-brand
-            className="font-display text-[clamp(2.8rem,9vw,6.5rem)] leading-[0.92] tracking-[-0.03em] text-[color:var(--rg-pearl)]"
+            className="font-brand text-[clamp(2.8rem,9vw,6.5rem)] leading-[0.92] text-[color:var(--rg-pearl)]"
           >
             {brand}
           </p>
@@ -290,7 +290,7 @@ export function Hero({
 
           <p
             data-hero-sub
-            className="mt-4 max-w-md text-[15px] leading-7 text-[color:var(--rg-muted)] md:mt-5 md:text-base md:leading-8"
+            className="mt-4 max-w-md text-[15px] leading-7 text-white md:mt-5 md:text-base md:leading-8"
           >
             {body}
           </p>
