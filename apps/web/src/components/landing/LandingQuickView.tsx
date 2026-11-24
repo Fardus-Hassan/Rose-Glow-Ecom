@@ -296,11 +296,14 @@ export function LandingQuickView({
             </div>
           ) : null}
 
-          <p className="mt-5 text-lg text-[color:var(--rg-pearl)]">
-            {formatBdt(offer.price, locale)}
+          <p className="mt-5 flex flex-wrap items-end gap-3">
+            <span className="font-display text-[clamp(1.7rem,2.4vw,2.1rem)] leading-none text-[#f3d78a]">
+              {formatBdt(offer.price, locale)}
+            </span>
             {compare ? (
-              <span className="ml-2 text-sm text-[color:var(--rg-muted)] line-through">
+              <span className="relative mb-0.5 inline-block font-display text-xl leading-none text-white/80">
                 {formatBdt(compare, locale)}
+                <span className="absolute inset-x-0 top-[58%] h-px bg-white/75" />
               </span>
             ) : null}
           </p>

@@ -75,14 +75,15 @@ export function ProductCard({
           {localize(product.name, locale)}
         </h3>
         <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <span className="text-sm tabular-nums text-[color:var(--rg-accent)] md:text-[15px]">
+          <span className="font-display text-lg leading-none text-[#f3d78a]">
             {(product.options?.length || 0) > 1
               ? t("priceFrom", { price: formatBdt(product.price, locale) })
               : formatBdt(product.price, locale)}
           </span>
           {product.compareAtPrice && !(product.options?.length || 0) ? (
-            <span className="text-xs tabular-nums text-[color:var(--rg-muted)] line-through">
+            <span className="relative inline-block font-display text-base leading-none text-white/80">
               {formatBdt(product.compareAtPrice, locale)}
+              <span className="absolute inset-x-0 top-[58%] h-px bg-white/75" />
             </span>
           ) : null}
         </div>

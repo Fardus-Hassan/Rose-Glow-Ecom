@@ -484,13 +484,14 @@ export function ProductLanding({
             </h1>
             <div className="rg-home-gold-rule mt-4 w-12" />
 
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <span className="font-display text-[clamp(1.55rem,2.8vw,2rem)] text-[color:var(--rg-accent)]">
+            <div className="mt-5 flex flex-wrap items-end gap-3">
+              <span className="font-display text-[clamp(2.05rem,3.6vw,2.75rem)] leading-none text-[#f3d78a]">
                 {formatBdt(offer.price, locale)}
               </span>
               {compare ? (
-                <span className="text-sm text-[color:var(--rg-muted)] line-through">
+                <span className="relative mb-1 inline-block font-display text-[1.35rem] leading-none text-white/80">
                   {formatBdt(compare, locale)}
+                  <span className="absolute inset-x-0 top-[58%] h-px bg-white/75" />
                 </span>
               ) : null}
               {discount > 0 ? (
@@ -817,7 +818,7 @@ export function ProductLanding({
                         <p className="text-sm leading-snug text-[color:var(--rg-pearl)]">
                           {localize(lineOffer.label, locale)}
                         </p>
-                        <p className="mt-0.5 text-xs text-[color:var(--rg-muted)]">
+                        <p className="mt-0.5 text-xs text-white">
                           {formatBdt(lineOffer.price, locale)}
                         </p>
                         <p className="mt-2 text-sm text-[color:var(--rg-pearl)] sm:hidden">
@@ -864,11 +865,11 @@ export function ProductLanding({
             </ul>
 
             <div className="mt-4 space-y-2 pt-2 text-sm">
-              <div className="flex items-center justify-between text-[color:var(--rg-muted)]">
+              <div className="flex items-center justify-between text-white">
                 <span>{t("subtotal")}</span>
                 <span>{formatBdt(subtotal, locale)}</span>
               </div>
-              <div className="flex items-center justify-between text-[color:var(--rg-muted)]">
+              <div className="flex items-center justify-between text-white">
                 <span>{t("shippingLabel")}</span>
                 <span>
                   {shippingFee > 0
@@ -888,7 +889,7 @@ export function ProductLanding({
                 </p>
               ) : null}
               <div className="flex items-center justify-between border-t border-[color:var(--rg-line)] pt-2">
-                <span className="text-[color:var(--rg-muted)]">{t("total")}</span>
+                <span className="text-white">{t("total")}</span>
                 <span className="text-[color:var(--rg-pearl)]">{formatBdt(total, locale)}</span>
               </div>
             </div>
@@ -908,7 +909,7 @@ export function ProductLanding({
                 ] as const
               ).map(([key, label, type]) => (
                 <label key={key} className="block">
-                  <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-[color:var(--rg-muted)]">
+                  <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-white">
                     {label}
                   </span>
                   <input
@@ -928,7 +929,7 @@ export function ProductLanding({
               ))}
 
               <label className="block">
-                <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-[color:var(--rg-muted)]">
+                <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-white">
                   {t("address")}
                 </span>
                 <textarea
@@ -951,7 +952,7 @@ export function ProductLanding({
               </label>
 
               <label className="block">
-                <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-[color:var(--rg-muted)]">
+                <span className="mb-1.5 block text-[10px] uppercase tracking-[0.16em] text-white">
                   {t("note")}
                 </span>
                 <textarea
@@ -990,7 +991,7 @@ export function ProductLanding({
               <p className="truncate text-sm text-[color:var(--rg-pearl)]">
                 {t("bagCount", { count: itemCount })}
               </p>
-              <p className="text-xs text-[color:var(--rg-muted)]">
+              <p className="text-xs text-white">
                 {formatBdt(total, locale)}
               </p>
             </div>

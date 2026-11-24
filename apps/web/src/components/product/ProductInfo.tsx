@@ -119,13 +119,14 @@ export function ProductInfo({
       </h1>
       <div className="rg-home-gold-rule mt-3.5 w-12" />
 
-      <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="font-display text-[clamp(1.55rem,2.8vw,2rem)] text-[color:var(--rg-accent)]">
+      <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
+        <span className="font-display text-[clamp(2.05rem,3.6vw,2.75rem)] leading-none text-[#f3d78a]">
           {formatBdt(offer.price, locale)}
         </span>
         {compare ? (
-          <span className="text-sm text-[color:var(--rg-muted)] line-through">
+          <span className="relative mb-1 inline-block font-display text-[1.35rem] leading-none text-white/80">
             {formatBdt(compare, locale)}
+            <span className="absolute inset-x-0 top-[58%] h-px bg-white/75" />
           </span>
         ) : null}
         {discount > 0 ? (
