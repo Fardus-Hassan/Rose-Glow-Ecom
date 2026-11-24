@@ -14,6 +14,7 @@ import {
 import { formatBdt, cn } from "@/lib/format";
 import { stripHtml } from "@/lib/rich-text";
 import { VariantChoices } from "@/components/product/VariantChoices";
+import { StruckPrice } from "@/components/ui/StruckPrice";
 
 export function LandingQuickView({
   product,
@@ -301,10 +302,7 @@ export function LandingQuickView({
               {formatBdt(offer.price, locale)}
             </span>
             {compare ? (
-              <span className="relative mb-0.5 inline-block font-display text-xl leading-none text-white/80">
-                {formatBdt(compare, locale)}
-                <span className="absolute inset-x-0 top-[58%] h-px bg-white/75" />
-              </span>
+              <StruckPrice className="mb-0.5">{formatBdt(compare, locale)}</StruckPrice>
             ) : null}
           </p>
           <VariantChoices

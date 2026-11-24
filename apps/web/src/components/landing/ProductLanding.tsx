@@ -29,6 +29,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingQuickView } from "@/components/landing/LandingQuickView";
 import { SocialLinks } from "@/components/ui/SocialLinks";
+import { StruckPrice } from "@/components/ui/StruckPrice";
 import { Slider } from "@/components/ui/Slider";
 import { RichText } from "@/components/ui/RichText";
 import { MetaViewContent } from "@/components/analytics/MetaViewContent";
@@ -489,10 +490,7 @@ export function ProductLanding({
                 {formatBdt(offer.price, locale)}
               </span>
               {compare ? (
-                <span className="relative mb-1 inline-block font-display text-[1.35rem] leading-none text-white/80">
-                  {formatBdt(compare, locale)}
-                  <span className="absolute inset-x-0 top-[58%] h-px bg-white/75" />
-                </span>
+                <StruckPrice className="mb-1">{formatBdt(compare, locale)}</StruckPrice>
               ) : null}
               {discount > 0 ? (
                 <span className="border border-[#d4af37] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#d4af37]">

@@ -13,6 +13,7 @@ import { IconHeart, IconStar } from "@/components/icons";
 import { useRouter } from "@/i18n/navigation";
 import { useBag } from "@/store/bag";
 import { SocialLinks } from "@/components/ui/SocialLinks";
+import { StruckPrice } from "@/components/ui/StruckPrice";
 import { RichText } from "@/components/ui/RichText";
 import { ProductContactActions } from "@/components/product/ProductContactActions";
 import { VariantChoices } from "@/components/product/VariantChoices";
@@ -124,10 +125,7 @@ export function ProductInfo({
           {formatBdt(offer.price, locale)}
         </span>
         {compare ? (
-          <span className="relative mb-1 inline-block font-display text-[1.35rem] leading-none text-white/80">
-            {formatBdt(compare, locale)}
-            <span className="absolute inset-x-0 top-[58%] h-px bg-white/75" />
-          </span>
+          <StruckPrice className="mb-1">{formatBdt(compare, locale)}</StruckPrice>
         ) : null}
         {discount > 0 ? (
           <span className="border border-[#d4af37] px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[#d4af37]">

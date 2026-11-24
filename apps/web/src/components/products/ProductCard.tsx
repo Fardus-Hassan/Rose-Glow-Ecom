@@ -6,6 +6,7 @@ import { getCoverMedia, localize, type Product } from "@/data/products";
 import { formatBdt } from "@/lib/format";
 import { IconStar } from "@/components/icons";
 import { SmartImage } from "@/components/media/SmartImage";
+import { StruckPrice } from "@/components/ui/StruckPrice";
 
 export function ProductCard({
   product,
@@ -81,10 +82,7 @@ export function ProductCard({
               : formatBdt(product.price, locale)}
           </span>
           {product.compareAtPrice && !(product.options?.length || 0) ? (
-            <span className="relative inline-block font-display text-base leading-none text-white/80">
-              {formatBdt(product.compareAtPrice, locale)}
-              <span className="absolute inset-x-0 top-[58%] h-px bg-white/75" />
-            </span>
+            <StruckPrice className="text-base">{formatBdt(product.compareAtPrice, locale)}</StruckPrice>
           ) : null}
         </div>
 
