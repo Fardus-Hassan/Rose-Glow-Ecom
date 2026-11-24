@@ -6,13 +6,15 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { IconBag, IconSearch } from "@/components/icons";
-import { getCoverMedia, localize } from "@/data/products";
+import { getCoverMedia, localize, type Product } from "@/data/products";
 import { NAV_FEATURED_PRODUCT_SLUG } from "@/data/nav";
 import { SmoothCollapse } from "@/components/ui/SmoothCollapse";
 import { formatBdt, cn } from "@/lib/format";
 import { CartDrawer } from "@/components/bag/CartDrawer";
 import { useBag } from "@/store/bag";
 import { useCatalog, useCategoryLabel } from "@/store/catalog";
+import { getApiBase } from "@/lib/api";
+import { mapApiProduct, type ApiProduct } from "@/lib/catalog";
 import { mediaUrl } from "@/lib/media";
 
 type RgLenis = { stop: () => void; start: () => void };
@@ -27,7 +29,10 @@ export function Header() {
   const categoryLabel = useCategoryLabel();
   const pathname = usePathname();
   const { cartCount, wishlistCount } = useBag();
-  const { ready, categories, getBySlug } = useCatalog();
+  const { ready, categories, getBySlug, featuredProductSlug } = useCatalog();
+  const featuredSlug = featuredProductSlug || NAV_FEATURED_PRODUCT_SLUG;
+  const listedFeatured = featuredSlug ? getBySlug(featuredSlug) : undefined;
+  const [fetchedFeatured, setFetchedFeatured] = useState<Product | null>(null);
   const [open, setOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -37,7 +42,28 @@ export function Header() {
   const shopRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isHome = pathname === "/";
-  const featured = getBySlug(NAV_FEATURED_PRODUCT_SLUG) ?? null;
+  useEffect(() => {
+    if (!ready || !featuredSlug || listedFeatured) {
+      setFetchedFeatured(null);
+      return;
+    }
+    let cancelled = false;
+    void fetch(`${getApiBase()}/products/${encodeURIComponent(featuredSlug)}`, {
+      cache: "no-store",
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((row: ApiProduct | null) => {
+        if (!cancelled) setFetchedFeatured(row ? mapApiProduct(row) : null);
+      })
+      .catch(() => {
+        if (!cancelled) setFetchedFeatured(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, featuredSlug, listedFeatured]);
+
+  const featured = listedFeatured ?? fetchedFeatured;
   const featuredCover = featured ? getCoverMedia(featured) : null;
 
   useEffect(() => {
@@ -349,7 +375,14 @@ export function Header() {
         onMouseLeave={scheduleCloseShop}
       >
         <div className="border-b border-white/10 bg-[#121110] text-[#f3eee8] shadow-[0_28px_80px_rgba(0,0,0,0.45)]">
-          <div className="container-rg grid grid-cols-[1fr_minmax(14rem,0.72fr)] gap-0">
+          <div
+            className={cn(
+              "container-rg grid gap-0",
+              featured && featuredCover
+                ? "grid-cols-[1fr_minmax(14rem,0.72fr)]"
+                : "grid-cols-1",
+            )}
+          >
             <div className="border-r border-white/10 py-8 pr-10">
               <p className="text-[10px] uppercase tracking-[0.28em] text-[#d4a574]">
                 {t("categories")}

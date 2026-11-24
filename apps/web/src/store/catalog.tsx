@@ -35,6 +35,7 @@ type CatalogContextValue = {
   taglineEn: string;
   taglineBn: string;
   logo: string;
+  featuredProductSlug: string;
   getBySlug: (slug: string) => Product | undefined;
 };
 
@@ -98,6 +99,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const [taglineEn, setTaglineEn] = useState("");
   const [taglineBn, setTaglineBn] = useState("");
   const [logo, setLogo] = useState(mediaUrl("/brand/logo.png"));
+  const [featuredProductSlug, setFeaturedProductSlug] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -105,12 +107,13 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
 
     const load = async () => {
       try {
-        const [productsRes, categoriesRes, settingsRes] = await Promise.all([
+        const [productsRes, categoriesRes, settingsRes, navRes] = await Promise.all([
           fetch(`${base}/products?page=1&pageSize=100&sort=newest`, {
             cache: "no-store",
           }),
           fetch(`${base}/categories?active=1`, { cache: "no-store" }),
           fetch(`${base}/cms/sections/settings`, { cache: "no-store" }),
+          fetch(`${base}/cms/sections/navigation`, { cache: "no-store" }),
         ]);
 
         if (!cancelled && productsRes.ok) {
@@ -188,6 +191,14 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
           if (section.data?.taglineBn) setTaglineBn(section.data.taglineBn);
           if (section.data?.logo) setLogo(section.data.logo);
         }
+
+        if (!cancelled && navRes.ok) {
+          const section = (await navRes.json()) as {
+            data?: { featuredProductSlug?: string };
+          };
+          const slug = String(section.data?.featuredProductSlug || "").trim();
+          if (slug) setFeaturedProductSlug(slug);
+        }
       } catch {
         // Leave empty — UI shows skeleton / empty, never seed defaults.
       } finally {
@@ -212,6 +223,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
       taglineEn,
       taglineBn,
       logo,
+      featuredProductSlug,
       getBySlug: (slug: string) => products.find((p) => p.slug === slug),
     }),
     [
@@ -224,6 +236,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
       taglineEn,
       taglineBn,
       logo,
+      featuredProductSlug,
     ],
   );
 
