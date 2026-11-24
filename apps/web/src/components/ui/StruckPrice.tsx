@@ -11,7 +11,7 @@ export function StruckPrice({
   return (
     <span
       className={cn(
-        "relative inline-block px-0.5 pb-0.5 font-sans text-[1.2rem] font-semibold leading-none text-white",
+        "relative inline-block px-0.5 pb-0.5 font-sans text-[1.2rem] font-semibold leading-none text-[#b7b0a8]",
         className,
       )}
     >
@@ -27,7 +27,7 @@ export function StruckPrice({
           y1="7"
           x2="100"
           y2="17"
-          stroke="rgba(255,255,255,0.92)"
+          stroke="#b7b0a8"
           strokeWidth="1.25"
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
