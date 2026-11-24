@@ -319,7 +319,7 @@
     "addToo": "যোগ করুন",
     "added": "যোগ হয়েছে",
     "remove": "সরান",
-    "bagCount": "{count}টি আইটেম",
+    "bagCount": "{count, number}টি আইটেম",
     "viewOrder": "অর্ডার দেখুন",
     "closePreview": "বন্ধ",
     "fullDetails": "ফুল পেজ",
