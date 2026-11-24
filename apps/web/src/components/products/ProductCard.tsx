@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useCategoryLabel } from "@/store/catalog";
 import { Link } from "@/i18n/navigation";
 import { getCoverMedia, localize, type Product } from "@/data/products";
-import { formatBdt } from "@/lib/format";
+import { cn, formatBdt } from "@/lib/format";
 import { IconStar } from "@/components/icons";
 import { SmartImage } from "@/components/media/SmartImage";
 import { StruckPrice } from "@/components/ui/StruckPrice";
@@ -13,11 +13,14 @@ export function ProductCard({
   product,
   priority = false,
   onSelect,
+  onImageSelect,
 }: {
   product: Product;
   priority?: boolean;
   /** When set, card opens this handler instead of navigating to PDP. */
   onSelect?: () => void;
+  /** When set, the photo opens this handler (zoom) and the rest of the card uses onSelect. */
+  onImageSelect?: () => void;
 }) {
   const locale = useLocale();
   const t = useTranslations("Products");
@@ -34,9 +37,8 @@ export function ProductCard({
   const coverSrc =
     cover?.type === "video" ? cover.poster || cover.src : cover?.src;
 
-  const body = (
-    <>
-      <div className="relative aspect-[3/4] overflow-hidden bg-[color:var(--rg-soft)]">
+  const image = (
+      <div className={cn("relative aspect-[3/4] overflow-hidden bg-[color:var(--rg-soft)]", onImageSelect && "cursor-zoom-in")}>
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(243,238,232,0.12),transparent_70%)]"
           aria-hidden
@@ -68,7 +70,9 @@ export function ProductCard({
           </span>
         ) : null}
       </div>
+  );
 
+  const meta = (
       <div className="flex flex-1 flex-col pt-5 text-left">
         <p className="text-[10px] uppercase tracking-[0.22em] text-[color:var(--rg-accent)]">
           {categoryLabel(product.category, product.categoryName)}
@@ -101,18 +105,34 @@ export function ProductCard({
           </div>
         ) : null}
       </div>
-    </>
   );
 
   return (
     <article className="group flex flex-col">
-      {onSelect ? (
+      {onImageSelect ? (
+        <>
+          <button type="button" onClick={onImageSelect} className="block w-full text-left">
+            {image}
+          </button>
+          {onSelect ? (
+            <button type="button" onClick={onSelect} className="block w-full text-left">
+              {meta}
+            </button>
+          ) : (
+            <Link href={`/product/${product.slug}`} className="block">
+              {meta}
+            </Link>
+          )}
+        </>
+      ) : onSelect ? (
         <button type="button" onClick={onSelect} className="block w-full text-left">
-          {body}
+          {image}
+          {meta}
         </button>
       ) : (
         <Link href={`/product/${product.slug}`} className="block">
-          {body}
+          {image}
+          {meta}
         </Link>
       )}
     </article>

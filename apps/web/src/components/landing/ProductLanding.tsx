@@ -22,6 +22,7 @@ import {
   IconWhatsApp,
 } from "@/components/icons";
 import { ProductGallery } from "@/components/product/ProductGallery";
+import { MobileGalleryZoom } from "@/components/product/MobileGalleryZoom";
 import { VariantChoices } from "@/components/product/VariantChoices";
 import { ProductContactActions } from "@/components/product/ProductContactActions";
 import { ProductReviews } from "@/components/product/ProductReviews";
@@ -107,6 +108,8 @@ export function ProductLanding({
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [submitted, setSubmitted] = useState(false);
   const [preview, setPreview] = useState<Product | null>(null);
+  const [zoomProduct, setZoomProduct] = useState<Product | null>(null);
+  const [zoomIndex, setZoomIndex] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
@@ -735,6 +738,10 @@ export function ProductLanding({
                     <ProductCard
                       product={item}
                       onSelect={() => setPreview(item)}
+                      onImageSelect={() => {
+                        setZoomIndex(0);
+                        setZoomProduct(item);
+                      }}
                     />
                     <div className="mt-3 flex flex-row gap-2">
                       <button
@@ -1045,6 +1052,18 @@ export function ProductLanding({
           onClose={() => setPreview(null)}
           onAdd={addProduct}
           onRemove={removeProduct}
+        />
+      ) : null}
+
+      {zoomProduct ? (
+        <MobileGalleryZoom
+          media={galleryForOffer(
+            zoomProduct,
+            chosenOffer(zoomProduct).media,
+          )}
+          index={zoomIndex}
+          onClose={() => setZoomProduct(null)}
+          onIndexChange={setZoomIndex}
         />
       ) : null}
     </div>

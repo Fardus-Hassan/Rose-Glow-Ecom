@@ -14,6 +14,7 @@ import {
 import { formatBdt, cn } from "@/lib/format";
 import { stripHtml } from "@/lib/rich-text";
 import { VariantChoices } from "@/components/product/VariantChoices";
+import { MobileGalleryZoom } from "@/components/product/MobileGalleryZoom";
 import { StruckPrice } from "@/components/ui/StruckPrice";
 import { useCategoryLabel } from "@/store/catalog";
 
@@ -31,6 +32,7 @@ export function LandingQuickView({
   onRemove: (slug: string) => void;
 }) {
   const t = useTranslations("LandingPearl");
+  const tProduct = useTranslations("Product");
   const categoryLabel = useCategoryLabel();
   const locale = useLocale();
   const [optionId, setOptionId] = useState(defaultOptionId(product));
@@ -41,11 +43,16 @@ export function LandingQuickView({
   );
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [zoomOpen, setZoomOpen] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef({ x: 0, y: 0, moved: false });
+  const zoomOpenRef = useRef(false);
+  zoomOpenRef.current = zoomOpen;
 
   useEffect(() => {
     setOptionId(defaultOptionId(product));
     setActive(0);
+    setZoomOpen(false);
     trackRef.current?.scrollTo({ left: 0 });
   }, [product.slug]);
 
@@ -80,7 +87,7 @@ export function LandingQuickView({
   };
 
   useEffect(() => {
-    if (media.length < 2 || paused) return;
+    if (media.length < 2 || paused || zoomOpen) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (media[active]?.type === "video") return;
 
@@ -96,10 +103,11 @@ export function LandingQuickView({
     }, 3000);
 
     return () => window.clearInterval(id);
-  }, [media, active, paused]);
+  }, [media, active, paused, zoomOpen]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (zoomOpenRef.current) return;
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowRight" && media.length > 1) go(1);
       if (e.key === "ArrowLeft" && media.length > 1) go(-1);
@@ -189,7 +197,28 @@ export function LandingQuickView({
               {media.map((item, index) => (
                 <div
                   key={`${item.src}-${index}`}
-                  className="relative h-full w-full shrink-0 snap-center"
+                  className={cn(
+                    "relative h-full w-full shrink-0 snap-center",
+                    item.type === "image" && "cursor-zoom-in",
+                  )}
+                  onPointerDown={(event) => {
+                    dragRef.current = {
+                      x: event.clientX,
+                      y: event.clientY,
+                      moved: false,
+                    };
+                  }}
+                  onPointerMove={(event) => {
+                    const dx = Math.abs(event.clientX - dragRef.current.x);
+                    const dy = Math.abs(event.clientY - dragRef.current.y);
+                    if (dx > 8 || dy > 8) dragRef.current.moved = true;
+                  }}
+                  onClick={() => {
+                    if (item.type !== "image" || dragRef.current.moved) return;
+                    setPaused(true);
+                    setActive(index);
+                    setZoomOpen(true);
+                  }}
                 >
                   {item.type === "image" ? (
                     <Image
@@ -247,6 +276,11 @@ export function LandingQuickView({
                   {active + 1}/{media.length}
                 </p>
               </>
+            ) : null}
+            {media[active]?.type === "image" ? (
+              <span className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-sm bg-[#0e0d0c]/55 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#f3eee8]/90">
+                {tProduct("tapToZoom")}
+              </span>
             ) : null}
           </div>
 
@@ -342,6 +376,18 @@ export function LandingQuickView({
           </Link>
         </div>
       </div>
+
+      {zoomOpen && media[active]?.type === "image" ? (
+        <MobileGalleryZoom
+          media={media}
+          index={active}
+          onClose={() => {
+            setZoomOpen(false);
+            setPaused(false);
+          }}
+          onIndexChange={(next) => jumpTo(next)}
+        />
+      ) : null}
     </div>
   );
 }
