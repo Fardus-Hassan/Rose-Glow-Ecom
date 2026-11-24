@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { localize, type ProductMedia } from "@/data/products";
 import { mediaVariant } from "@/lib/media";
@@ -38,7 +38,8 @@ export function MobileGalleryZoom({
     0,
     images.findIndex((item) => item.src === media[index]?.src),
   );
-  const current = images[imageIndex] || images[0];
+  const [pos, setPos] = useState(imageIndex);
+  const current = images[pos] || images[0];
   const [scale, setScale] = useState(1);
   const [tx, setTx] = useState(0);
   const [ty, setTy] = useState(0);
@@ -47,6 +48,7 @@ export function MobileGalleryZoom({
   const tyRef = useRef(0);
   const frameRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number | null>(null);
+  const [frameW, setFrameW] = useState(0);
   const [dragX, setDragX] = useState(0);
   const [sliding, setSliding] = useState(false);
   const dragRef = useRef<{
@@ -67,12 +69,24 @@ export function MobileGalleryZoom({
   }, [scale, tx, ty]);
 
   useEffect(() => {
+    if (animRef.current) return;
+    setPos(imageIndex);
+    setDragX(0);
+    setSliding(false);
     setScale(1);
     setTx(0);
     setTy(0);
-    setDragX(0);
-    setSliding(false);
   }, [imageIndex]);
+
+  useLayoutEffect(() => {
+    const el = frameRef.current;
+    if (!el) return;
+    const measure = () => setFrameW(el.clientWidth);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -109,17 +123,30 @@ export function MobileGalleryZoom({
 
   const go = (dir: -1 | 1) => {
     if (images.length < 2 || scaleRef.current > 1.05 || animRef.current) return;
-    const width = frameRef.current?.clientWidth || window.innerWidth;
-    setSliding(true);
-    setDragX(dir === 1 ? -width : width);
-    animRef.current = window.setTimeout(() => {
-      animRef.current = null;
-      const next = (imageIndex + dir + images.length) % images.length;
-      const mediaIdx = media.findIndex((item) => item.src === images[next].src);
+    const next = (pos + dir + images.length) % images.length;
+    const wraps =
+      (dir === 1 && pos === images.length - 1) || (dir === -1 && pos === 0);
+    const mediaIdx = media.findIndex((item) => item.src === images[next].src);
+    const commit = () => {
+      if (mediaIdx >= 0) onIndexChange(mediaIdx);
+    };
+    if (wraps) {
       setSliding(false);
       setDragX(0);
-      if (mediaIdx >= 0) onIndexChange(mediaIdx);
-    }, 280);
+      setPos(next);
+      commit();
+      return;
+    }
+    setSliding(true);
+    animRef.current = window.setTimeout(() => {
+      setDragX(0);
+      setPos(next);
+      commit();
+      animRef.current = window.setTimeout(() => {
+        animRef.current = null;
+        setSliding(false);
+      }, 280);
+    }, 20);
   };
 
   const onTouchStart = (e: React.TouchEvent) => {
@@ -246,7 +273,7 @@ export function MobileGalleryZoom({
     >
       <div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <p className="text-[11px] uppercase tracking-[0.18em] text-[#f3eee8]/70">
-          {imageIndex + 1} / {images.length}
+          {pos + 1} / {images.length}
         </p>
         <button
           type="button"
@@ -269,27 +296,19 @@ export function MobileGalleryZoom({
         <div
           className="flex h-full"
           style={{
-            width: images.length > 1 ? "300%" : "100%",
-            transform: `translate3d(calc(${images.length > 1 ? -100 / 3 : 0}% + ${dragX}px), 0, 0)`,
+            transform: frameW
+              ? `translate3d(${-pos * frameW + dragX}px, 0, 0)`
+              : "translate3d(-100vw, 0, 0)",
             transition: sliding ? "transform 280ms ease-out" : "none",
           }}
         >
-          {(images.length > 1
-            ? [
-                images[(imageIndex - 1 + images.length) % images.length],
-                current,
-                images[(imageIndex + 1) % images.length],
-              ]
-            : [current]
-          ).map((item, slot) => {
-            const activeSlot = images.length > 1 ? slot === 1 : slot === 0;
+          {images.map((item, imagePos) => {
+            const zoomed = imagePos === pos && (scale !== 1 || tx !== 0 || ty !== 0);
             return (
               <div
-                key={slot}
-                className={cn(
-                  "relative h-full shrink-0",
-                  images.length > 1 ? "w-1/3" : "w-full",
-                )}
+                key={imagePos}
+                className="h-full shrink-0"
+                style={{ width: frameW || "100%" }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -297,11 +316,11 @@ export function MobileGalleryZoom({
                   alt={item.alt ? localize(item.alt, locale) : t("image")}
                   draggable={false}
                   className={cn(
-                    "pointer-events-none absolute inset-0 m-auto max-h-full max-w-full object-contain select-none",
-                    activeSlot && "transition-transform duration-150 ease-out",
+                    "pointer-events-none h-full w-full object-contain select-none",
+                    zoomed && "transition-transform duration-150 ease-out",
                   )}
                   style={
-                    activeSlot
+                    zoomed
                       ? { transform: `translate3d(${tx}px, ${ty}px, 0) scale(${scale})` }
                       : undefined
                   }
