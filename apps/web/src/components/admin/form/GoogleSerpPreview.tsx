@@ -12,7 +12,7 @@ export function GoogleSerpPreview({
   title,
   description,
   siteName = "Rose Glow",
-  host = "www.roseglo.studio",
+  host = "roseglowbd.com",
 }: {
   path: string;
   title: string;
