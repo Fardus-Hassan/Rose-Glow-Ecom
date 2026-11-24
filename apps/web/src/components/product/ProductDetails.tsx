@@ -6,13 +6,14 @@ import { localize, type Product } from "@/data/products";
 import { Reveal } from "@/components/motion/Reveal";
 import { RichText } from "@/components/ui/RichText";
 import { fetchShippingSettings } from "@/lib/catalog";
+import { useCategoryLabel } from "@/store/catalog";
 
 /**
  * One editorial details band — description + specs + shipping, no tab chrome.
  */
 export function ProductDetails({ product }: { product: Product }) {
   const t = useTranslations("Product");
-  const tc = useTranslations("Categories");
+  const categoryLabel = useCategoryLabel();
   const locale = useLocale();
   const [shippingCopy, setShippingCopy] = useState(t("shippingCopy"));
 
@@ -38,7 +39,7 @@ export function ProductDetails({ product }: { product: Product }) {
   const specs = [
     [t("material"), localize(product.material, locale)],
     [t("color"), product.colors.map((c) => localize(c, locale)).join(" · ")],
-    [t("category"), tc(product.category)],
+    [t("category"), categoryLabel(product.category, product.categoryName)],
   ] as const;
 
   return (

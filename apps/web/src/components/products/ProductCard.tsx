@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import { useCategoryLabel } from "@/store/catalog";
 import { Link } from "@/i18n/navigation";
 import { getCoverMedia, localize, type Product } from "@/data/products";
 import { formatBdt } from "@/lib/format";
@@ -20,7 +21,7 @@ export function ProductCard({
 }) {
   const locale = useLocale();
   const t = useTranslations("Products");
-  const tc = useTranslations("Categories");
+  const categoryLabel = useCategoryLabel();
   const cover = getCoverMedia(product);
   const discount =
     product.compareAtPrice && product.compareAtPrice > product.price
@@ -70,7 +71,7 @@ export function ProductCard({
 
       <div className="flex flex-1 flex-col pt-5 text-left">
         <p className="text-[10px] uppercase tracking-[0.22em] text-[color:var(--rg-accent)]">
-          {tc(product.category)}
+          {categoryLabel(product.category, product.categoryName)}
         </p>
         <h3 className="mt-2 font-display text-[clamp(1.15rem,2.2vw,1.45rem)] leading-[1.15] tracking-[-0.02em] text-[color:var(--rg-pearl)] transition group-hover:text-[color:var(--rg-accent)]">
           {localize(product.name, locale)}

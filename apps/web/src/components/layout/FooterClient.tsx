@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { SocialLinks } from "@/components/ui/SocialLinks";
-import { useCatalog } from "@/store/catalog";
+import { useCatalog, useCategoryLabel } from "@/store/catalog";
 import { mediaUrl } from "@/lib/media";
 import { Parallax } from "@/components/motion/Parallax";
 
@@ -13,8 +13,8 @@ export function FooterClient() {
   const t = useTranslations("Footer");
   const home = useTranslations("Home");
   const nav = useTranslations("Nav");
-  const tc = useTranslations("Categories");
   const locale = useLocale();
+  const categoryLabel = useCategoryLabel();
   const { ready, categories, social, storeName, taglineEn, taglineBn, logo } =
     useCatalog();
   const [email, setEmail] = useState("");
@@ -106,13 +106,13 @@ export function FooterClient() {
                         className="inline-block h-3 w-20 animate-pulse rounded-sm bg-[color:var(--rg-soft)]"
                       />
                     ))
-                  : categories.slice(0, 4).map((c) => (
+                  : categories.map((c) => (
                       <Link
-                        key={c}
-                        href={`/products?category=${c}`}
+                        key={c.slug}
+                        href={`/products?category=${c.slug}`}
                         className="hover:text-[color:var(--rg-charcoal)]"
                       >
-                        {tc(c)}
+                        {categoryLabel(c.slug)}
                       </Link>
                     ))}
               </div>

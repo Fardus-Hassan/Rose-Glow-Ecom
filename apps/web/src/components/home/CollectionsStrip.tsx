@@ -7,20 +7,20 @@ import { getCoverMedia } from "@/data/products";
 import { Reveal } from "@/components/motion/Reveal";
 import { Parallax } from "@/components/motion/Parallax";
 import { CollectionsStripSkeleton } from "@/components/skeletons/ChromeSkeletons";
-import { useCatalog } from "@/store/catalog";
+import { useCatalog, useCategoryLabel } from "@/store/catalog";
 
 /**
  * Overlapping category runway — giant gold labels, deep image wells.
  */
 export function CollectionsStrip() {
   const t = useTranslations("Home");
-  const tc = useTranslations("Categories");
+  const categoryLabel = useCategoryLabel();
   const { ready, categories, products } = useCatalog();
 
   if (!ready) return <CollectionsStripSkeleton />;
 
-  const items = categories.slice(0, 3).map((category) => {
-    const sample = products.find((p) => p.category === category);
+  const items = categories.map((category) => {
+    const sample = products.find((p) => p.category === category.slug);
     return {
       category,
       cover: sample ? getCoverMedia(sample)?.src : undefined,
@@ -44,9 +44,9 @@ export function CollectionsStrip() {
 
         <div className="flex flex-col gap-4 md:gap-5">
           {items.map(({ category, cover }, i) => (
-            <Reveal key={category} delay={i * 0.1}>
+            <Reveal key={category.slug} delay={i * 0.1}>
               <Link
-                href={`/products?category=${category}`}
+                href={`/products?category=${category.slug}`}
                 className="group relative block min-h-[42vw] overflow-hidden md:min-h-[28vh] lg:min-h-[34vh]"
               >
                 <div className="absolute inset-0 bg-[color:var(--rg-soft)]">
@@ -70,7 +70,7 @@ export function CollectionsStrip() {
 
                 <div className="relative flex h-full min-h-[42vw] items-center px-6 py-10 md:min-h-[28vh] md:px-12 lg:min-h-[34vh]">
                   <p className="font-display text-[clamp(2.2rem,8vw,5.5rem)] leading-none tracking-[-0.03em] text-[color:var(--rg-pearl)] transition group-hover:text-[color:var(--rg-accent)]">
-                    {tc(category)}
+                    {categoryLabel(category.slug)}
                   </p>
                   <span className="ml-auto hidden text-[10px] uppercase tracking-[0.28em] text-[color:var(--rg-accent)] md:inline">
                     {t("explore")} →

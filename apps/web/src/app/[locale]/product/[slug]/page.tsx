@@ -56,7 +56,6 @@ export default async function ProductPage({
     fetchSocialLinks(),
   ]);
   const t = await getTranslations("Product");
-  const tc = await getTranslations("Categories");
 
   return (
     <div className="rg-stage relative pb-24 md:pb-28">
@@ -90,7 +89,7 @@ export default async function ProductPage({
             href={`/products?category=${product.category}`}
             className="transition hover:text-[color:var(--rg-accent)]"
           >
-            {tc(product.category)}
+            {localize(product.categoryName || { en: product.category, bn: product.category }, locale)}
           </Link>
         </nav>
 

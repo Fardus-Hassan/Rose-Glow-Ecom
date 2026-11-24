@@ -15,6 +15,7 @@ import { formatBdt, cn } from "@/lib/format";
 import { stripHtml } from "@/lib/rich-text";
 import { VariantChoices } from "@/components/product/VariantChoices";
 import { StruckPrice } from "@/components/ui/StruckPrice";
+import { useCategoryLabel } from "@/store/catalog";
 
 export function LandingQuickView({
   product,
@@ -30,7 +31,7 @@ export function LandingQuickView({
   onRemove: (slug: string) => void;
 }) {
   const t = useTranslations("LandingPearl");
-  const tc = useTranslations("Categories");
+  const categoryLabel = useCategoryLabel();
   const locale = useLocale();
   const [optionId, setOptionId] = useState(defaultOptionId(product));
   const offer = chosenOffer(product, optionId);
@@ -145,7 +146,7 @@ export function LandingQuickView({
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-[color:var(--rg-line)] px-5 py-4 sm:px-7">
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em] text-[color:var(--rg-accent)]">
-              {tc(product.category)}
+              {categoryLabel(product.category, product.categoryName)}
             </p>
             <h3 className="mt-1 font-display text-2xl text-[color:var(--rg-pearl)]">
               {localize(product.name, locale)}

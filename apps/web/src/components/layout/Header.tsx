@@ -12,7 +12,7 @@ import { SmoothCollapse } from "@/components/ui/SmoothCollapse";
 import { formatBdt, cn } from "@/lib/format";
 import { CartDrawer } from "@/components/bag/CartDrawer";
 import { useBag } from "@/store/bag";
-import { useCatalog } from "@/store/catalog";
+import { useCatalog, useCategoryLabel } from "@/store/catalog";
 import { mediaUrl } from "@/lib/media";
 
 type RgLenis = { stop: () => void; start: () => void };
@@ -23,8 +23,8 @@ function getLenis() {
 
 export function Header() {
   const t = useTranslations("Nav");
-  const tc = useTranslations("Categories");
   const locale = useLocale();
+  const categoryLabel = useCategoryLabel();
   const pathname = usePathname();
   const { cartCount, wishlistCount } = useBag();
   const { ready, categories, getBySlug } = useCatalog();
@@ -356,13 +356,13 @@ export function Header() {
               </p>
               <ul className="mt-5 grid grid-cols-2 gap-x-10 gap-y-1">
                 {categories.map((c) => (
-                  <li key={c}>
+                  <li key={c.slug}>
                     <Link
-                      href={`/products?category=${c}`}
+                      href={`/products?category=${c.slug}`}
                       className="group flex items-center justify-between py-3 text-[14px] text-[#f3eee8]/8 transition hover:text-[#f3eee8]"
                       onClick={() => setShopOpen(false)}
                     >
-                      <span>{tc(c)}</span>
+                      <span>{categoryLabel(c.slug)}</span>
                       <span className="translate-x-0 text-[#d4a574] opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100">
                         →
                       </span>
@@ -499,13 +499,13 @@ export function Header() {
                     </p>
                     <ul>
                       {categories.map((c) => (
-                        <li key={c}>
+                        <li key={c.slug}>
                           <Link
-                            href={`/products?category=${c}`}
+                            href={`/products?category=${c.slug}`}
                             className="group flex items-center justify-between py-3 text-[16px] text-[#f3eee8]/85 transition hover:text-[#f3eee8]"
                             onClick={() => setOpen(false)}
                           >
-                            <span>{tc(c)}</span>
+                            <span>{categoryLabel(c.slug)}</span>
                             <span className="text-[#d4a574] transition group-hover:translate-x-0.5">
                               →
                             </span>

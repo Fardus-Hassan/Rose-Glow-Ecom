@@ -30,6 +30,7 @@ import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingQuickView } from "@/components/landing/LandingQuickView";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 import { StruckPrice } from "@/components/ui/StruckPrice";
+import { useCategoryLabel } from "@/store/catalog";
 import { Slider } from "@/components/ui/Slider";
 import { RichText } from "@/components/ui/RichText";
 import { MetaViewContent } from "@/components/analytics/MetaViewContent";
@@ -87,7 +88,7 @@ export function ProductLanding({
 }) {
   const t = useTranslations("LandingPearl");
   const tp = useTranslations("Product");
-  const tc = useTranslations("Categories");
+  const categoryLabel = useCategoryLabel();
   const locale = useLocale();
   const { ready, products, getBySlug, contact } = useCatalog();
   // Prefer SSR product so reload never flashes seed/default catalog rows.
@@ -468,8 +469,8 @@ export function ProductLanding({
             <p className="text-[10px] uppercase tracking-[0.24em] text-[color:var(--rg-accent)]">
               {localize(
                 {
-                  en: landing.eyebrowEn || tc(product.category),
-                  bn: landing.eyebrowBn || tc(product.category),
+                  en: landing.eyebrowEn || categoryLabel(product.category, product.categoryName),
+                  bn: landing.eyebrowBn || categoryLabel(product.category, product.categoryName),
                 },
                 locale,
               )}
@@ -653,7 +654,7 @@ export function ProductLanding({
                       tp("color"),
                       product.colors.map((c) => localize(c, locale)).join(" · "),
                     ],
-                    [tp("category"), tc(product.category)],
+                    [tp("category"), categoryLabel(product.category, product.categoryName)],
                   ] as const
                 ).map(([label, value]) => (
                   <div

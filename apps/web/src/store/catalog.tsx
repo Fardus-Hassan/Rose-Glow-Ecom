@@ -8,11 +8,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  categories as knownCategorySlugs,
-  type Product,
-  type ProductCategory,
-} from "@/data/products";
+import { useLocale } from "next-intl";
+import { localize, type Product } from "@/data/products";
 import type { SocialLink } from "@/data/social";
 import { getApiBase } from "@/lib/api";
 import {
@@ -22,10 +19,16 @@ import {
 } from "@/lib/catalog";
 import { mediaUrl } from "@/lib/media";
 
+export type StoreCategory = {
+  slug: string;
+  nameEn: string;
+  nameBn: string;
+};
+
 type CatalogContextValue = {
   ready: boolean;
   products: Product[];
-  categories: ProductCategory[];
+  categories: StoreCategory[];
   social: SocialLink[];
   contact: ContactContent;
   storeName: string;
@@ -88,7 +91,7 @@ function mapContact(
 export function CatalogProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [categories, setCategories] = useState<StoreCategory[]>([]);
   const [social, setSocial] = useState<SocialLink[]>([]);
   const [contact, setContact] = useState<ContactContent>(emptyContact);
   const [storeName, setStoreName] = useState("");
@@ -123,17 +126,21 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
         if (!cancelled && categoriesRes.ok) {
           const rows = (await categoriesRes.json()) as Array<{
             slug: string;
+            nameEn?: string;
+            nameBn?: string;
             isActive?: boolean;
             sortOrder?: number;
           }>;
-          const slugs = rows
-            .filter((c) => c.isActive !== false)
-            .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-            .map((c) => c.slug)
-            .filter((slug): slug is ProductCategory =>
-              knownCategorySlugs.includes(slug as ProductCategory),
-            );
-          setCategories(slugs);
+          setCategories(
+            rows
+              .filter((c) => c.isActive !== false && c.slug)
+              .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+              .map((c) => ({
+                slug: c.slug,
+                nameEn: c.nameEn || c.slug,
+                nameBn: c.nameBn || c.nameEn || c.slug,
+              })),
+          );
         }
 
         if (!cancelled && settingsRes.ok) {
@@ -223,6 +230,17 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   return (
     <CatalogContext.Provider value={value}>{children}</CatalogContext.Provider>
   );
+}
+
+export function useCategoryLabel() {
+  const locale = useLocale();
+  const { categories } = useCatalog();
+  return (slug: string, fallback?: Product["categoryName"]) => {
+    const row = categories.find((item) => item.slug === slug);
+    if (row) return localize({ en: row.nameEn, bn: row.nameBn }, locale);
+    if (fallback?.en || fallback?.bn) return localize(fallback, locale);
+    return slug;
+  };
 }
 
 export function useCatalog() {

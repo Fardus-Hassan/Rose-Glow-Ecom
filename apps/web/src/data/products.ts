@@ -14,12 +14,7 @@ export type ProductMedia = {
   variants?: MediaVariants;
 };
 
-export type ProductCategory =
-  | "earrings"
-  | "necklaces"
-  | "bangles"
-  | "rings"
-  | "sets";
+export type ProductCategory = string;
 
 export type ProductOption = {
   id: string;
@@ -44,6 +39,7 @@ export type Product = {
   price: number;
   compareAtPrice?: number;
   category: ProductCategory;
+  categoryName?: LocalizedString;
   material: LocalizedString;
   colors: LocalizedString[];
   media: ProductMedia[];

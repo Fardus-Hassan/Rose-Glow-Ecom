@@ -19,6 +19,7 @@ import { ProductContactActions } from "@/components/product/ProductContactAction
 import { VariantChoices } from "@/components/product/VariantChoices";
 import type { SocialLink } from "@/data/social";
 import type { ContactContent } from "@/lib/catalog";
+import { useCategoryLabel } from "@/store/catalog";
 import { trackAddToCart } from "@/lib/meta-pixel";
 import { isRichTextEmpty } from "@/lib/rich-text";
 
@@ -36,7 +37,7 @@ export function ProductInfo({
   social?: SocialLink[];
 }) {
   const t = useTranslations("Product");
-  const tc = useTranslations("Categories");
+  const categoryLabel = useCategoryLabel();
   const locale = useLocale();
   const router = useRouter();
   const { addToCart, toggleWishlist, isWishlisted } = useBag();
@@ -113,7 +114,7 @@ export function ProductInfo({
   return (
     <div className="flex flex-col">
       <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--rg-accent)]">
-        {tc(product.category)}
+        {categoryLabel(product.category, product.categoryName)}
       </p>
       <h1 className="mt-2.5 font-display text-[clamp(1.85rem,3.8vw,2.75rem)] leading-[1.08] tracking-[-0.03em] text-[color:var(--rg-pearl)]">
         {localize(product.name, locale)}

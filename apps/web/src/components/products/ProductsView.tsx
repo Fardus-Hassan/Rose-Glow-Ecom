@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { type Product, type ProductCategory } from "@/data/products";
+import { type Product } from "@/data/products";
 import {
   fetchProductsPage,
   type ProductsPage,
@@ -14,7 +14,7 @@ import { ProductGridSkeleton } from "@/components/skeletons/StorefrontSkeletons"
 import { Pagination } from "@/components/ui/Pagination";
 import { SHOP_PAGE_SIZE } from "@/lib/shop";
 import { formatBdt, cn } from "@/lib/format";
-import { useCatalog } from "@/store/catalog";
+import { useCatalog, useCategoryLabel } from "@/store/catalog";
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "newest";
 
@@ -26,15 +26,16 @@ export function ProductsView({
   initialCategory?: string;
 }) {
   const t = useTranslations("Products");
-  const tc = useTranslations("Categories");
   const locale = useLocale();
+  const categoryLabel = useCategoryLabel();
   const router = useRouter();
   const { ready, categories } = useCatalog();
   const [, startTransition] = useTransition();
-  const [category, setCategory] = useState<ProductCategory | "all">(
-    categories.includes(initialCategory as ProductCategory)
-      ? (initialCategory as ProductCategory)
-      : "all",
+  const [category, setCategory] = useState<string | "all">(
+    initialCategory &&
+      categories.some((item) => item.slug === initialCategory)
+      ? initialCategory
+      : initialCategory || "all",
   );
   const [sort, setSort] = useState<SortKey>("featured");
   const [page, setPage] = useState(initial.page || 1);
@@ -50,7 +51,7 @@ export function ProductsView({
   const [maxPrice, setMaxPrice] = useState(priceBounds.max);
   const bounds = priceBounds;
 
-  const selectCategory = (next: ProductCategory | "all") => {
+  const selectCategory = (next: string | "all") => {
     setCategory(next);
     setPage(1);
     startTransition(() => {
@@ -142,10 +143,10 @@ export function ProductsView({
               />
               {categories.map((item) => (
                 <FilterLink
-                  key={item}
-                  active={category === item}
-                  onClick={() => selectCategory(item)}
-                  label={tc(item)}
+                  key={item.slug}
+                  active={category === item.slug}
+                  onClick={() => selectCategory(item.slug)}
+                  label={categoryLabel(item.slug)}
                 />
               ))}
             </>
@@ -271,10 +272,10 @@ export function ProductsView({
               />
               {categories.map((item) => (
                 <MobileChip
-                  key={item}
-                  active={category === item}
-                  onClick={() => selectCategory(item)}
-                  label={tc(item)}
+                  key={item.slug}
+                  active={category === item.slug}
+                  onClick={() => selectCategory(item.slug)}
+                  label={categoryLabel(item.slug)}
                 />
               ))}
             </>

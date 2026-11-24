@@ -434,6 +434,31 @@ export const products = {
   },
 };
 
+function categoryWrite(dto: Record<string, unknown>) {
+  const slug = String(dto.slug || "")
+    .trim()
+    .toLowerCase();
+  const nameEn = String(dto.nameEn || "").trim();
+  const nameBn = String(dto.nameBn || "").trim();
+  if (!slug || !nameEn || !nameBn) {
+    throw new HttpError(400, "Name and slug are required");
+  }
+  const sort = Number(dto.sortOrder);
+  return {
+    slug,
+    nameEn,
+    nameBn,
+    descriptionEn: String(dto.descriptionEn || ""),
+    descriptionBn: String(dto.descriptionBn || ""),
+    seoTitleEn: String(dto.seoTitleEn || ""),
+    seoTitleBn: String(dto.seoTitleBn || ""),
+    seoDescriptionEn: String(dto.seoDescriptionEn || ""),
+    seoDescriptionBn: String(dto.seoDescriptionBn || ""),
+    sortOrder: Number.isFinite(sort) ? Math.round(sort) : 0,
+    isActive: dto.isActive !== false,
+  };
+}
+
 export const categories = {
   findAll(activeOnly = false) {
     return prisma.category.findMany({
@@ -464,12 +489,12 @@ export const categories = {
     if (!category) throw new HttpError(404, "Category not found");
     return category;
   },
-  create(dto: Prisma.CategoryCreateInput) {
-    return prisma.category.create({ data: dto });
+  create(dto: Record<string, unknown>) {
+    return prisma.category.create({ data: categoryWrite(dto) });
   },
-  async update(id: string, dto: Prisma.CategoryUpdateInput) {
+  async update(id: string, dto: Record<string, unknown>) {
     await this.findOne(id);
-    return prisma.category.update({ where: { id }, data: dto });
+    return prisma.category.update({ where: { id }, data: categoryWrite(dto) });
   },
   async remove(id: string) {
     await this.findOne(id);

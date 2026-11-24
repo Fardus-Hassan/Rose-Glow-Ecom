@@ -40,7 +40,7 @@ export type ApiProduct = {
   shortDescriptionBn?: string;
   price: number;
   compareAtPrice?: number | null;
-  category?: { slug: string };
+  category?: { slug: string; nameEn?: string; nameBn?: string };
   materialEn?: string;
   materialBn?: string;
   colors?: ApiLocalized[] | unknown;
@@ -181,19 +181,9 @@ export type CreateStoreOrderInput = {
   }>;
 };
 
-const CATEGORIES: ProductCategory[] = [
-  "earrings",
-  "necklaces",
-  "bangles",
-  "rings",
-  "sets",
-];
-
 function asCategory(slug?: string): ProductCategory {
-  if (slug && CATEGORIES.includes(slug as ProductCategory)) {
-    return slug as ProductCategory;
-  }
-  return "earrings";
+  const value = slug?.trim();
+  return value || "earrings";
 }
 
 function asColors(value: unknown): ApiLocalized[] {
@@ -285,6 +275,10 @@ export function mapApiProduct(p: ApiProduct): Product {
     price: options.length ? Math.min(...options.map((item) => item.price)) : p.price,
     compareAtPrice: p.compareAtPrice ?? undefined,
     category: asCategory(p.category?.slug),
+    categoryName: {
+      en: p.category?.nameEn || p.category?.slug || "",
+      bn: p.category?.nameBn || p.category?.nameEn || p.category?.slug || "",
+    },
     material: {
       en: p.materialEn ?? "",
       bn: p.materialBn ?? "",
@@ -425,9 +419,7 @@ export async function fetchCategorySlugs(): Promise<ProductCategory[]> {
     .filter((c) => c.isActive !== false)
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
     .map((c) => c.slug)
-    .filter((slug): slug is ProductCategory =>
-      CATEGORIES.includes(slug as ProductCategory),
-    );
+    .filter((slug): slug is ProductCategory => Boolean(slug));
 }
 
 export type ReviewsPage = {
