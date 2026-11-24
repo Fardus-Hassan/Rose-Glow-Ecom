@@ -269,6 +269,7 @@ export function MobileGalleryZoom({
         <div
           className="flex h-full"
           style={{
+            width: images.length > 1 ? "300%" : "100%",
             transform: `translate3d(calc(${images.length > 1 ? -100 / 3 : 0}% + ${dragX}px), 0, 0)`,
             transition: sliding ? "transform 280ms ease-out" : "none",
           }}
@@ -283,7 +284,13 @@ export function MobileGalleryZoom({
           ).map((item, slot) => {
             const activeSlot = images.length > 1 ? slot === 1 : slot === 0;
             return (
-              <div key={slot} className="relative h-full w-full shrink-0">
+              <div
+                key={slot}
+                className={cn(
+                  "relative h-full shrink-0",
+                  images.length > 1 ? "w-1/3" : "w-full",
+                )}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={mediaVariant(item.src, "full", item.variants)}
