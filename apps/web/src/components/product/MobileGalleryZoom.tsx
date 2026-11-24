@@ -45,6 +45,10 @@ export function MobileGalleryZoom({
   const scaleRef = useRef(1);
   const txRef = useRef(0);
   const tyRef = useRef(0);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const animRef = useRef<number | null>(null);
+  const [dragX, setDragX] = useState(0);
+  const [sliding, setSliding] = useState(false);
   const dragRef = useRef<{
     mode: "pan" | "pinch" | "swipe";
     start?: Point;
@@ -66,7 +70,15 @@ export function MobileGalleryZoom({
     setScale(1);
     setTx(0);
     setTy(0);
+    setDragX(0);
+    setSliding(false);
   }, [imageIndex]);
+
+  useEffect(() => {
+    return () => {
+      if (animRef.current) window.clearTimeout(animRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -86,7 +98,6 @@ export function MobileGalleryZoom({
 
   if (!current) return null;
 
-  const src = mediaVariant(current.src, "full", current.variants);
   const clampPan = (nextScale: number, nextTx: number, nextTy: number) => {
     const maxX = ((nextScale - 1) * window.innerWidth) / 2;
     const maxY = ((nextScale - 1) * window.innerHeight) / 2;
@@ -97,10 +108,18 @@ export function MobileGalleryZoom({
   };
 
   const go = (dir: -1 | 1) => {
-    if (images.length < 2 || scaleRef.current > 1.05) return;
-    const next = (imageIndex + dir + images.length) % images.length;
-    const mediaIdx = media.findIndex((item) => item.src === images[next].src);
-    if (mediaIdx >= 0) onIndexChange(mediaIdx);
+    if (images.length < 2 || scaleRef.current > 1.05 || animRef.current) return;
+    const width = frameRef.current?.clientWidth || window.innerWidth;
+    setSliding(true);
+    setDragX(dir === 1 ? -width : width);
+    animRef.current = window.setTimeout(() => {
+      animRef.current = null;
+      const next = (imageIndex + dir + images.length) % images.length;
+      const mediaIdx = media.findIndex((item) => item.src === images[next].src);
+      setSliding(false);
+      setDragX(0);
+      if (mediaIdx >= 0) onIndexChange(mediaIdx);
+    }, 280);
   };
 
   const onTouchStart = (e: React.TouchEvent) => {
@@ -118,6 +137,8 @@ export function MobileGalleryZoom({
       return;
     }
     if (e.touches.length === 1) {
+      if (animRef.current) return;
+      setSliding(false);
       dragRef.current = {
         mode: scaleRef.current > 1.05 ? "pan" : "swipe",
         start: { x: e.touches[0].clientX, y: e.touches[0].clientY },
@@ -150,9 +171,14 @@ export function MobileGalleryZoom({
       return;
     }
 
-    if (e.touches.length !== 1 || !drag.start) return;
+    if (e.touches.length !== 1 || !drag.start || animRef.current) return;
     const dx = e.touches[0].clientX - drag.start.x;
     const dy = e.touches[0].clientY - drag.start.y;
+
+    if (drag.mode === "swipe") {
+      if (Math.abs(dx) > Math.abs(dy)) setDragX(dx);
+      return;
+    }
 
     if (drag.mode === "pan") {
       e.preventDefault();
@@ -176,7 +202,11 @@ export function MobileGalleryZoom({
       if (Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy) * 1.2) {
         go(dx < 0 ? 1 : -1);
       } else if (dy > 90 && Math.abs(dy) > Math.abs(dx)) {
+        setDragX(0);
         onClose();
+      } else {
+        setSliding(true);
+        setDragX(0);
       }
     }
 
@@ -229,24 +259,50 @@ export function MobileGalleryZoom({
       </div>
 
       <div
+        ref={frameRef}
         className="relative min-h-0 flex-1 touch-none overflow-hidden bg-[#141211]"
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
         onClick={onDoubleTap}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={src}
-          alt={
-            current.alt ? localize(current.alt, locale) : t("image")
-          }
-          draggable={false}
-          className="pointer-events-none absolute inset-0 m-auto max-h-full max-w-full object-contain transition-transform duration-150 ease-out select-none"
+        <div
+          className="flex h-full"
           style={{
-            transform: `translate3d(${tx}px, ${ty}px, 0) scale(${scale})`,
+            transform: `translate3d(calc(${images.length > 1 ? -100 / 3 : 0}% + ${dragX}px), 0, 0)`,
+            transition: sliding ? "transform 280ms ease-out" : "none",
           }}
-        />
+        >
+          {(images.length > 1
+            ? [
+                images[(imageIndex - 1 + images.length) % images.length],
+                current,
+                images[(imageIndex + 1) % images.length],
+              ]
+            : [current]
+          ).map((item, slot) => {
+            const activeSlot = images.length > 1 ? slot === 1 : slot === 0;
+            return (
+              <div key={slot} className="relative h-full w-full shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={mediaVariant(item.src, "full", item.variants)}
+                  alt={item.alt ? localize(item.alt, locale) : t("image")}
+                  draggable={false}
+                  className={cn(
+                    "pointer-events-none absolute inset-0 m-auto max-h-full max-w-full object-contain select-none",
+                    activeSlot && "transition-transform duration-150 ease-out",
+                  )}
+                  style={
+                    activeSlot
+                      ? { transform: `translate3d(${tx}px, ${ty}px, 0) scale(${scale})` }
+                      : undefined
+                  }
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">

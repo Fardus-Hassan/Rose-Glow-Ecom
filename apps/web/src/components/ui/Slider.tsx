@@ -31,6 +31,7 @@ export function Slider({
   const [paused, setPaused] = useState(false);
   const [inView, setInView] = useState(false);
   const [tabVisible, setTabVisible] = useState(true);
+  const touchingRef = useRef(false);
 
   const update = useCallback(() => {
     const el = scrollerRef.current;
@@ -123,8 +124,14 @@ export function Slider({
     <div
       ref={rootRef}
       className={cn("relative", className)}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      onPointerEnter={(event) => {
+        if (event.pointerType === "touch") return;
+        setPaused(true);
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === "touch" || touchingRef.current) return;
+        setPaused(false);
+      }}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
@@ -166,6 +173,18 @@ export function Slider({
       <div
         ref={scrollerRef}
         className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] md:gap-6 [&::-webkit-scrollbar]:hidden"
+        onTouchStart={() => {
+          touchingRef.current = true;
+          setPaused(true);
+        }}
+        onTouchEnd={() => {
+          touchingRef.current = false;
+          setPaused(false);
+        }}
+        onTouchCancel={() => {
+          touchingRef.current = false;
+          setPaused(false);
+        }}
       >
         {items.map((child, index) => (
           <div
