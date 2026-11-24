@@ -16,6 +16,11 @@ export async function Spotlight({ products }: { products: Product[] }) {
   const product = products.find((p) => p.featured) ?? products[0];
   if (!product) return null;
   const cover = getCoverMedia(product);
+  const short = product.shortDescription
+    ? stripHtml(localize(product.shortDescription, locale)).trim()
+    : "";
+  const blurb =
+    short || stripHtml(localize(product.description, locale));
 
   return (
     <section className="relative isolate min-h-[88svh] overflow-hidden bg-[color:var(--rg-paper)] md:min-h-[92svh]">
@@ -46,7 +51,7 @@ export async function Spotlight({ products }: { products: Product[] }) {
           </h2>
           <div className="rg-home-gold-rule mt-6 w-20" />
           <p className="mt-6 max-w-lg text-[15px] leading-7 text-white md:text-base md:leading-8">
-            {stripHtml(localize(product.description, locale))}
+            {blurb}
           </p>
           <div className="mt-8 flex flex-wrap items-end gap-6 md:mt-10">
             <p className="font-display text-3xl text-[color:var(--rg-accent)] md:text-4xl">

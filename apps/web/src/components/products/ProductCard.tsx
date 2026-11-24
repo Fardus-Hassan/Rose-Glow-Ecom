@@ -77,13 +77,13 @@ export function ProductCard({
           {localize(product.name, locale)}
         </h3>
         <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <span className="font-display text-lg leading-none text-[#f3d78a]">
+          <span className="font-display text-2xl leading-none text-[#f3d78a]">
             {(product.options?.length || 0) > 1
               ? t("priceFrom", { price: formatBdt(product.price, locale) })
               : formatBdt(product.price, locale)}
           </span>
           {product.compareAtPrice && !(product.options?.length || 0) ? (
-            <StruckPrice className="text-base">{formatBdt(product.compareAtPrice, locale)}</StruckPrice>
+            <StruckPrice className="text-sm">{formatBdt(product.compareAtPrice, locale)}</StruckPrice>
           ) : null}
         </div>
 
