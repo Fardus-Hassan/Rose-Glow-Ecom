@@ -38,8 +38,17 @@ export function MobileGalleryZoom({
     0,
     images.findIndex((item) => item.src === media[index]?.src),
   );
-  const [pos, setPos] = useState(imageIndex);
-  const current = images[pos] || images[0];
+  const looped = images.length > 1;
+  const [track, setTrack] = useState(looped ? imageIndex + 1 : imageIndex);
+  const shown = looped
+    ? track <= 0
+      ? images.length - 1
+      : track >= images.length + 1
+        ? 0
+        : track - 1
+    : 0;
+  const current = images[shown] || images[0];
+  const slides = looped ? [images[images.length - 1], ...images, images[0]] : images;
   const [scale, setScale] = useState(1);
   const [tx, setTx] = useState(0);
   const [ty, setTy] = useState(0);
@@ -70,7 +79,7 @@ export function MobileGalleryZoom({
 
   useEffect(() => {
     if (animRef.current) return;
-    setPos(imageIndex);
+    setTrack(images.length > 1 ? imageIndex + 1 : imageIndex);
     setDragX(0);
     setSliding(false);
     setScale(1);
@@ -123,28 +132,20 @@ export function MobileGalleryZoom({
 
   const go = (dir: -1 | 1) => {
     if (images.length < 2 || scaleRef.current > 1.05 || animRef.current) return;
-    const next = (pos + dir + images.length) % images.length;
-    const wraps =
-      (dir === 1 && pos === images.length - 1) || (dir === -1 && pos === 0);
-    const mediaIdx = media.findIndex((item) => item.src === images[next].src);
-    const commit = () => {
-      if (mediaIdx >= 0) onIndexChange(mediaIdx);
-    };
-    if (wraps) {
-      setSliding(false);
-      setDragX(0);
-      setPos(next);
-      commit();
-      return;
-    }
+    const dest = track + dir;
+    const real =
+      dest <= 0 ? images.length - 1 : dest >= images.length + 1 ? 0 : dest - 1;
+    const mediaIdx = media.findIndex((item) => item.src === images[real].src);
     setSliding(true);
     animRef.current = window.setTimeout(() => {
       setDragX(0);
-      setPos(next);
-      commit();
+      setTrack(dest);
+      if (mediaIdx >= 0) onIndexChange(mediaIdx);
       animRef.current = window.setTimeout(() => {
-        animRef.current = null;
+        const snapped = dest === 0 ? images.length : dest === images.length + 1 ? 1 : dest;
         setSliding(false);
+        if (snapped !== dest) setTrack(snapped);
+        animRef.current = null;
       }, 280);
     }, 20);
   };
@@ -273,7 +274,7 @@ export function MobileGalleryZoom({
     >
       <div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <p className="text-[11px] uppercase tracking-[0.18em] text-[#f3eee8]/70">
-          {pos + 1} / {images.length}
+          {shown + 1} / {images.length}
         </p>
         <button
           type="button"
@@ -297,13 +298,13 @@ export function MobileGalleryZoom({
           className="flex h-full"
           style={{
             transform: frameW
-              ? `translate3d(${-pos * frameW + dragX}px, 0, 0)`
+              ? `translate3d(${-track * frameW + dragX}px, 0, 0)`
               : "translate3d(-100vw, 0, 0)",
             transition: sliding ? "transform 280ms ease-out" : "none",
           }}
         >
-          {images.map((item, imagePos) => {
-            const zoomed = imagePos === pos && (scale !== 1 || tx !== 0 || ty !== 0);
+          {slides.map((item, imagePos) => {
+            const zoomed = imagePos === track && (scale !== 1 || tx !== 0 || ty !== 0);
             return (
               <div
                 key={imagePos}
